@@ -1,0 +1,1 @@
+# vault-plugin-secrets-eth2.0
