@@ -1,7 +1,7 @@
 FROM vault
 
 RUN apk add go
-RUN apk add git
+RUN apk add --update gcc g++
 
 COPY ./config/vault-config.json /vault/config/vault-config.json
 
