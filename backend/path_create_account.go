@@ -11,7 +11,8 @@ import (
 
 func pathCreateAndListAccount(b *backend) *framework.Path {
 	return &framework.Path{
-		Pattern: "accounts/?",
+		Pattern: "wallets/" + framework.GenericNameRegex("walletName") + "/accounts/?",
+		//Pattern: "accounts/?",
 		Callbacks: map[logical.Operation]framework.OperationFunc{
 			//logical.ListOperation:   b.listWallets,
 			logical.UpdateOperation: b.createAccount,

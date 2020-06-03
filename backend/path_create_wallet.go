@@ -45,14 +45,6 @@ func (b *backend) createWallet(ctx context.Context, req *logical.Request, data *
 		return nil,err
 	}
 
-	//err = vlt.Wallet.Unlock([]byte(""))
-	//if err != nil {
-	//	return nil,err
-	//}
-
-	//account, err := vlt.Wallet.CreateAccount("account1", []byte(""))
-	//vlt.Wallet.CreateAccount()
-
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"id": vlt.Wallet.ID().String(),
@@ -64,7 +56,7 @@ func (b *backend) createWallet(ctx context.Context, req *logical.Request, data *
 func (b *backend) listWallets(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	options := vault.WalletOptions{}
 	options.SetStore(store.NewHashicorpVaultStore(req.Storage, ctx))
-	vlt, err := vault. NewKeyVault(&options)
+	vlt, err := vault.NewKeyVault(&options)
 	if err != nil {
 		return nil,err
 	}
