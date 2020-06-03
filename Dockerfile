@@ -1,5 +1,6 @@
 FROM vault
 
+RUN apk add git
 RUN apk add go
 RUN apk add --update gcc g++
 
