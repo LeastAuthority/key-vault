@@ -1,6 +1,7 @@
 FROM vault
 
 RUN apk add go
+RUN apk add git
 
 COPY ./config/vault-config.json /vault/config/vault-config.json
 
