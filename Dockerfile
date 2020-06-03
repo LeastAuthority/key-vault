@@ -1,6 +1,8 @@
 FROM vault
 
-RUN apk add git
-RUN mkdir /data/ && \
-    cd /data/ && \
-    git clone https://github.com/bloxapp/vault-plugin-secrets-eth2.0
+# COPY ./config/vault-config.json /vault/config/vault-config.json
+
+
+go build -o ethsign main.go && \
+    mkdir /vault/plugins/ && \
+    cp ethsign /vault/plugins/
