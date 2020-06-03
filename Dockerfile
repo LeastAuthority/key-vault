@@ -9,6 +9,7 @@ RUN pwd
 
 RUN ls -lah
 
+COPY ./backend /backend
 COPY go.mod /
 COPY go.sum /
 COPY main.go /
