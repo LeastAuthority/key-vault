@@ -7,7 +7,7 @@
   },
   "listener": {
     "tcp":{
-      "address": "vault.stage.bloxinfra.com:80",
+      "address": "vault.stage.bloxinfra.com:8200",
       "tls_disable": 1
     }
   },
