@@ -6,4 +6,4 @@ consul/data/*
 !consul/data/.gitkeep
 
 .idea
-vault/keys
+keys
