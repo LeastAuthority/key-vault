@@ -11,7 +11,6 @@ import (
 
 func pathCreateAndListAccount(b *backend) *framework.Path {
 	return &framework.Path{
-		//Pattern: "wallets/" + framework.GenericNameRegex("walletName") + "/accounts/?",
 		Pattern: "accounts/?",
 		Callbacks: map[logical.Operation]framework.OperationFunc{
 			logical.ListOperation:   b.listAccounts,
@@ -77,6 +76,10 @@ func (b *backend) listAccounts(ctx context.Context, req *logical.Request, data *
 	options.SetWalletName(walletName)
 	options.SetStore(storeInstance)
 	vlt, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil,err
+	}
+	err = vlt.Wallet.Unlock([]byte(""))
 	if err != nil {
 		return nil,err
 	}
