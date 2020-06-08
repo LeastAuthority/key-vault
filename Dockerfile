@@ -4,17 +4,17 @@ RUN apk add git
 RUN apk add go
 RUN apk add --update gcc g++
 
-COPY ./config/vault-config.json /vault/config/vault-config.json
+# enable Go modules support
+ENV GO111MODULE=on
 
-RUN pwd
-
-RUN ls -lah
-
-COPY ./backend /backend
 COPY go.mod /
 COPY go.sum /
+RUN go mod download
+
+COPY ./config/vault-config.json /vault/config/vault-config.json
+COPY ./backend /backend
 COPY main.go /
 
-RUN go build -o ethsign main.go && \
-    mkdir /vault/plugins/ && \
+RUN CGO_ENABLED=1 GOOS=linux go build -a -o ethsign main.go
+RUN mkdir /vault/plugins/ && \
     cp ethsign /vault/plugins/
