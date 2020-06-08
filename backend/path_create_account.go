@@ -11,10 +11,10 @@ import (
 
 func pathCreateAndListAccount(b *backend) *framework.Path {
 	return &framework.Path{
-		Pattern: "wallets/" + framework.GenericNameRegex("walletName") + "/accounts/?",
-		//Pattern: "accounts/?",
+		//Pattern: "wallets/" + framework.GenericNameRegex("walletName") + "/accounts/?",
+		Pattern: "accounts/?",
 		Callbacks: map[logical.Operation]framework.OperationFunc{
-			//logical.ListOperation:   b.listWallets,
+			logical.ListOperation:   b.listAccounts,
 			logical.UpdateOperation: b.createAccount,
 		},
 		HelpSynopsis: "List all the Ethereum 2.0 accounts maintained by the plugin backend and create new accounts.",
@@ -68,10 +68,27 @@ func (b *backend) createAccount(ctx context.Context, req *logical.Request, data 
 	}, nil
 }
 
-//func getStorage() logical.Storage {
-//	return &logical.InmemStorage{}
-//}
-//
-//func getWalletStorage() wtypes.Store {
-//	return store.NewHashicorpVaultStore(getStorage(), context.Background())
-//}
+func (b *backend) listAccounts(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	walletName := data.Get("walletName").(string)
+	storeInstance := store.NewHashicorpVaultStore(req.Storage, ctx)
+
+	options := vault.WalletOptions{}
+	options.SetEncryptor(enc.NewPlainTextEncryptor())
+	options.SetWalletName(walletName)
+	options.SetStore(storeInstance)
+	vlt, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil,err
+	}
+
+	accounts := map[string]bool{}
+	for w := range storeInstance.RetrieveAccounts(vlt.Wallet.ID()) {
+		accounts[string(w)] = true
+	}
+
+	return &logical.Response{
+		Data: map[string]interface{}{
+			"accounts": accounts,
+		},
+	}, nil
+}
