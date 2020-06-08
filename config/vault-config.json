@@ -2,7 +2,7 @@
   "plugin_directory": "vault/plugins",
   "storage": {
     "file": {
-      "path": "vault/data"
+      "path": "/data"
     }
   },
   "listener": {
