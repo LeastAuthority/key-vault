@@ -13,7 +13,7 @@ func pathCreateAndListWallet(b *backend) *framework.Path {
 	return &framework.Path{
 		Pattern: "wallets/?",
 		Callbacks: map[logical.Operation]framework.OperationFunc{
-			//logical.ListOperation:   b.listWallets,
+			logical.ListOperation:   b.listWallets,
 			logical.UpdateOperation: b.createWallet,
 		},
 		HelpSynopsis: "List all the Ethereum 2.0 wallets maintained by the plugin backend and create new wallets.",
@@ -42,30 +42,27 @@ func (b *backend) createWallet(ctx context.Context, req *logical.Request, data *
 	options.SetStore(store.NewHashicorpVaultStore(req.Storage, ctx))
 	vlt, err := vault.NewKeyVault(&options)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"id": vlt.Wallet.ID().String(),
+			"id":   vlt.Wallet.ID().String(),
 			"name": vlt.Wallet.Name(),
 		},
 	}, nil
 }
 
 func (b *backend) listWallets(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
-	options := vault.WalletOptions{}
-	options.SetStore(store.NewHashicorpVaultStore(req.Storage, ctx))
-	vlt, err := vault.NewKeyVault(&options)
-	if err != nil {
-		return nil,err
+	storeInstance := store.NewHashicorpVaultStore(req.Storage, ctx)
+	wallets := map[string]bool{}
+	for w := range storeInstance.RetrieveWallets() {
+		wallets[string(w)] = true
 	}
-	//vlt.Wallet.CreateAccount()
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"id": vlt.Wallet.ID().String(),
-			"name": vlt.Wallet.Name(),
+			"wallets": wallets,
 		},
 	}, nil
 }
