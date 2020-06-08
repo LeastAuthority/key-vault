@@ -47,5 +47,6 @@ func paths(b *backend) []*framework.Path {
 	return []*framework.Path{
 		pathCreateAndListWallet(b),
 		pathCreateAndListAccount(b),
+		pathSign(b),
 	}
 }
