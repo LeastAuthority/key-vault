@@ -12,6 +12,7 @@ COPY go.sum /
 RUN go mod download
 
 COPY ./config/vault-config.json /vault/config/vault-config.json
+COPY ./config/vault-init-unseal.sh /vault/config/vault-init-unseal.sh
 COPY ./backend /backend
 COPY main.go /
 
