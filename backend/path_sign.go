@@ -4,16 +4,16 @@ import (
 	"context"
 	"encoding/hex"
 	vault "github.com/bloxapp/KeyVault"
-	enc "github.com/bloxapp/KeyVault/encryptors"
 	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	pb "github.com/wealdtech/eth2-signer-api/pb/v1"
+	keystore "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 )
 
 func pathSign(b *backend) *framework.Path {
 	return &framework.Path{
-		Pattern: "wallets/" + framework.GenericNameRegex("walletName") + "accounts/" + framework.GenericNameRegex("accountName") + "/sign",
+		Pattern: "sign-attestation",
 		Callbacks: map[logical.Operation]framework.OperationFunc{
 			logical.CreateOperation: b.signTx,
 		},
@@ -90,9 +90,10 @@ func (b *backend) signTx(ctx context.Context, req *logical.Request, data *framew
 	targetEpoch := data.Get("targetEpoch").(uint64)
 	targetRoot := data.Get("targetRoot").(string)
 	options := vault.WalletOptions{}
-	options.SetEncryptor(enc.NewPlainTextEncryptor())
+	options.SetEncryptor(keystore.New())
 	options.SetWalletName(walletName)
 	options.SetStore(store.NewHashicorpVaultStore(req.Storage, ctx))
+	options.EnableSimpleSigner(true)
 	vlt, err := vault.OpenKeyVault(&options)
 	if err != nil {
 		return nil,err
@@ -103,17 +104,7 @@ func (b *backend) signTx(ctx context.Context, req *logical.Request, data *framew
 		return nil,err
 	}
 
-	//account, err := vlt.Wallet.AccountByName(accountName)
-	//if err != nil {
-	//	return nil,err
-	//}
-	//
-	//err = account.Unlock([]byte(""))
-	//if err != nil {
-	//	return nil,err
-	//}
-
-	_, err = vlt.Signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
+	res, err := vlt.Signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
 		Id:     &pb.SignBeaconAttestationRequest_Account{Account: accountName},
 		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
 		Data: &pb.AttestationData{
@@ -130,14 +121,13 @@ func (b *backend) signTx(ctx context.Context, req *logical.Request, data *framew
 			},
 		},
 	})
-
 	if err != nil {
 		return nil,err
 	}
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"ok": true,
+			"data": res,
 		},
 	}, nil
 }
