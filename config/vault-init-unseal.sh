@@ -1,9 +1,5 @@
 #!/bin/sh
 
-# Start Vault
-
-vault server -config=/vault/config/vault-config.json
-
 # Init Vault
 echo "Init vault..."
 vault operator init  &> /vault/keys.txt
