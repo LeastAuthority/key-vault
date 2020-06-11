@@ -62,7 +62,7 @@ func walletsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:      "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign/",
+			Pattern:      "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign",
 			HelpSynopsis: "Sign",
 			HelpDescription: ` Sign attestation`,
 			Fields: map[string]*framework.FieldSchema{
