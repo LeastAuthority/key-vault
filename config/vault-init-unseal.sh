@@ -4,7 +4,7 @@
 echo "Init vault..."
 vault operator init  &> /data/keys.txt
 
-if ! grep -q "Vault is already initialized" /vault/data.txt; then
+if ! grep -q "Vault is already initialized" /data/keys.txt; then
 
 # Unseal Vault
 echo "Unseal vault..."
