@@ -233,8 +233,18 @@ func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Reque
 		return nil,err
 	}
 
+	account, err := vlt.Wallet.AccountByName(accountName)
+	if err != nil {
+		return nil,err
+	}
+
+	err = account.Unlock([]byte(""))
+	if err != nil {
+		return nil,err
+	}
+
 	res, err := vlt.Signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
-		Id:     &pb.SignBeaconAttestationRequest_Account{Account: accountName},
+		Id:     &pb.SignBeaconAttestationRequest_Account{Account: account.Name()},
 		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
 		Data: &pb.AttestationData{
 			Slot:            uint64(slot),
