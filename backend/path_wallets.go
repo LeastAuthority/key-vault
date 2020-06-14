@@ -2,14 +2,11 @@ package backend
 
 import (
 	"context"
-	"encoding/hex"
 	vault "github.com/bloxapp/KeyVault"
-	enc "github.com/bloxapp/KeyVault/encryptors"
+	"github.com/bloxapp/KeyVault/core"
 	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
-	pb "github.com/wealdtech/eth2-signer-api/pb/v1"
-	keystore "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 )
 
 func walletsPaths(b *backend) []*framework.Path {
@@ -25,8 +22,8 @@ func walletsPaths(b *backend) []*framework.Path {
 			`,
 		},
 		&framework.Path{
-			Pattern:      "wallets/" + framework.GenericNameRegex("wallet_name"),
-			HelpSynopsis: "Create an Ethereum 2.0 wallet",
+			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name"),
+			HelpSynopsis:    "Create an Ethereum 2.0 wallet",
 			HelpDescription: ``,
 			Fields: map[string]*framework.FieldSchema{
 				"wallet_name": &framework.FieldSchema{Type: framework.TypeString},
@@ -37,8 +34,8 @@ func walletsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:      "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/",
-			HelpSynopsis: "List wallet accounts",
+			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/",
+			HelpSynopsis:    "List wallet accounts",
 			HelpDescription: ``,
 			Fields: map[string]*framework.FieldSchema{
 				"wallet_name": &framework.FieldSchema{Type: framework.TypeString},
@@ -49,11 +46,11 @@ func walletsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:      "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name"),
-			HelpSynopsis: "Create an Ethereum 2.0 account",
+			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name"),
+			HelpSynopsis:    "Create an Ethereum 2.0 account",
 			HelpDescription: ``,
 			Fields: map[string]*framework.FieldSchema{
-				"wallet_name": &framework.FieldSchema{Type: framework.TypeString},
+				"wallet_name":  &framework.FieldSchema{Type: framework.TypeString},
 				"account_name": &framework.FieldSchema{Type: framework.TypeString},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
@@ -61,87 +58,95 @@ func walletsPaths(b *backend) []*framework.Path {
 				logical.CreateOperation: b.pathWalletsAccountCreate,
 			},
 		},
-		&framework.Path{
-			Pattern:      "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign",
-			HelpSynopsis: "Sign",
-			HelpDescription: ` Sign attestation`,
-			Fields: map[string]*framework.FieldSchema{
-				"wallet_name": &framework.FieldSchema{Type: framework.TypeString},
-				"account_name": &framework.FieldSchema{Type: framework.TypeString},
-				"domain": &framework.FieldSchema{
-					Type:        framework.TypeString,
-					Description: "Domain",
-					Default:     "",
-				},
-				"slot": &framework.FieldSchema{
-					Type:        framework.TypeInt,
-					Description: "Data Slot",
-					Default:     0,
-				},
-				"committeeIndex": &framework.FieldSchema{
-					Type:        framework.TypeInt,
-					Description: "Data CommitteeIndex",
-					Default:     0,
-				},
-				"beaconBlockRoot": &framework.FieldSchema{
-					Type:        framework.TypeString,
-					Description: "Data BeaconBlockRoot",
-					Default:     "",
-				},
-				"sourceEpoch": &framework.FieldSchema{
-					Type:        framework.TypeInt,
-					Description: "Data Source Epoch",
-					Default:     0,
-				},
-				"sourceRoot": &framework.FieldSchema{
-					Type:        framework.TypeString,
-					Description: "Data Source Root",
-					Default:     "",
-				},
-				"targetEpoch": &framework.FieldSchema{
-					Type:        framework.TypeInt,
-					Description: "Data Target Epoch",
-					Default:     0,
-				},
-				"targetRoot": &framework.FieldSchema{
-					Type:        framework.TypeString,
-					Description: "Data Target Root",
-					Default:     "",
-				},
-			},
-			ExistenceCheck: b.pathExistenceCheck,
-			Callbacks: map[logical.Operation]framework.OperationFunc{
-				logical.CreateOperation: b.pathWalletsAccountSign,
-			},
-		},
+		//&framework.Path{
+		//	Pattern:      "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign",
+		//	HelpSynopsis: "Sign",
+		//	HelpDescription: ` Sign attestation`,
+		//	Fields: map[string]*framework.FieldSchema{
+		//		"wallet_name": &framework.FieldSchema{Type: framework.TypeString},
+		//		"account_name": &framework.FieldSchema{Type: framework.TypeString},
+		//		"domain": &framework.FieldSchema{
+		//			Type:        framework.TypeString,
+		//			Description: "Domain",
+		//			Default:     "",
+		//		},
+		//		"slot": &framework.FieldSchema{
+		//			Type:        framework.TypeInt,
+		//			Description: "Data Slot",
+		//			Default:     0,
+		//		},
+		//		"committeeIndex": &framework.FieldSchema{
+		//			Type:        framework.TypeInt,
+		//			Description: "Data CommitteeIndex",
+		//			Default:     0,
+		//		},
+		//		"beaconBlockRoot": &framework.FieldSchema{
+		//			Type:        framework.TypeString,
+		//			Description: "Data BeaconBlockRoot",
+		//			Default:     "",
+		//		},
+		//		"sourceEpoch": &framework.FieldSchema{
+		//			Type:        framework.TypeInt,
+		//			Description: "Data Source Epoch",
+		//			Default:     0,
+		//		},
+		//		"sourceRoot": &framework.FieldSchema{
+		//			Type:        framework.TypeString,
+		//			Description: "Data Source Root",
+		//			Default:     "",
+		//		},
+		//		"targetEpoch": &framework.FieldSchema{
+		//			Type:        framework.TypeInt,
+		//			Description: "Data Target Epoch",
+		//			Default:     0,
+		//		},
+		//		"targetRoot": &framework.FieldSchema{
+		//			Type:        framework.TypeString,
+		//			Description: "Data Target Root",
+		//			Default:     "",
+		//		},
+		//	},
+		//	ExistenceCheck: b.pathExistenceCheck,
+		//	Callbacks: map[logical.Operation]framework.OperationFunc{
+		//		logical.CreateOperation: b.pathWalletsAccountSign,
+		//	},
+		//},
 	}
 }
 
 func (b *backend) pathWalletCreate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	walletName := data.Get("wallet_name").(string)
-	options := vault.WalletOptions{}
-	options.SetEncryptor(enc.NewPlainTextEncryptor())
-	options.SetWalletPassword("")
-	options.SetWalletName(walletName)
-	options.SetStore(store.NewHashicorpVaultStore(req.Storage, ctx))
-	vlt, err := vault.NewKeyVault(&options)
+	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	options := vault.PortfolioOptions{}
+	options.SetStorage(storage)
+	portfolio, err := vault.NewKeyVault(&options)
+	if err != nil {
+		return nil, err
+	}
+	wallet, err := portfolio.CreateWallet(walletName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"id":   vlt.Wallet.ID().String(),
-			"name": vlt.Wallet.Name(),
+			"id":   wallet.ID().String(),
+			"name": wallet.Name(),
 		},
 	}, nil
 }
 
 func (b *backend) pathWalletsList(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
-	storeInstance := store.NewHashicorpVaultStore(req.Storage, ctx)
-	wallets := map[string]bool{}
-	for w := range storeInstance.RetrieveWallets() {
-		wallets[string(w)] = true
+	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	options := vault.PortfolioOptions{}
+	options.SetStorage(storage)
+	portfolio, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil, err
+	}
+	wallets := make([]core.Wallet, 0)
+	for w := range portfolio.Wallets() {
+		wallets = append(wallets, w)
 	}
 
 	return &logical.Response{
@@ -154,50 +159,51 @@ func (b *backend) pathWalletsList(ctx context.Context, req *logical.Request, dat
 func (b *backend) pathWalletsAccountCreate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	walletName := data.Get("wallet_name").(string)
 	accountName := data.Get("account_name").(string)
-	options := vault.WalletOptions{}
-	options.SetEncryptor(enc.NewPlainTextEncryptor())
-	options.SetWalletName(walletName)
-	options.SetStore(store.NewHashicorpVaultStore(req.Storage, ctx))
-	vlt, err := vault.OpenKeyVault(&options)
+	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	options := vault.PortfolioOptions{}
+	options.SetStorage(storage)
+	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-
-	err = vlt.Wallet.Unlock([]byte(""))
+	wallet, err := portfolio.WalletByName(walletName)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-
-	account, err := vlt.Wallet.CreateAccount(accountName, []byte(""))
+	account, err := wallet.CreateValidatorAccount(accountName)
+	if err != nil {
+		return nil, err
+	}
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"walletName": vlt.Wallet.Name(),
+			"walletName":  wallet.Name(),
 			"accountName": account.Name(),
-			"path": account.Path(),
+			"accountId":   account.ID().String(),
+			"type":        account.Type(),
+			"path":        account.Path(),
+			"publicKey": account.PublicKey(),
 		},
 	}, nil
 }
 
 func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	walletName := data.Get("wallet_name").(string)
-	storeInstance := store.NewHashicorpVaultStore(req.Storage, ctx)
-	options := vault.WalletOptions{}
-	options.SetEncryptor(enc.NewPlainTextEncryptor())
-	options.SetWalletName(walletName)
-	options.SetStore(storeInstance)
-	vlt, err := vault.OpenKeyVault(&options)
+	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	options := vault.PortfolioOptions{}
+	options.SetStorage(storage)
+	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	err = vlt.Wallet.Unlock([]byte(""))
+	wallet, err := portfolio.WalletByName(walletName)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
-	accounts := map[string]bool{}
-	for w := range storeInstance.RetrieveAccounts(vlt.Wallet.ID()) {
-		accounts[string(w)] = true
+	accounts := make([]core.Account, 0)
+	for a := range wallet.Accounts() {
+		accounts = append(accounts, a)
 	}
 
 	return &logical.Response{
@@ -207,70 +213,63 @@ func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Reque
 	}, nil
 }
 
-func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
-	walletName := data.Get("wallet_name").(string)
-	accountName := data.Get("account_name").(string)
-	domain := data.Get("domain").(string)
-	slot := data.Get("slot").(int)
-	committeeIndex := data.Get("committeeIndex").(int)
-	beaconBlockRoot := data.Get("beaconBlockRoot").(string)
-	sourceEpoch := data.Get("sourceEpoch").(int)
-	sourceRoot := data.Get("sourceRoot").(string)
-	targetEpoch := data.Get("targetEpoch").(int)
-	targetRoot := data.Get("targetRoot").(string)
-	options := vault.WalletOptions{}
-	options.SetEncryptor(keystore.New())
-	options.SetWalletName(walletName)
-	options.SetStore(store.NewHashicorpVaultStore(req.Storage, ctx))
-	options.EnableSimpleSigner(true)
-	vlt, err := vault.OpenKeyVault(&options)
-	if err != nil {
-		return nil,err
-	}
-
-	err = vlt.Wallet.Unlock([]byte(""))
-	if err != nil {
-		return nil,err
-	}
-
-	account, err := vlt.Wallet.AccountByName(accountName)
-	if err != nil {
-		return nil,err
-	}
-
-	err = account.Unlock([]byte(""))
-	if err != nil {
-		return nil,err
-	}
-
-	res, err := vlt.Signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
-		Id:     &pb.SignBeaconAttestationRequest_Account{Account: account.Name()},
-		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
-		Data: &pb.AttestationData{
-			Slot:            uint64(slot),
-			CommitteeIndex:  uint64(committeeIndex),
-			BeaconBlockRoot: ignoreError(hex.DecodeString(beaconBlockRoot)).([]byte),
-			Source: &pb.Checkpoint{
-				Epoch: uint64(sourceEpoch),
-				Root:  ignoreError(hex.DecodeString(sourceRoot)).([]byte),
-			},
-			Target: &pb.Checkpoint{
-				Epoch: uint64(targetEpoch),
-				Root:  ignoreError(hex.DecodeString(targetRoot)).([]byte),
-			},
-		},
-	})
-	if err != nil {
-		return nil,err
-	}
-
-	return &logical.Response{
-		Data: map[string]interface{}{
-			"data": res,
-		},
-	}, nil
-}
-
-func ignoreError(val interface{}, err error)interface{} {
-	return val
-}
+//func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+//	walletName := data.Get("wallet_name").(string)
+//	accountName := data.Get("account_name").(string)
+//	domain := data.Get("domain").(string)
+//	slot := data.Get("slot").(int)
+//	committeeIndex := data.Get("committeeIndex").(int)
+//	beaconBlockRoot := data.Get("beaconBlockRoot").(string)
+//	sourceEpoch := data.Get("sourceEpoch").(int)
+//	sourceRoot := data.Get("sourceRoot").(string)
+//	targetEpoch := data.Get("targetEpoch").(int)
+//	targetRoot := data.Get("targetRoot").(string)
+//	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+//	options := vault.PortfolioOptions{}
+//	options.SetStorage(storage)
+//	portfolio, err := vault.OpenKeyVault(&options)
+//	if err != nil {
+//		return nil,err
+//	}
+//	wallet, err := portfolio.WalletByName(walletName)
+//	if err != nil {
+//		return nil, err
+//	}
+//	account, err := wallet.AccountByName(accountName)
+//	if err != nil {
+//		return nil,err
+//	}
+//
+//	account.
+//
+//	res, err := vlt.Signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
+//		Id:     &pb.SignBeaconAttestationRequest_Account{Account: account.Name()},
+//		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
+//		Data: &pb.AttestationData{
+//			Slot:            uint64(slot),
+//			CommitteeIndex:  uint64(committeeIndex),
+//			BeaconBlockRoot: ignoreError(hex.DecodeString(beaconBlockRoot)).([]byte),
+//			Source: &pb.Checkpoint{
+//				Epoch: uint64(sourceEpoch),
+//				Root:  ignoreError(hex.DecodeString(sourceRoot)).([]byte),
+//			},
+//			Target: &pb.Checkpoint{
+//				Epoch: uint64(targetEpoch),
+//				Root:  ignoreError(hex.DecodeString(targetRoot)).([]byte),
+//			},
+//		},
+//	})
+//	if err != nil {
+//		return nil,err
+//	}
+//
+//	return &logical.Response{
+//		Data: map[string]interface{}{
+//			"data": res,
+//		},
+//	}, nil
+//}
+//
+//func ignoreError(val interface{}, err error)interface{} {
+//	return val
+//}
