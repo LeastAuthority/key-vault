@@ -83,8 +83,17 @@ The example below shows output for the successful creation of `/ethereum/wallets
     "renewable": false,
     "lease_duration": 0,
     "data": {
-        "id": "f461caab-0bd7-4f81-9816-f055dc027a81",
-        "name": "wallet2"
+        "wallet": {
+            "id": "3486507e-5318-4d26-aef2-e52cc241efbf",
+            "indexMapper": {},
+            "key": {
+                "id": "71143ff7-fef5-4296-89e4-3d856924327c",
+                "path": "m/12381/3600/0",
+                "pubkey": "b29769ca8ee1c9f299977daf91432b279547079ce26cb98b350733de36deb9c54819ffa3f2a89ef85ec41d5c7b0c50d1"
+            },
+            "name": "wallet1",
+            "type": "HD"
+        }
     },
     "wrap_info": null,
     "warnings": null,
@@ -151,9 +160,17 @@ The example below shows output for the successful creation of `/ethereum/wallets
     "renewable": false,
     "lease_duration": 0,
     "data": {
-        "accountName": "account1",
-        "path": "m/12381/3600/2/0",
-        "walletName": "wallet1"
+        "account": {
+            "id": "982be00d-9453-4c43-9239-348afaf8595b",
+            "key": {
+                "id": "e75e8142-fd54-4baa-b155-fcb6e62e2c84",
+                "path": "m/12381/3600/0/0/0",
+                "pubkey": "9184a9163413073e6432de3409615014fe2303bcf49f5ebf077ab52c74df77d68c7fbc7499cc7cfff47421f7dad675bf"
+            },
+            "name": "account1",
+            "parentWalletId": "3d809558-385f-4a0f-8f55-769bbb0b5586",
+            "type": "Validation"
+        }
     },
     "wrap_info": null,
     "warnings": null,

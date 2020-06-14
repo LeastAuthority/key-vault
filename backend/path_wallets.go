@@ -133,8 +133,7 @@ func (b *backend) pathWalletCreate(ctx context.Context, req *logical.Request, da
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"id":   wallet.ID().String(),
-			"name": wallet.Name(),
+			"wallet": wallet,
 		},
 	}, nil
 }
@@ -180,11 +179,7 @@ func (b *backend) pathWalletsAccountCreate(ctx context.Context, req *logical.Req
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"walletName":  wallet.Name(),
-			"accountName": account.Name(),
-			"accountId":   account.ID().String(),
-			"type":        account.Type(),
-			"path":        account.Path(),
+			"account":  account,
 		},
 	}, nil
 }
