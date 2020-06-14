@@ -274,7 +274,7 @@ func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Reque
 	}
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"data": res,
+			"signature": res.Signature,
 		},
 	}, nil
 }
