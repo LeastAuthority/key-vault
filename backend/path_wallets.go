@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	vault "github.com/bloxapp/KeyVault"
 	"github.com/bloxapp/KeyVault/core"
+	"github.com/bloxapp/KeyVault/slashing_protection"
 	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/bloxapp/KeyVault/validator_signer"
 	"github.com/hashicorp/vault/sdk/framework"
@@ -131,6 +132,16 @@ func (b *backend) pathWalletCreate(ctx context.Context, req *logical.Request, da
 		return nil, err
 	}
 
+	//portfolio, err = vault.OpenKeyVault(&options)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//wallet, err = portfolio.CreateWallet(walletName)
+	//if err != nil {
+	//	return nil, err
+	//}
+
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"wallet": wallet,
@@ -239,7 +250,7 @@ func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Reque
 		return nil,err
 	}
 
-	protector := core.NewNormalProtection(storage)
+	protector := slashing_protection.NewNormalProtection(storage)
 	signer := validator_signer.NewSimpleSigner(wallet, protector)
 	res, err := signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
 		Id:     &pb.SignBeaconAttestationRequest_Account{Account: account.Name()},
