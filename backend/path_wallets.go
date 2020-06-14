@@ -200,7 +200,6 @@ func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Reque
 	if err != nil {
 		return nil, err
 	}
-
 	accounts := make([]core.Account, 0)
 	for a := range wallet.Accounts() {
 		accounts = append(accounts, a)
