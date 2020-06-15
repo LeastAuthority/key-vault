@@ -126,6 +126,9 @@ func (b *backend) pathWalletCreate(ctx context.Context, req *logical.Request, da
 	options.SetStorage(storage)
 	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
+		portfolio, err = vault.NewKeyVault(&options)
+	}
+	if err != nil {
 		return nil, err
 	}
 	wallet, err := portfolio.CreateWallet(walletName)
