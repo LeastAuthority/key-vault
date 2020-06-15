@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"encoding/hex"
+
 	vault "github.com/bloxapp/KeyVault"
 	"github.com/bloxapp/KeyVault/core"
 	"github.com/bloxapp/KeyVault/slashing_protection"
@@ -63,11 +64,11 @@ func walletsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:      "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign",
-			HelpSynopsis: "Sign",
-			HelpDescription: ` Sign attestation`,
+			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign",
+			HelpSynopsis:    "Sign",
+			HelpDescription: `Sign attestation`,
 			Fields: map[string]*framework.FieldSchema{
-				"wallet_name": &framework.FieldSchema{Type: framework.TypeString},
+				"wallet_name":  &framework.FieldSchema{Type: framework.TypeString},
 				"account_name": &framework.FieldSchema{Type: framework.TypeString},
 				"domain": &framework.FieldSchema{
 					Type:        framework.TypeString,
@@ -77,37 +78,37 @@ func walletsPaths(b *backend) []*framework.Path {
 				"slot": &framework.FieldSchema{
 					Type:        framework.TypeInt,
 					Description: "Data Slot",
-					Default:     0,
+					Default:     1,
 				},
 				"committeeIndex": &framework.FieldSchema{
 					Type:        framework.TypeInt,
 					Description: "Data CommitteeIndex",
-					Default:     0,
+					Default:     5,
 				},
 				"beaconBlockRoot": &framework.FieldSchema{
 					Type:        framework.TypeString,
 					Description: "Data BeaconBlockRoot",
-					Default:     "",
+					Default:     "test",
 				},
 				"sourceEpoch": &framework.FieldSchema{
 					Type:        framework.TypeInt,
 					Description: "Data Source Epoch",
-					Default:     0,
+					Default:     6,
 				},
 				"sourceRoot": &framework.FieldSchema{
 					Type:        framework.TypeString,
 					Description: "Data Source Root",
-					Default:     "",
+					Default:     "test2",
 				},
 				"targetEpoch": &framework.FieldSchema{
 					Type:        framework.TypeInt,
 					Description: "Data Target Epoch",
-					Default:     0,
+					Default:     45,
 				},
 				"targetRoot": &framework.FieldSchema{
 					Type:        framework.TypeString,
 					Description: "Data Target Root",
-					Default:     "",
+					Default:     "test3",
 				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
@@ -123,7 +124,7 @@ func (b *backend) pathWalletCreate(ctx context.Context, req *logical.Request, da
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
-	portfolio, err := vault.NewKeyVault(&options)
+	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
 		return nil, err
 	}
@@ -131,16 +132,6 @@ func (b *backend) pathWalletCreate(ctx context.Context, req *logical.Request, da
 	if err != nil {
 		return nil, err
 	}
-
-	//portfolio, err = vault.OpenKeyVault(&options)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//wallet, err = portfolio.CreateWallet(walletName)
-	//if err != nil {
-	//	return nil, err
-	//}
 
 	return &logical.Response{
 		Data: map[string]interface{}{
@@ -190,7 +181,7 @@ func (b *backend) pathWalletsAccountCreate(ctx context.Context, req *logical.Req
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"account":  account,
+			"account": account,
 		},
 	}, nil
 }
@@ -237,23 +228,18 @@ func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Reque
 	//portfolio, err := vault.NewKeyVault(&options)
 	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	//wallet, err := portfolio.CreateWallet(walletName)
 	wallet, err := portfolio.WalletByName(walletName)
 	if err != nil {
 		return nil, err
 	}
-	//account, err := wallet.CreateValidatorAccount(accountName)
-	account, err := wallet.AccountByName(accountName)
-	if err != nil {
-		return nil,err
-	}
 
 	protector := slashing_protection.NewNormalProtection(storage)
 	signer := validator_signer.NewSimpleSigner(wallet, protector)
 	res, err := signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
-		Id:     &pb.SignBeaconAttestationRequest_Account{Account: account.Name()},
+		Id:     &pb.SignBeaconAttestationRequest_Account{Account: accountName},
 		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
 		Data: &pb.AttestationData{
 			Slot:            uint64(slot),
@@ -270,15 +256,15 @@ func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Reque
 		},
 	})
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"signature": res.Signature,
+			"signature": res.GetSignature(),
 		},
 	}, nil
 }
 
-func ignoreError(val interface{}, err error)interface{} {
+func ignoreError(val interface{}, err error) interface{} {
 	return val
 }
