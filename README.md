@@ -4,30 +4,30 @@
 
   1. Build the images and run the containers:
 
-    ```sh
-    $ docker-compose up --build
-    ```
+        ```sh
+        $ docker-compose up --build
+        ```
 
   2. Execute the container
 
-    ```sh
-    $ docker-compose exec vault bash
-    ```
+        ```sh
+        $ docker-compose exec vault bash
+        ```
 
   3. Initialize the server
  
-    ```sh
-    $ vault operator init
-    ```
+        ```sh
+        $ vault operator init
+        ```
 
   4. Now we need to unseal the server. A sealed server can't accept any requests. Since vault was initialized with 5 key
   shares and requires a minimum of 3 keys to reconstruct master key, we need to send 3 unseal requests with these
   3 keys. After 3 unseal keys are provided, Sealed in the server status turns to false, and the server is ready to be
   further configured.
  
-    ```sh
-    $ vault operator unseal
-    ```
+        ```sh
+        $ vault operator unseal
+        ```
 
 
 ## Install Ethereum 2.0 Signing Plugin
