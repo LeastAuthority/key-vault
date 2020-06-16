@@ -1,5 +1,5 @@
 {
-  "plugin_directory": "vault/plugins",
+  "plugin_directory": "/vault/plugins",
   "storage": {
     "file": {
       "path": "/data"

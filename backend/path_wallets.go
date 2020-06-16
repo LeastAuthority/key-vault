@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"encoding/hex"
+
 	vault "github.com/bloxapp/KeyVault"
 	"github.com/bloxapp/KeyVault/core"
 	"github.com/bloxapp/KeyVault/slashing_protection"
@@ -63,11 +64,11 @@ func walletsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:      "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign",
-			HelpSynopsis: "Sign",
+			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign",
+			HelpSynopsis:    "Sign",
 			HelpDescription: ` Sign attestation`,
 			Fields: map[string]*framework.FieldSchema{
-				"wallet_name": &framework.FieldSchema{Type: framework.TypeString},
+				"wallet_name":  &framework.FieldSchema{Type: framework.TypeString},
 				"account_name": &framework.FieldSchema{Type: framework.TypeString},
 				"domain": &framework.FieldSchema{
 					Type:        framework.TypeString,
@@ -190,7 +191,7 @@ func (b *backend) pathWalletsAccountCreate(ctx context.Context, req *logical.Req
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"account":  account,
+			"account": account,
 		},
 	}, nil
 }
@@ -237,7 +238,7 @@ func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Reque
 	//portfolio, err := vault.NewKeyVault(&options)
 	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	//wallet, err := portfolio.CreateWallet(walletName)
 	wallet, err := portfolio.WalletByName(walletName)
@@ -247,7 +248,7 @@ func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Reque
 	//account, err := wallet.CreateValidatorAccount(accountName)
 	account, err := wallet.AccountByName(accountName)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	protector := slashing_protection.NewNormalProtection(storage)
@@ -270,7 +271,7 @@ func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Reque
 		},
 	})
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	return &logical.Response{
 		Data: map[string]interface{}{
@@ -279,6 +280,6 @@ func (b *backend) pathWalletsAccountSign(ctx context.Context, req *logical.Reque
 	}, nil
 }
 
-func ignoreError(val interface{}, err error)interface{} {
+func ignoreError(val interface{}, err error) interface{} {
 	return val
 }

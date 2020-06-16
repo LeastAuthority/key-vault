@@ -1,11 +1,13 @@
 package main
 
 import (
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend"
-	"github.com/hashicorp/vault/api"
-	"github.com/hashicorp/vault/sdk/plugin"
 	"log"
 	"os"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend"
+
+	"github.com/hashicorp/vault/api"
+	"github.com/hashicorp/vault/sdk/plugin"
 )
 
 func main() {
