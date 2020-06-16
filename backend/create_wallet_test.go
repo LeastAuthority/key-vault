@@ -2,11 +2,12 @@ package backend
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	log "github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/vault/sdk/helper/logging"
 	"github.com/hashicorp/vault/sdk/logical"
-	"testing"
-	"time"
 )
 
 func getBackend(t *testing.T) (logical.Backend, logical.Storage) {
@@ -43,7 +44,7 @@ func TestWalletCreate(t *testing.T) {
 
 	req = logical.TestRequest(t, logical.UpdateOperation, "accounts")
 	data = map[string]interface{}{
-		"walletName": "wallet1",
+		"walletName":  "wallet1",
 		"accountName": "account1",
 	}
 	req.Data = data
