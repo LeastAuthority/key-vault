@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 )
@@ -26,6 +27,8 @@ func Backend() (*backend, error) {
 		Help: "",
 		Paths: framework.PathAppend(
 			walletsPaths(&b),
+			accountsPaths(&b),
+			signsPaths(&b),
 		),
 		PathsSpecial: &logical.Paths{
 			SealWrapStorage: []string{

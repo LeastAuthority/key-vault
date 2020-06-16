@@ -245,7 +245,7 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/wallets/:wallet_name/accounts/:account_name/sign`  | `200 application/json` |
+| `POST`  | `:mount-path/wallets/:wallet_name/accounts/:account_name/sign-attestation`  | `200 application/json` |
 
 #### Parameters
 
@@ -254,7 +254,7 @@ This endpoint will sign attestation for specific account at a path.
 
 #### Sample Response
 
-The example below shows output for the successful creation of `/ethereum/wallets/wallet1/account1/sign`.
+The example below shows output for the successful creation of `/ethereum/wallets/wallet1/account1/sign-attestation`.
 
 ```
 {
