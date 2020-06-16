@@ -1,5 +1,35 @@
 # vault-plugin-secrets-eth2.0
 
+## How to use this project?
+
+  1. Build the images and run the containers:
+
+        ```sh
+        $ docker-compose up --build
+        ```
+
+  2. Execute the container
+
+        ```sh
+        $ docker-compose exec vault bash
+        ```
+
+  3. Initialize the server
+ 
+        ```sh
+        $ vault operator init
+        ```
+
+  4. Now we need to unseal the server. A sealed server can't accept any requests. Since vault was initialized with 5 key
+  shares and requires a minimum of 3 keys to reconstruct master key, we need to send 3 unseal requests with these
+  3 keys. After 3 unseal keys are provided, Sealed in the server status turns to false, and the server is ready to be
+  further configured.
+ 
+        ```sh
+        $ vault operator unseal
+        ```
+
+
 ## Install Ethereum 2.0 Signing Plugin
 
   1. Login into the vault using root token
@@ -26,6 +56,16 @@
         $ vault secrets enable -path=ethereum -description="Eth Signing Wallet" -plugin-name=ethsign plugin
         ```
      
+## Re-Install Ethereum 2.0 Signing Plugin
+
+  1. docker-compose up --build
+  2. unseal key
+  3. disable secrets engine
+  4. remove plugin
+  5. go inside running container
+  6. login
+  7. enable plugin
+     
 ### LIST WALLETS
 
 This endpoint will list all wallets stores at a path.
@@ -49,9 +89,21 @@ The example below shows output for a query path of `/ethereum/wallets/` when the
     "renewable": false,
     "lease_duration": 0,
     "data": {
-        "wallets": {
-            "{\"crypto\":{\"original\":\"R/DQm1NoDtbvZQm3OK+cb7A4qipMEqbdwgF5kwy/4lE=\"},\"name\":\"wallet1\",\"nextaccount\":3,\"type\":\"hierarchical deterministic\",\"uuid\":\"80eb953c-4478-42bb-add3-7b4e143d4051\",\"version\":1}": true
-        }
+        "wallets": [
+            {
+                "id": "d0cf6367-865a-4c80-bfc2-c036ecfa6eda",
+                "indexMapper": {
+                    "account2": "2a75d4eb-e541-4536-a237-8705a8f36a19"
+                },
+                "key": {
+                    "id": "22cc1c64-2853-4d28-8ad7-519f93098454",
+                    "path": "m/12381/3600/0",
+                    "pubkey": "9038df960844983756bf40d30e02e5fedd62f59745bae4a3393557d2fcf49be72a22ed3a6b6b325744fecf55aabf986c"
+                },
+                "name": "wallet1",
+                "type": "HD"
+            }
+        ]
     },
     "wrap_info": null,
     "warnings": null,
@@ -124,10 +176,19 @@ The example below shows output for a query path of `/ethereum/wallets/wallet1/ac
     "renewable": false,
     "lease_duration": 0,
     "data": {
-        "accounts": {
-            "{\"crypto\":{\"original\":\"EGtt6Ujj+kYGfwOkUCPqcfKFhxVMskpbOBtCi5XtW1A=\"},\"name\":\"account1\",\"path\":\"m/12381/3600/0/0\",\"pubkey\":\"b9c4c809fb2536b76107bea7fde58bd686e5b593358e163868bdf4a006d6128a459f7fa62064a6ef3d94c804ae6efa6a\",\"uuid\":\"f164c78b-1ba7-4f59-9d97-2e129b12a992\",\"version\":1}": true,
-            "{\"crypto\":{\"original\":\"JcjxrkBnvinsKqW6ycZF6J3ToiopgWpYPD51dXYVl6c=\"},\"name\":\"account1\",\"path\":\"m/12381/3600/1/0\",\"pubkey\":\"a8fb2d7fa997b3db9a004866ba8b52ec4534213c969d3813197bc2e590b54146f6033eea3d46cf97bd291bb479535320\",\"uuid\":\"8e92540a-8403-4329-911e-af5f8afea7c9\",\"version\":1}": true
-        }
+        "accounts": [
+            {
+                "id": "453fe5cc-7d52-4085-b660-b970f35925b6",
+                "key": {
+                    "id": "a3635e45-e6f5-41e9-9167-10e5898f522e",
+                    "path": "m/12381/3600/0/0/0",
+                    "pubkey": "845ebb2be5ed29e332b9d7f1825e9512bbb113cdb1cd536c311e2b19e9dd992973c991cd210ca1dc50d972253cc76307"
+                },
+                "name": "account2",
+                "parentWalletId": "79561078-100d-4c4a-9e35-dfe3a3c34168",
+                "type": "Validation"
+            }
+        ]
     },
     "wrap_info": null,
     "warnings": null,
@@ -202,9 +263,7 @@ The example below shows output for the successful creation of `/ethereum/wallets
     "renewable": false,
     "lease_duration": 0,
     "data": {
-        "accountName": "account1",
-        "path": "m/12381/3600/2/0",
-        "walletName": "wallet1"
+        "signature": "kEEOMxNkouz7EOSULfrG6hXzZbIOvRCVVK+lfBofj3U49/PHm7YHji8ac9Gf9vgEFVEmbPp+lhO3OpAElt3yaBajTKaJBWocgXuv64Ojq44tfxLJo6jrzMU5yoP78dYW"
     },
     "wrap_info": null,
     "warnings": null,
