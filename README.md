@@ -56,15 +56,35 @@
         $ vault secrets enable -path=ethereum -description="Eth Signing Wallet" -plugin-name=ethsign plugin
         ```
      
-## Re-Install Ethereum 2.0 Signing Plugin
+## Upgrade Ethereum 2.0 Signing Plugin
 
-  1. docker-compose up --build
-  2. unseal key
-  3. disable secrets engine
-  4. remove plugin
-  5. go inside running container
-  6. login
-  7. enable plugin
+  1. Login into the vault using root token
+
+        ```sh
+        $ vault login Your_Initial_Root_Token
+        ```
+      
+  2. Calculate checksum of the binary from the build
+
+        ```sh
+        $ export SHASUM256=$(sha256sum "/vault/plugins/ethsign" | cut -d' ' -f1)
+        ```
+  
+  3. Register the binary with vault server.
+
+        ```sh
+        $ vault write /sys/plugins/catalog/secret/ethsign sha_256=${SHASUM256} command=ethsign
+        ```
+
+  4. Trigger a plugin reload
+  
+        ```sh
+        $ curl \
+            --header "X-Vault-Token: ..." \
+            --request PUT \
+            --data @payload.json \
+            http://127.0.0.1:8200/v1/sys/plugins/reload/backend
+        ```
      
 ### LIST WALLETS
 
