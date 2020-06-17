@@ -267,6 +267,14 @@ This endpoint will sign attestation for specific account at a path.
 
 * `walet_name` (`string: <required>`) - Specifies the name of the wallet of the account to sign. This is specified as part of the URL.
 * `account_name` (`string: <required>`) - Specifies the name of the account to sign. This is specified as part of the URL.
+* `domain` (`string: <required>`) - Specifies the domain.
+* `slot` (`int: <required>`) - Specifies the slot.
+* `committeeIndex` (`int: <required>`) - Specifies the committeeIndex.
+* `beaconBlockRoot` (`string: <required>`) - Specifies the beaconBlockRoot.
+* `sourceEpoch` (`int: <required>`) - Specifies the sourceEpoch.
+* `sourceRoot` (`string: <required>`) - Specifies the sourceRoot.
+* `targetEpoch` (`int: <required>`) - Specifies the targetEpoch.
+* `targetRoot` (`string: <required>`) - Specifies the targetRoot.
 
 #### Sample Response
 
@@ -280,6 +288,43 @@ The example below shows output for the successful creation of `/ethereum/wallets
     "lease_duration": 0,
     "data": {
         "signature": "kEEOMxNkouz7EOSULfrG6hXzZbIOvRCVVK+lfBofj3U49/PHm7YHji8ac9Gf9vgEFVEmbPp+lhO3OpAElt3yaBajTKaJBWocgXuv64Ojq44tfxLJo6jrzMU5yoP78dYW"
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}
+```
+
+### GET DEPOSIT DATA
+
+This endpoint will return deposit data.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `GET`  | `:mount-path/wallets/:wallet_name/accounts/:account_name/deposit-data`  | `200 application/json` |
+
+#### Parameters
+
+* `walet_name` (`string: <required>`) - Specifies the name of the wallet to create account in. This is specified as part of the URL.
+* `account_name` (`string: <required>`) - Specifies the name of the account to create. This is specified as part of the URL.
+
+#### Sample Response
+
+The example below shows output for the successful creation of `/ethereum/wallets/wallet1/account1/deposit-data`.
+
+```
+{
+    "request_id": "b767dcca-5b10-4a52-1d9a-0a9b81b378ae",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "depositData": {
+            "amount": 32000000000,
+            "public_key": "g8yu7YB3jEy79oUubQf0ESg+WAfG9Vxh1zeUQr+3+wQhPHBL5Y3PRzma9CxQ5Zbc",
+            "signature": "h2MWkBLgd4e6npSLdqWqJJI0opyPskph+IOIn6m4PS13rHOBaRHXaWarlm+0FymvF0OAWxPTMAa7jWiluOZJSryt3d+7Gqewdk15CGS2F2MCSAyUFCO4Kq6BR3kzvwyN",
+            "withdrawal_credentials": "AK7JF5gDHMPr7gCzRT6bweOqw0ryIZ6VAasAlnAMisc="
+        }
     },
     "wrap_info": null,
     "warnings": null,
