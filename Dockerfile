@@ -39,6 +39,10 @@ WORKDIR /vault/plugins/
 
 COPY --from=builder /go/src/github.com/bloxapp/vault-plugin-secrets-eth2.0/ethsign ./ethsign
 COPY ./config/vault-config.json /vault/config/vault-config.json
+COPY ./config/vault-init-unseal.sh /vault/config/vault-init-unseal.sh
+COPY ./config/entrypoint.sh /vault/config/entrypoint.sh
+RUN chown vault /vault/config/vault-init-unseal.sh 
+RUN chown vault /vault/config/entrypoint.sh
 
 WORKDIR /
 
@@ -46,4 +50,4 @@ WORKDIR /
 EXPOSE 8200
 
 # Run vault
-ENTRYPOINT ["vault"]
+ENTRYPOINT ["/vault/config/entrypoint.sh"]

@@ -1,21 +1,46 @@
-#!/bin/sh
+#!/bin/bash
+set -e
 
-# Init Vault
-echo "Init vault..."
-vault operator init  &> /data/keys.txt
+echo "Initialize Vault"
+vault status | tee /data/vault.status > /dev/null
 
-if ! grep -q "Vault is already initialized" /data/keys.txt; then
 
-# Unseal Vault
-echo "Unseal vault..."
-vault operator unseal -address=${VAULT_ADDR} $(grep 'Key 1:' /data/keys.txt | awk '{print $NF}')
-vault operator unseal -address=${VAULT_ADDR} $(grep 'Key 2:' /data/keys.txt | awk '{print $NF}')
-vault operator unseal -address=${VAULT_ADDR} $(grep 'Key 3:' /data/keys.txt | awk '{print $NF}')
-vault login $(grep 'Initial Root Token:' /vault/keys.txt | awk '{print $NF}') > /data/token.txt
-echo "###Please save the token information.###"
-cat /data/token.txt
+SEALED=$(grep 'Sealed' /data/vault.status | awk '{print $NF}')
 
+if [ "$SEALED" = "false" ]; then
+
+  echo "Vault is already initialized."
 
 else
-    echo "Vault is already initialized!"
+
+echo "Initialize Vault"
+vault status | tee /data/vault.status > /dev/null
+vault operator init | tee /data/vault.init > /dev/null 
+
+cat /data/vault.init
+
+echo "Unsealing Vault"
+vault operator unseal -address=${VAULT_ADDR} $(grep 'Key 1:' /data/vault.init | awk '{print $NF}') 
+vault operator unseal -address=${VAULT_ADDR} $(grep 'Key 2:' /data/vault.init | awk '{print $NF}')
+vault operator unseal -address=${VAULT_ADDR} $(grep 'Key 3:' /data/vault.init | awk '{print $NF}')
+
+echo "Login Vault"
+vault login $(grep 'Initial Root Token:' /data/vault.init | awk '{print $NF}') > /data/token.txt
+
+echo "Vault setup complete."
+
+instructions() {
+  cat <<EOF
+
+The unseal keys and root token have been stored in /data directory.
+
+  /data/vault.init
+  /data/token.txt
+EOF
+
+  exit 1
+}
+
+instructions
+
 fi
