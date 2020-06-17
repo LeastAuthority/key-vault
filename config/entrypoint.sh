@@ -1,7 +1,8 @@
 #!/bin/sh
+
 set -e
 
-vault server -config=/vault/config/vault-config.json
+vault server -config=/vault/config/vault-config.json > /dev/null
 
 echo "Vault Status"
 vault status | tee /data/vault.status > /dev/null
