@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8200:8200
+    volumes:
+      - ./data:/data
     environment:
       VAULT_ADDR: http://vault:8200
       VAULT_API_ADDR: http://vault:8200
