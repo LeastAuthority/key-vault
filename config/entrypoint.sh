@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set +e
 
 vault server -config=/vault/config/vault-config.json > /dev/null
 
