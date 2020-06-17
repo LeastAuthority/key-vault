@@ -79,11 +79,7 @@
   4. Trigger a plugin reload
   
         ```sh
-        $ curl \
-            --header "X-Vault-Token: ..." \
-            --request PUT \
-            --data @payload.json \
-            http://127.0.0.1:8200/v1/sys/plugins/reload/backend
+        $ vault plugin reload -plugin=ethsign
         ```
      
 ### LIST WALLETS
