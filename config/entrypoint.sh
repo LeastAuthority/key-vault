@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set +e
+set +x
 
 vault server -config=/vault/config/vault-config.json > /dev/null
 
@@ -27,7 +27,7 @@ vault operator unseal $(grep 'Key 2:' /data/vault.init | awk '{print $NF}')  > /
 vault operator unseal $(grep 'Key 3:' /data/vault.init | awk '{print $NF}')  > /dev/null
 
 echo "Login Vault"
-vault login $(grep 'Initial Root Token:' /data/vault.init | awk '{print $NF}') > /data/token.txt > /dev/null
+vault login $(grep 'Initial Root Token:' /data/vault.init | awk '{print $NF}') > /data/token.txt 
 
 echo "Vault setup complete."
 
