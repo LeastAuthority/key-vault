@@ -85,26 +85,25 @@ func (b *backend) pathWalletsAccountSignAttestation(ctx context.Context, req *lo
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
-	portfolio, err := vault.NewKeyVault(&options)
-	//portfolio, err := vault.OpenKeyVault(&options)
+	//portfolio, err := vault.NewKeyVault(&options)
+	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
 		return nil, err
 	}
-	wallet, err := portfolio.CreateWallet(walletName)
-	//wallet, err := portfolio.WalletByName(walletName)
+	//wallet, err := portfolio.CreateWallet(walletName)
+	wallet, err := portfolio.WalletByName(walletName)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = wallet.CreateValidatorAccount(accountName)
-	if err != nil {
-		return nil, err
-	}
+	//_, err = wallet.CreateValidatorAccount(accountName)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	protector := slashing_protection.NewNormalProtection(storage)
 	signer := validator_signer.NewSimpleSigner(wallet, protector)
-	println("before signing")
-	_, err = signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
+	res, err := signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
 		Id:     &pb.SignBeaconAttestationRequest_Account{Account: accountName},
 		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
 		Data: &pb.AttestationData{
@@ -124,12 +123,9 @@ func (b *backend) pathWalletsAccountSignAttestation(ctx context.Context, req *lo
 	if err != nil {
 		return nil, err
 	}
-	println("before response")
-	//println(res.GetSignature())
-	println("after response")
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"signature": "res.GetSignature()",
+			"signature": res.GetSignature(),
 		},
 	}, nil
 }
