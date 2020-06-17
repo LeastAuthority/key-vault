@@ -52,7 +52,6 @@ func TestWalletCreate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
-
 	if res.Error() != nil {
 		t.Error(res.Error())
 	}
