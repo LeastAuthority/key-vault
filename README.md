@@ -301,7 +301,7 @@ This endpoint will return deposit data.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `GET`  | `:mount-path/wallets/:wallet_name/accounts/:account_name/deposit-data`  | `200 application/json` |
+| `GET`  | `:mount-path/wallets/:wallet_name/accounts/:account_name/deposit-data/`  | `200 application/json` |
 
 #### Parameters
 
