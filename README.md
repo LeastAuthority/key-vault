@@ -79,6 +79,11 @@
   4. Trigger a plugin reload
   
         ```sh
+        Sample Payload:
+        {
+            "plugin": "ethsign"
+        }
+     
         $ curl \
             --header "X-Vault-Token: ..." \
             --request PUT \
