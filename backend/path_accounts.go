@@ -112,18 +112,18 @@ func (b *backend) pathWalletsAccountDepositData(ctx context.Context, req *logica
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
-	//portfolio, err := vault.OpenKeyVault(&options)
-	portfolio, err := vault.NewKeyVault(&options)
+	portfolio, err := vault.OpenKeyVault(&options)
+	//portfolio, err := vault.NewKeyVault(&options)
 	if err != nil {
 		return nil, err
 	}
-	//wallet, err := portfolio.WalletByName(walletName)
-	wallet, err := portfolio.CreateWallet(walletName)
+	wallet, err := portfolio.WalletByName(walletName)
+	//wallet, err := portfolio.CreateWallet(walletName)
 	if err != nil {
 		return nil, err
 	}
-	//account, err := wallet.AccountByName(accountName)
-	account, err := wallet.CreateValidatorAccount(accountName)
+	account, err := wallet.AccountByName(accountName)
+	//account, err := wallet.CreateValidatorAccount(accountName)
 	if err != nil {
 		return nil, err
 	}
