@@ -5,7 +5,7 @@ FROM golang:1.14-stretch AS preparer
 
 RUN apt-get update                                                        && \
   DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
-    curl git zip unzip wget g++ python gcc                                   \
+    curl git zip unzip wget g++ python gcc jq                                \
   && rm -rf /var/lib/apt/lists/*
 
 RUN go version
@@ -43,6 +43,7 @@ COPY ./config/vault-init-unseal.sh /vault/config/vault-init-unseal.sh
 COPY ./config/entrypoint.sh /vault/config/entrypoint.sh
 RUN chown vault /vault/config/vault-init-unseal.sh 
 RUN chown vault /vault/config/entrypoint.sh
+RUN apk add jq
 
 WORKDIR /
 
@@ -50,4 +51,4 @@ WORKDIR /
 EXPOSE 8200
 
 # Run vault
-ENTRYPOINT ["/vault/config/entrypoint.sh"]
+CMD ["/vault/config/entrypoint.sh"]
