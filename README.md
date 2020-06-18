@@ -366,13 +366,11 @@ The example below shows output for the successful creation of `/ethereum/wallets
     "renewable": false,
     "lease_duration": 0,
     "data": {
-        "depositData": {
-            "amount": 32000000000,
-            "depositDataRoot": "6f3c48737eb58f47acf8268dad48d951577beb1d3c5dedbbe57f5ebf9e2c08a6",
-            "publicKey": "g8yu7YB3jEy79oUubQf0ESg+WAfG9Vxh1zeUQr+3+wQhPHBL5Y3PRzma9CxQ5Zbc",
-            "signature": "h2MWkBLgd4e6npSLdqWqJJI0opyPskph+IOIn6m4PS13rHOBaRHXaWarlm+0FymvF0OAWxPTMAa7jWiluOZJSryt3d+7Gqewdk15CGS2F2MCSAyUFCO4Kq6BR3kzvwyN",
-            "withdrawalCredentials": "AK7JF5gDHMPr7gCzRT6bweOqw0ryIZ6VAasAlnAMisc="
-        }
+        "amount": 32000000000,
+        "depositDataRoot": "6f3c48737eb58f47acf8268dad48d951577beb1d3c5dedbbe57f5ebf9e2c08a6",
+        "publicKey": "g8yu7YB3jEy79oUubQf0ESg+WAfG9Vxh1zeUQr+3+wQhPHBL5Y3PRzma9CxQ5Zbc",
+        "signature": "h2MWkBLgd4e6npSLdqWqJJI0opyPskph+IOIn6m4PS13rHOBaRHXaWarlm+0FymvF0OAWxPTMAa7jWiluOZJSryt3d+7Gqewdk15CGS2F2MCSAyUFCO4Kq6BR3kzvwyN",
+        "withdrawalCredentials": "AK7JF5gDHMPr7gCzRT6bweOqw0ryIZ6VAasAlnAMisc="
     },
     "wrap_info": null,
     "warnings": null,
