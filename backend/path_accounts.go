@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"encoding/hex"
 
 	vault "github.com/bloxapp/KeyVault"
 	"github.com/bloxapp/KeyVault/core"
@@ -124,12 +125,15 @@ func (b *backend) pathWalletsAccountDepositData(ctx context.Context, req *logica
 		return nil, err
 	}
 	withdrawal, err := wallet.GetWithdrawalAccount()
-
-	depositData, _, err := eth1_deposit.DepositData(account, withdrawal, eth1_deposit.MaxEffectiveBalanceInGwei)
+	depositData, root, err := eth1_deposit.DepositData(account, withdrawal, eth1_deposit.MaxEffectiveBalanceInGwei)
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"depositData": depositData,
+			"amount":                depositData.GetAmount(),
+			"publicKey":             depositData.GetPublicKey(),
+			"signature":             depositData.GetSignature(),
+			"withdrawalCredentials": depositData.GetWithdrawalCredentials(),
+			"depositDataRoot":       hex.EncodeToString(root[:]),
 		},
 	}, nil
 }

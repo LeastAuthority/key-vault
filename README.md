@@ -79,7 +79,11 @@
   4. Trigger a plugin reload
   
         ```sh
-        $ vault plugin reload -plugin=ethsign
+        $ curl \
+            --header "X-Vault-Token: ..." \
+            --request PUT \
+            --data @payload.json \
+            http://127.0.0.1:8200/v1/sys/plugins/reload/backend
         ```
      
 ### LIST WALLETS
@@ -359,9 +363,10 @@ The example below shows output for the successful creation of `/ethereum/wallets
     "data": {
         "depositData": {
             "amount": 32000000000,
-            "public_key": "g8yu7YB3jEy79oUubQf0ESg+WAfG9Vxh1zeUQr+3+wQhPHBL5Y3PRzma9CxQ5Zbc",
+            "depositDataRoot": "6f3c48737eb58f47acf8268dad48d951577beb1d3c5dedbbe57f5ebf9e2c08a6",
+            "publicKey": "g8yu7YB3jEy79oUubQf0ESg+WAfG9Vxh1zeUQr+3+wQhPHBL5Y3PRzma9CxQ5Zbc",
             "signature": "h2MWkBLgd4e6npSLdqWqJJI0opyPskph+IOIn6m4PS13rHOBaRHXaWarlm+0FymvF0OAWxPTMAa7jWiluOZJSryt3d+7Gqewdk15CGS2F2MCSAyUFCO4Kq6BR3kzvwyN",
-            "withdrawal_credentials": "AK7JF5gDHMPr7gCzRT6bweOqw0ryIZ6VAasAlnAMisc="
+            "withdrawalCredentials": "AK7JF5gDHMPr7gCzRT6bweOqw0ryIZ6VAasAlnAMisc="
         }
     },
     "wrap_info": null,
