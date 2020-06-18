@@ -17,7 +17,7 @@ func signsPaths(b *backend) []*framework.Path {
 	return []*framework.Path{
 		&framework.Path{
 			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign-attestation",
-			HelpSynopsis:    "Sign",
+			HelpSynopsis:    "Sign attestation",
 			HelpDescription: `Sign attestation`,
 			Fields: map[string]*framework.FieldSchema{
 				"wallet_name":  &framework.FieldSchema{Type: framework.TypeString},
@@ -30,42 +30,85 @@ func signsPaths(b *backend) []*framework.Path {
 				"slot": &framework.FieldSchema{
 					Type:        framework.TypeInt,
 					Description: "Data Slot",
-					Default:     1,
+					Default:     0,
 				},
 				"committeeIndex": &framework.FieldSchema{
 					Type:        framework.TypeInt,
 					Description: "Data CommitteeIndex",
-					Default:     5,
+					Default:     0,
 				},
 				"beaconBlockRoot": &framework.FieldSchema{
 					Type:        framework.TypeString,
 					Description: "Data BeaconBlockRoot",
-					Default:     "test",
+					Default:     "",
 				},
 				"sourceEpoch": &framework.FieldSchema{
 					Type:        framework.TypeInt,
 					Description: "Data Source Epoch",
-					Default:     6,
+					Default:     0,
 				},
 				"sourceRoot": &framework.FieldSchema{
 					Type:        framework.TypeString,
 					Description: "Data Source Root",
-					Default:     "test2",
+					Default:     "",
 				},
 				"targetEpoch": &framework.FieldSchema{
 					Type:        framework.TypeInt,
 					Description: "Data Target Epoch",
-					Default:     45,
+					Default:     0,
 				},
 				"targetRoot": &framework.FieldSchema{
 					Type:        framework.TypeString,
 					Description: "Data Target Root",
-					Default:     "test3",
+					Default:     "",
 				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
 				logical.CreateOperation: b.pathWalletsAccountSignAttestation,
+			},
+		},
+		&framework.Path{
+			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign-proposal",
+			HelpSynopsis:    "Sign proposal",
+			HelpDescription: `Sign proposal`,
+			Fields: map[string]*framework.FieldSchema{
+				"wallet_name":  &framework.FieldSchema{Type: framework.TypeString},
+				"account_name": &framework.FieldSchema{Type: framework.TypeString},
+				"domain": &framework.FieldSchema{
+					Type:        framework.TypeString,
+					Description: "Domain",
+					Default:     "",
+				},
+				"slot": &framework.FieldSchema{
+					Type:        framework.TypeInt,
+					Description: "Data Slot",
+					Default:     0,
+				},
+				"proposerIndex": &framework.FieldSchema{
+					Type:        framework.TypeInt,
+					Description: "Data ProposerIndex",
+					Default:     0,
+				},
+				"parentRoot": &framework.FieldSchema{
+					Type:        framework.TypeString,
+					Description: "Data ParentRoot",
+					Default:     "",
+				},
+				"stateRoot": &framework.FieldSchema{
+					Type:        framework.TypeString,
+					Description: "Data StateRoot",
+					Default:     "",
+				},
+				"bodyRoot": &framework.FieldSchema{
+					Type:        framework.TypeString,
+					Description: "Data BodyRoot",
+					Default:     "",
+				},
+			},
+			ExistenceCheck: b.pathExistenceCheck,
+			Callbacks: map[logical.Operation]framework.OperationFunc{
+				logical.CreateOperation: b.pathWalletsAccountSignProposal,
 			},
 		},
 	}
@@ -120,6 +163,52 @@ func (b *backend) pathWalletsAccountSignAttestation(ctx context.Context, req *lo
 			},
 		},
 	})
+	if err != nil {
+		return nil, err
+	}
+	return &logical.Response{
+		Data: map[string]interface{}{
+			"signature": res.GetSignature(),
+		},
+	}, nil
+}
+
+func (b *backend) pathWalletsAccountSignProposal(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	walletName := data.Get("wallet_name").(string)
+	accountName := data.Get("account_name").(string)
+	domain := data.Get("domain").(string)
+	slot := data.Get("slot").(int)
+	proposerIndex := data.Get("proposerIndex").(int)
+	parentRoot := data.Get("parentRoot").(string)
+	stateRoot := data.Get("stateRoot").(string)
+	bodyRoot := data.Get("bodyRoot").(string)
+	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	options := vault.PortfolioOptions{}
+	options.SetStorage(storage)
+	portfolio, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil, err
+	}
+	wallet, err := portfolio.WalletByName(walletName)
+	if err != nil {
+		return nil, err
+	}
+
+	proposalRequest := &pb.SignBeaconProposalRequest{
+		Id:     &pb.SignBeaconProposalRequest_Account{Account: accountName},
+		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
+		Data: &pb.BeaconBlockHeader{
+			Slot:          uint64(slot),
+			ProposerIndex: uint64(proposerIndex),
+			ParentRoot:    ignoreError(hex.DecodeString(parentRoot)).([]byte),
+			StateRoot:     ignoreError(hex.DecodeString(stateRoot)).([]byte),
+			BodyRoot:      ignoreError(hex.DecodeString(bodyRoot)).([]byte),
+		},
+	}
+
+	protector := slashing_protection.NewNormalProtection(storage)
+	signer := validator_signer.NewSimpleSigner(wallet, protector)
+	res, err := signer.SignBeaconProposal(proposalRequest)
 	if err != nil {
 		return nil, err
 	}
