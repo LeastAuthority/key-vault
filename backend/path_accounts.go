@@ -112,15 +112,18 @@ func (b *backend) pathWalletsAccountDepositData(ctx context.Context, req *logica
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
-	portfolio, err := vault.OpenKeyVault(&options)
+	//portfolio, err := vault.OpenKeyVault(&options)
+	portfolio, err := vault.NewKeyVault(&options)
 	if err != nil {
 		return nil, err
 	}
-	wallet, err := portfolio.WalletByName(walletName)
+	//wallet, err := portfolio.WalletByName(walletName)
+	wallet, err := portfolio.CreateWallet(walletName)
 	if err != nil {
 		return nil, err
 	}
-	account, err := wallet.AccountByName(accountName)
+	//account, err := wallet.AccountByName(accountName)
+	account, err := wallet.CreateValidatorAccount(accountName)
 	if err != nil {
 		return nil, err
 	}
@@ -130,9 +133,9 @@ func (b *backend) pathWalletsAccountDepositData(ctx context.Context, req *logica
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"amount":                depositData.GetAmount(),
-			"publicKey":             depositData.GetPublicKey(),
-			"signature":             depositData.GetSignature(),
-			"withdrawalCredentials": depositData.GetWithdrawalCredentials(),
+			"publicKey":             hex.EncodeToString(depositData.GetPublicKey()),
+			"signature":             hex.EncodeToString(depositData.GetSignature()),
+			"withdrawalCredentials": hex.EncodeToString(depositData.GetWithdrawalCredentials()),
 			"depositDataRoot":       hex.EncodeToString(root[:]),
 		},
 	}, nil
