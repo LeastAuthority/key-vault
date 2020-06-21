@@ -29,6 +29,7 @@ func Backend() (*backend, error) {
 			walletsPaths(&b),
 			accountsPaths(&b),
 			signsPaths(&b),
+			portfoliosPaths(&b),
 		),
 		PathsSpecial: &logical.Paths{
 			SealWrapStorage: []string{
