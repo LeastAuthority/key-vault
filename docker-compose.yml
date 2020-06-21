@@ -10,11 +10,12 @@ services:
       - 8200:8200
     volumes:
       - ./data:/data
+      - ./keys:/keys
     environment:
       VAULT_ADDR: http://vault:8200
       VAULT_API_ADDR: http://vault:8200
       VAULT_CLIENT_TIMEOUT: "30s"
-    command: server -config=/vault/config/vault-config.json -log-level=debug
+    # command: server -config=/vault/config/vault-config.json -log-level=debug
     # command: server -dev -dev-root-token-id=root -dev-plugin-dir=./vault/plugins
     cap_add:
       - IPC_LOCK
