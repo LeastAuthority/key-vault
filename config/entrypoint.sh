@@ -13,7 +13,13 @@ fi
 vault status 
 if [[ $? -eq 2 ]]; then 
   vault operator unseal $(cat /keys/vault.unseal.token ) >/dev/null 2>&1
-  vault login $(cat /keys/vault.root.token ) >/dev/null 2>&1
+  vault login $(cat /keys/vault.root.token) >/dev/null 2>&1
 fi 
+
+# Upgrade Ethereum 2.0 Signing Plugin
+vault login $(cat /keys/vault.root.token)
+export SHASUM256=$(sha256sum "/vault/plugins/ethsign" | cut -d' ' -f1)
+vault write /sys/plugins/catalog/secret/ethsign sha_256=${SHASUM256} command=ethsign
+curl --header "X-Vault-Token: $(cat /keys/vault.root.token)" --request PUT --data '{"plugin": "ethsign"}'  http://127.0.0.1:8200/v1/sys/plugins/reload/backend
 
 sleep 356000d
