@@ -3,6 +3,7 @@
 vault server -config=/vault/config/vault-config.json > /dev/null 2&1
 sleep 5
 mkdir /data/keys
+apk add curl
 vault operator init -status
 if [[ $? -eq 2 ]]; then
  vault operator init -key-shares=1 -key-threshold=1 -recovery-shares=1 -recovery-threshold=1 -format=json > /tmp/vault.init 2>&1
