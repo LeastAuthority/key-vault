@@ -2,7 +2,7 @@
 
 vault server -config=/vault/config/vault-config.json > /dev/null 2&1
 sleep 5
-mkdir /data/keys
+mkdir -p /data/keys
 apk add curl
 vault operator init -status
 if [[ $? -eq 2 ]]; then
