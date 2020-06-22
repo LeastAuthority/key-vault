@@ -42,8 +42,6 @@ COPY ./config/vault-config.json /vault/config/vault-config.json
 COPY ./config/entrypoint.sh /vault/config/entrypoint.sh
 RUN chown vault /vault/config/entrypoint.sh
 RUN apk add jq
-RUN mkdir /data/keys
-RUN chown vault /data/keys
 
 WORKDIR /
 
