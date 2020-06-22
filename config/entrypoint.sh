@@ -19,7 +19,7 @@ if [[ $? -eq 2 ]]; then
 fi 
 
 # Upgrade Ethereum 2.0 Signing Plugin
-vault login $(cat /data/keys/vault.root.token)
+#vault login $(cat /data/keys/vault.root.token)
 export SHASUM256=$(sha256sum "/vault/plugins/ethsign" | cut -d' ' -f1)
 vault write /sys/plugins/catalog/secret/ethsign sha_256=${SHASUM256} command=ethsign
 vault secrets enable -path=ethereum -description="Eth Signing Wallet" -plugin-name=ethsign plugin > /dev/null 2>&1
