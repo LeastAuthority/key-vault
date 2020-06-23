@@ -10,6 +10,7 @@ import (
 	"github.com/bloxapp/KeyVault/validator_signer"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
+	"github.com/pkg/errors"
 	pb "github.com/wealdtech/eth2-signer-api/pb/v1"
 )
 
@@ -128,15 +129,15 @@ func (b *backend) pathWalletsAccountSignAttestation(ctx context.Context, req *lo
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
-	//portfolio, err := vault.NewKeyVault(&options)
+
 	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to open key vault")
 	}
-	//wallet, err := portfolio.CreateWallet(walletName)
+
 	wallet, err := portfolio.WalletByName(walletName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
 	//_, err = wallet.CreateValidatorAccount(accountName)
@@ -164,8 +165,9 @@ func (b *backend) pathWalletsAccountSignAttestation(ctx context.Context, req *lo
 		},
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to sign data")
 	}
+
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"signature": res.GetSignature(),
@@ -182,16 +184,19 @@ func (b *backend) pathWalletsAccountSignProposal(ctx context.Context, req *logic
 	parentRoot := data.Get("parentRoot").(string)
 	stateRoot := data.Get("stateRoot").(string)
 	bodyRoot := data.Get("bodyRoot").(string)
+
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
+
 	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to open key vault")
 	}
+
 	wallet, err := portfolio.WalletByName(walletName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
 	proposalRequest := &pb.SignBeaconProposalRequest{
@@ -210,8 +215,9 @@ func (b *backend) pathWalletsAccountSignProposal(ctx context.Context, req *logic
 	signer := validator_signer.NewSimpleSigner(wallet, protector)
 	res, err := signer.SignBeaconProposal(proposalRequest)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to sign data")
 	}
+
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"signature": res.GetSignature(),

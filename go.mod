@@ -7,5 +7,7 @@ require (
 	github.com/hashicorp/go-hclog v0.14.1
 	github.com/hashicorp/vault/api v1.0.4
 	github.com/hashicorp/vault/sdk v0.1.13
+	github.com/pkg/errors v0.9.1
 	github.com/wealdtech/eth2-signer-api v1.3.0
+	github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4 v1.0.0
 )

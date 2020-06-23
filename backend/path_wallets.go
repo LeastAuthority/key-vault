@@ -8,6 +8,7 @@ import (
 	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
+	"github.com/pkg/errors"
 )
 
 func walletsPaths(b *backend) []*framework.Path {
@@ -42,16 +43,15 @@ func (b *backend) pathWalletCreate(ctx context.Context, req *logical.Request, da
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
-	portfolio, err := vault.OpenKeyVault(&options)
+
+	portfolio, err := vault.NewKeyVault(&options)
 	if err != nil {
-		portfolio, err = vault.NewKeyVault(&options)
+		return nil, errors.Wrap(err, "failed to create new key vault")
 	}
-	if err != nil {
-		return nil, err
-	}
+
 	wallet, err := portfolio.CreateWallet(walletName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create new wallet")
 	}
 
 	return &logical.Response{
@@ -65,11 +65,13 @@ func (b *backend) pathWalletsList(ctx context.Context, req *logical.Request, dat
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
+
 	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to open key vault")
 	}
-	wallets := make([]core.Wallet, 0)
+
+	var wallets []core.Wallet
 	for w := range portfolio.Wallets() {
 		wallets = append(wallets, w)
 	}
