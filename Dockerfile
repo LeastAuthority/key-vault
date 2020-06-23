@@ -40,6 +40,10 @@ WORKDIR /vault/plugins/
 COPY --from=builder /go/src/github.com/bloxapp/vault-plugin-secrets-eth2.0/ethsign ./ethsign
 COPY ./config/vault-config.json /vault/config/vault-config.json
 COPY ./config/entrypoint.sh /vault/config/entrypoint.sh
+COPY ./config/vault-init.sh /vault/config/vault-init.sh
+COPY ./config/vault-unseal.sh /vault/config/vault-unseal.sh
+COPY ./config/vault-plugin.sh /vault/config/vault-plugin.sh
+
 RUN chown vault /vault/config/entrypoint.sh
 RUN apk add jq
 
