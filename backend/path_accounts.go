@@ -10,6 +10,7 @@ import (
 	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
+	"github.com/pkg/errors"
 )
 
 func accountsPaths(b *backend) []*framework.Path {
@@ -61,17 +62,20 @@ func (b *backend) pathWalletsAccountCreate(ctx context.Context, req *logical.Req
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
+
 	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to open key vault")
 	}
+
 	wallet, err := portfolio.WalletByName(walletName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
+
 	account, err := wallet.CreateValidatorAccount(accountName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create a new validator account")
 	}
 
 	return &logical.Response{
@@ -86,15 +90,18 @@ func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Reque
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
+
 	portfolio, err := vault.OpenKeyVault(&options)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to open key vault")
 	}
+
 	wallet, err := portfolio.WalletByName(walletName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
-	accounts := make([]core.Account, 0)
+
+	var accounts []core.Account
 	for a := range wallet.Accounts() {
 		accounts = append(accounts, a)
 	}
@@ -112,23 +119,31 @@ func (b *backend) pathWalletsAccountDepositData(ctx context.Context, req *logica
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
+
 	portfolio, err := vault.OpenKeyVault(&options)
-	//portfolio, err := vault.NewKeyVault(&options)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to open key vault")
 	}
+
 	wallet, err := portfolio.WalletByName(walletName)
-	//wallet, err := portfolio.CreateWallet(walletName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
+
 	account, err := wallet.AccountByName(accountName)
-	//account, err := wallet.CreateValidatorAccount(accountName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to retrieve account by name")
 	}
+
 	withdrawal, err := wallet.GetWithdrawalAccount()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get withdrawal account")
+	}
+
 	depositData, root, err := eth1_deposit.DepositData(account, withdrawal, eth1_deposit.MaxEffectiveBalanceInGwei)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get deposit data")
+	}
 
 	return &logical.Response{
 		Data: map[string]interface{}{

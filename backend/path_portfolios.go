@@ -8,6 +8,7 @@ import (
 	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
+	"github.com/pkg/errors"
 )
 
 func portfoliosPaths(b *backend) []*framework.Path {
@@ -18,7 +19,7 @@ func portfoliosPaths(b *backend) []*framework.Path {
 			HelpDescription: `Export seed`,
 			ExistenceCheck:  b.pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
-				logical.CreateOperation: b.pathWalletExport,
+				logical.ReadOperation: b.pathWalletExport,
 			},
 		},
 		&framework.Path{
@@ -40,13 +41,15 @@ func (b *backend) pathWalletExport(ctx context.Context, req *logical.Request, da
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
-	_, err := vault.OpenKeyVault(&options)
-	//_, err := vault.NewKeyVault(&options)
-	if err != nil {
-		return nil, err
+
+	if _, err := vault.OpenKeyVault(&options); err != nil {
+		return nil, errors.Wrap(err, "failed to open key vault")
 	}
 
-	seed, _ := storage.SecurelyFetchPortfolioSeed()
+	seed, err := storage.SecurelyFetchPortfolioSeed()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to fetch portfolio seed")
+	}
 
 	return &logical.Response{
 		Data: map[string]interface{}{
@@ -57,15 +60,18 @@ func (b *backend) pathWalletExport(ctx context.Context, req *logical.Request, da
 
 func (b *backend) pathWalletImport(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	seed := data.Get("seed").(string)
-	seedDecoded, _ := hex.DecodeString(seed)
+	seedDecoded, err := hex.DecodeString(seed)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to hex decode the given seed")
+	}
+
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
 	options.SetSeed(seedDecoded)
-	//_, err := vault.NewKeyVault(&options)
-	_, err := vault.ImportKeyVault(&options)
-	if err != nil {
-		return nil, err
+
+	if _, err := vault.ImportKeyVault(&options); err != nil {
+		return nil, errors.Wrap(err, "failed to import key vault")
 	}
 
 	return &logical.Response{
