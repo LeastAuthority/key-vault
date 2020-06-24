@@ -112,6 +112,29 @@ func signsPaths(b *backend) []*framework.Path {
 				logical.CreateOperation: b.pathWalletsAccountSignProposal,
 			},
 		},
+		&framework.Path{
+			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/sign-aggregation",
+			HelpSynopsis:    "Sign aggregation",
+			HelpDescription: `Sign aggregation`,
+			Fields: map[string]*framework.FieldSchema{
+				"wallet_name":  &framework.FieldSchema{Type: framework.TypeString},
+				"account_name": &framework.FieldSchema{Type: framework.TypeString},
+				"domain": &framework.FieldSchema{
+					Type:        framework.TypeString,
+					Description: "Domain",
+					Default:     "",
+				},
+				"dataToSign": &framework.FieldSchema{
+					Type:        framework.TypeBool,
+					Description: "Data to sign",
+					Default:     "",
+				},
+			},
+			ExistenceCheck: b.pathExistenceCheck,
+			Callbacks: map[logical.Operation]framework.OperationFunc{
+				logical.CreateOperation: b.pathWalletsAccountSignAggregation,
+			},
+		},
 	}
 }
 
@@ -214,6 +237,46 @@ func (b *backend) pathWalletsAccountSignProposal(ctx context.Context, req *logic
 	protector := slashing_protection.NewNormalProtection(storage)
 	signer := validator_signer.NewSimpleSigner(wallet, protector)
 	res, err := signer.SignBeaconProposal(proposalRequest)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to sign data")
+	}
+
+	return &logical.Response{
+		Data: map[string]interface{}{
+			"signature": res.GetSignature(),
+		},
+	}, nil
+}
+
+func (b *backend) pathWalletsAccountSignAggregation(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	walletName := data.Get("wallet_name").(string)
+	accountName := data.Get("account_name").(string)
+	domain := data.Get("domain").(string)
+	dataToSign := data.Get("dataToSign").(string)
+
+	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	options := vault.PortfolioOptions{}
+	options.SetStorage(storage)
+
+	portfolio, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open key vault")
+	}
+
+	wallet, err := portfolio.WalletByName(walletName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
+	}
+
+	proposalRequest := &pb.SignRequest{
+		Id:     &pb.SignRequest_Account{Account: accountName},
+		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
+		Data:   ignoreError(hex.DecodeString(dataToSign)).([]byte),
+	}
+
+	protector := slashing_protection.NewNormalProtection(storage)
+	signer := validator_signer.NewSimpleSigner(wallet, protector)
+	res, err := signer.Sign(proposalRequest)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to sign data")
 	}
