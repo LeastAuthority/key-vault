@@ -12,6 +12,8 @@ import (
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
 	pb "github.com/wealdtech/eth2-signer-api/pb/v1"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/fakesigner"
 )
 
 func signsPaths(b *backend) []*framework.Path {
@@ -146,7 +148,15 @@ func (b *backend) pathWalletsAccountSignAttestation(ctx context.Context, req *lo
 	//}
 
 	protector := slashing_protection.NewNormalProtection(storage)
-	signer := validator_signer.NewSimpleSigner(wallet, protector)
+	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
+
+	//----------------------------
+	// TODO: REMOVE THIS
+	//----------------------------
+	if signer, err = fakesigner.New(); err != nil {
+		return nil, errors.Wrap(err, "failed to create a fake signer")
+	}
+
 	res, err := signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
 		Id:     &pb.SignBeaconAttestationRequest_Account{Account: accountName},
 		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
@@ -212,7 +222,15 @@ func (b *backend) pathWalletsAccountSignProposal(ctx context.Context, req *logic
 	}
 
 	protector := slashing_protection.NewNormalProtection(storage)
-	signer := validator_signer.NewSimpleSigner(wallet, protector)
+	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
+
+	//----------------------------
+	// TODO: REMOVE THIS
+	//----------------------------
+	if signer, err = fakesigner.New(); err != nil {
+		return nil, errors.Wrap(err, "failed to create a fake signer")
+	}
+
 	res, err := signer.SignBeaconProposal(proposalRequest)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to sign data")
