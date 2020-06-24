@@ -342,6 +342,40 @@ The example below shows output for the successful creation of `/ethereum/wallets
 }
 ```
 
+### SIGN AGGREGATION
+
+This endpoint will sign attestation for specific account at a path.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `POST`  | `:mount-path/wallets/:wallet_name/accounts/:account_name/sign-aggregation`  | `200 application/json` |
+
+#### Parameters
+
+* `walet_name` (`string: <required>`) - Specifies the name of the wallet of the account to sign. This is specified as part of the URL.
+* `account_name` (`string: <required>`) - Specifies the name of the account to sign. This is specified as part of the URL.
+* `domain` (`string: <required>`) - Specifies the domain.
+* `dataToSign` (`string: <required>`) - Specifies the slot.
+
+#### Sample Response
+
+The example below shows output for the successful creation of `/ethereum/wallets/wallet1/accounts/account1/sign-aggregation`.
+
+```
+{
+    "request_id": "b767dcca-5b10-4a52-1d9a-0a9b81b378ae",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "signature": "kPyCp8ID44ceUB3KSp+7QsxqTlGSP2u6/cytr04qJyxkkIKIO/FW57qwH9E7/c48D1PgHsyb8hgoT8/jOLMD7Y/Jt06Qiw80ZRtoS78CzMFYRut/OQot+FzAJcW7Jk0U"
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}
+```
+
 ### GET DEPOSIT DATA
 
 This endpoint will return deposit data.
