@@ -5,12 +5,13 @@ import (
 	"encoding/hex"
 
 	vault "github.com/bloxapp/KeyVault"
-	"github.com/bloxapp/KeyVault/core"
 	"github.com/bloxapp/KeyVault/eth1_deposit"
 	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/fakesigner"
 )
 
 func accountsPaths(b *backend) []*framework.Path {
@@ -101,9 +102,22 @@ func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Reque
 		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
-	var accounts []core.Account
+	/*var accounts []core.Account
 	for a := range wallet.Accounts() {
 		accounts = append(accounts, a)
+	}*/
+
+	//----------------------------
+	// TODO: REMOVE THIS
+	//----------------------------
+	var accounts []map[string]interface{}
+	for a := range wallet.Accounts() {
+		acc, err := fakesigner.ReplacePublicKey(a)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to replace account public key")
+		}
+
+		accounts = append(accounts, acc)
 	}
 
 	return &logical.Response{
