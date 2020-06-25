@@ -83,5 +83,15 @@ func (fs *fakeSigner) SignBeaconAttestation(req *pb.SignBeaconAttestationRequest
 
 // Sign implements validator_signer.ValidatorSigner interface.
 func (fs *fakeSigner) Sign(req *pb.SignRequest) (*pb.SignResponse, error) {
-	panic("not implemented")
+	preparedData, err := validator_signer.PrepareReqForSigning(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to prepare data for signing")
+	}
+
+	sig := fs.key.SecretKey.Sign(preparedData[:])
+
+	return &pb.SignResponse{
+		State:     pb.ResponseState_SUCCEEDED,
+		Signature: sig.Marshal(),
+	}, nil
 }
