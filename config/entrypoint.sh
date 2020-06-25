@@ -1,6 +1,6 @@
 #!/bin/sh
 
-vault server -config=/vault/config/vault-config.json > /dev/null 2&1
+vault server -config=/vault/config/vault-config.json -log-level=debug > /data/logs 2&1
 sleep 5
 mkdir -p /data/keys
 apk add curl
