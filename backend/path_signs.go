@@ -65,6 +65,11 @@ func signsPaths(b *backend) []*framework.Path {
 					Description: "Data Target Root",
 					Default:     "",
 				},
+				"useFakeSigner": &framework.FieldSchema{
+					Type:        framework.TypeBool,
+					Description: "True if the fake signer should be used",
+					Default:     "",
+				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
@@ -108,6 +113,11 @@ func signsPaths(b *backend) []*framework.Path {
 					Description: "Data BodyRoot",
 					Default:     "",
 				},
+				"useFakeSigner": &framework.FieldSchema{
+					Type:        framework.TypeBool,
+					Description: "True if the fake signer should be used",
+					Default:     "",
+				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
@@ -127,8 +137,13 @@ func signsPaths(b *backend) []*framework.Path {
 					Default:     "",
 				},
 				"dataToSign": &framework.FieldSchema{
-					Type:        framework.TypeBool,
+					Type:        framework.TypeString,
 					Description: "Data to sign",
+					Default:     "",
+				},
+				"useFakeSigner": &framework.FieldSchema{
+					Type:        framework.TypeBool,
+					Description: "True if the fake signer should be used",
 					Default:     "",
 				},
 			},
