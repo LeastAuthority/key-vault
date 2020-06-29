@@ -1,6 +1,6 @@
 #!/bin/sh
 
-apk add curl
+#apk add curl
 vault status 
 if [[ $? -eq 2 ]]; then 
   vault operator unseal $(cat /data/keys/vault.unseal.token ) >/dev/null 2>&1

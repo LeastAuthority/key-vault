@@ -33,7 +33,7 @@ FROM vault:latest AS runner
 
 # Download dependencies
 RUN apk -v --update --no-cache add \
-    bash ca-certificates
+    bash ca-certificates curl
 
 WORKDIR /vault/plugins/
 
