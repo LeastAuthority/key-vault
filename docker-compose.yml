@@ -20,3 +20,19 @@ services:
     # command: server -dev -dev-root-token-id=root -dev-plugin-dir=./vault/plugins
     cap_add:
       - IPC_LOCK
+
+  vault-image:
+    image: bloxstaking/key-vault:version-0.0.2
+    ports:
+      - 8200:8200
+    volumes:
+      - ./data:/data
+      - ./keys:/keys
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_API_ADDR: http://vault:8200
+      VAULT_CLIENT_TIMEOUT: "30s"
+      UNSEAL: "true"
+    # command: server -dev -dev-root-token-id=root -dev-plugin-dir=./vault/plugins
+    cap_add:
+      - IPC_LOCK
