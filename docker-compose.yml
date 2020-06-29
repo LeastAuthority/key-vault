@@ -22,7 +22,7 @@ services:
       - IPC_LOCK
 
   vault-image:
-    image: bloxstaking/key-vault:version-0.0.2
+    image: bloxstaking/key-vault:version-0.0.3
     ports:
       - 8200:8200
     volumes:
