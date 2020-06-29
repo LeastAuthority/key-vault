@@ -66,7 +66,7 @@ func signsPaths(b *backend) []*framework.Path {
 				"useFakeSigner": &framework.FieldSchema{
 					Type:        framework.TypeBool,
 					Description: "True if the fake signer should be used",
-					Default:     "",
+					Default:     false,
 				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
@@ -114,7 +114,7 @@ func signsPaths(b *backend) []*framework.Path {
 				"useFakeSigner": &framework.FieldSchema{
 					Type:        framework.TypeBool,
 					Description: "True if the fake signer should be used",
-					Default:     "",
+					Default:     false,
 				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
@@ -142,7 +142,7 @@ func signsPaths(b *backend) []*framework.Path {
 				"useFakeSigner": &framework.FieldSchema{
 					Type:        framework.TypeBool,
 					Description: "True if the fake signer should be used",
-					Default:     "",
+					Default:     false,
 				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
