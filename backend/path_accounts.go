@@ -41,6 +41,19 @@ func accountsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
+			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/read",
+			HelpSynopsis:    "Read an Ethereum 2.0 account by its name",
+			HelpDescription: ``,
+			Fields: map[string]*framework.FieldSchema{
+				"wallet_name":  &framework.FieldSchema{Type: framework.TypeString},
+				"account_name": &framework.FieldSchema{Type: framework.TypeString},
+			},
+			ExistenceCheck: b.pathExistenceCheck,
+			Callbacks: map[logical.Operation]framework.OperationFunc{
+				logical.ReadOperation: b.pathWalletsAccountRead,
+			},
+		},
+		&framework.Path{
 			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/deposit-data/",
 			HelpSynopsis:    "Get Deposit Data",
 			HelpDescription: `Get ETH1 Deposit Data`,
@@ -76,6 +89,36 @@ func (b *backend) pathWalletsAccountCreate(ctx context.Context, req *logical.Req
 	account, err := wallet.CreateValidatorAccount(accountName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create a new validator account")
+	}
+
+	return &logical.Response{
+		Data: map[string]interface{}{
+			"account": account,
+		},
+	}, nil
+}
+
+func (b *backend) pathWalletsAccountRead(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	walletName := data.Get("wallet_name").(string)
+	accountName := data.Get("account_name").(string)
+
+	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	options := vault.PortfolioOptions{}
+	options.SetStorage(storage)
+
+	portfolio, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open key vault")
+	}
+
+	wallet, err := portfolio.WalletByName(walletName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
+	}
+
+	account, err := wallet.AccountByName(accountName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read a validator account")
 	}
 
 	return &logical.Response{
