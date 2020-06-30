@@ -2,6 +2,8 @@ package backend
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 )
@@ -24,11 +26,13 @@ func Backend() (*backend, error) {
 	b.Backend = &framework.Backend{
 		Help: "",
 		Paths: framework.PathAppend(
-			paths(&b),
+			walletsPaths(&b),
+			accountsPaths(&b),
+			signsPaths(&b),
+			portfoliosPaths(&b),
 		),
 		PathsSpecial: &logical.Paths{
 			SealWrapStorage: []string{
-				"accounts/",
 				"wallets/",
 			},
 		},
@@ -43,9 +47,12 @@ type backend struct {
 	*framework.Backend
 }
 
-func paths(b *backend) []*framework.Path {
-	return []*framework.Path{
-		pathCreateAndListWallet(b),
-		pathCreateAndListAccount(b),
+func (b *backend) pathExistenceCheck(ctx context.Context, req *logical.Request, data *framework.FieldData) (bool, error) {
+	out, err := req.Storage.Get(ctx, req.Path)
+	if err != nil {
+		b.Logger().Error("Path existence check failed", err)
+		return false, fmt.Errorf("existence check failed: %v", err)
 	}
+
+	return out != nil, nil
 }
