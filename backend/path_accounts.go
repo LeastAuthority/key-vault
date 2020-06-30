@@ -29,7 +29,7 @@ func accountsPaths(b *backend) []*framework.Path {
 		},
 		&framework.Path{
 			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name"),
-			HelpSynopsis:    "Create an Ethereum 2.0 account",
+			HelpSynopsis:    "Create/Read an Ethereum 2.0 account",
 			HelpDescription: ``,
 			Fields: map[string]*framework.FieldSchema{
 				"wallet_name":  &framework.FieldSchema{Type: framework.TypeString},
@@ -38,19 +38,7 @@ func accountsPaths(b *backend) []*framework.Path {
 			ExistenceCheck: b.pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
 				logical.CreateOperation: b.pathWalletsAccountCreate,
-			},
-		},
-		&framework.Path{
-			Pattern:         "wallets/" + framework.GenericNameRegex("wallet_name") + "/accounts/" + framework.GenericNameRegex("account_name") + "/read",
-			HelpSynopsis:    "Read an Ethereum 2.0 account by its name",
-			HelpDescription: ``,
-			Fields: map[string]*framework.FieldSchema{
-				"wallet_name":  &framework.FieldSchema{Type: framework.TypeString},
-				"account_name": &framework.FieldSchema{Type: framework.TypeString},
-			},
-			ExistenceCheck: b.pathExistenceCheck,
-			Callbacks: map[logical.Operation]framework.OperationFunc{
-				logical.ReadOperation: b.pathWalletsAccountRead,
+				logical.ReadOperation:   b.pathWalletsAccountRead,
 			},
 		},
 		&framework.Path{

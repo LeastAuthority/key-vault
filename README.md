@@ -270,7 +270,7 @@ This endpoint will return an Ethereum 2.0 account by the given name.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `GET`  | `:mount-path/wallets/:wallet_name/accounts/:account_name/read`  | `200 application/json` |
+| `GET`  | `:mount-path/wallets/:wallet_name/accounts/:account_name`  | `200 application/json` |
 
 #### Parameters
 
@@ -279,7 +279,7 @@ This endpoint will return an Ethereum 2.0 account by the given name.
 
 #### Sample Response
 
-The example below shows output for the successful creation of `/ethereum/wallets/wallet1/accounts/account1/read`.
+The example below shows output for the successful creation of `/ethereum/wallets/wallet1/accounts/account1`.
 
 ```
 {
