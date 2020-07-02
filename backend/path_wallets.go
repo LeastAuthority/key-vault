@@ -43,14 +43,18 @@ func (b *backend) pathWalletCreate(ctx context.Context, req *logical.Request, da
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
-	// TODO throw proper error if portfolio doesn't exist
 	portfolio, err := vault.OpenKeyVault(&options)
-	// TODO move to new portfolio create path
 	if err != nil {
-		portfolio, err = vault.NewKeyVault(&options)
-	}
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create new key vault")
+		switch e := err.(type) {
+		// TODO move to portfolio create path
+		case *vault.NotExistError:
+			portfolio, err = vault.NewKeyVault(&options)
+			if err != nil {
+				return nil, errors.Wrap(err, "failed to create key vault")
+			}
+		default:
+			return nil, errors.Wrap(e, "failed to open key vault")
+		}
 	}
 
 	wallet, err := portfolio.CreateWallet(walletName)
