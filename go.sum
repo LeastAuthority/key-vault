@@ -94,6 +94,7 @@ github.com/bloxapp/KeyVault v0.0.0-20200624085117-6eaa88b21846 h1:cbkJiLhnMad3gG
 github.com/bloxapp/KeyVault v0.0.0-20200624085117-6eaa88b21846/go.mod h1:MO+HB1iiUhgRVftZCi5ww4gqR4/WXSdQDIRj8dHCKNw=
 github.com/bloxapp/KeyVault v0.0.0-20200625093714-727c0be68da9 h1:ARxFTkwm0MIh36mabUduuOxgegZQKKzIomX9K0Ak8xg=
 github.com/bloxapp/KeyVault v0.0.0-20200625093714-727c0be68da9/go.mod h1:MO+HB1iiUhgRVftZCi5ww4gqR4/WXSdQDIRj8dHCKNw=
+github.com/bloxapp/KeyVault v0.0.0-20200702084557-9df8b01ada4c/go.mod h1:MO+HB1iiUhgRVftZCi5ww4gqR4/WXSdQDIRj8dHCKNw=
 github.com/bloxapp/prysm v0.3.10 h1:UsA8bbUal9kRUATOcECdXL/cHB2mCa5qhvniSyQQyUY=
 github.com/bloxapp/prysm v0.3.10/go.mod h1:f0h0g08AjK1g0MjokJpCCNUTMw3TFOJb0PcHYx+6Kq8=
 github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40/go.mod h1:8rLXio+WjiTceGBHIoTvn60HIbs7Hm7bcHjyrSqYB9c=
