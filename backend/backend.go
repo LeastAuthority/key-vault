@@ -26,10 +26,10 @@ func Backend() (*backend, error) {
 	b.Backend = &framework.Backend{
 		Help: "",
 		Paths: framework.PathAppend(
+			portfoliosPaths(&b),
 			walletsPaths(&b),
 			accountsPaths(&b),
 			signsPaths(&b),
-			portfoliosPaths(&b),
 		),
 		PathsSpecial: &logical.Paths{
 			SealWrapStorage: []string{

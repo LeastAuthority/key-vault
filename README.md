@@ -453,3 +453,71 @@ The example below shows output for the successful creation of `/ethereum/wallets
     "auth": null
 }
 ```
+
+## Access Policies
+The plugin's endpoint paths are designed such that admin-level access policies vs. signer-level access policies can be easily separated.
+
+### Sample Signer Level Policy:
+Use the following policy to assign to a signer level access token, with the abilities to list accounts and sign transactions.
+
+```
+# Ability to list existing accounts ("list")
+path "ethereum/wallets/+/accounts/" {
+  capabilities = ["list"]
+}
+
+# Ability to create create accounts ("create") and read existing account ("read")
+path "ethereum/wallets/+/accounts/+" {
+  capabilities = ["read"]
+}
+
+# Ability to sign data ("create")
+path "ethereum/wallets/+/+/+/sign-*" {
+  capabilities = ["create"]
+}
+```
+
+### Sample Admin Level Policy:
+Use the following policy to assign to a admin level access token, with the full ability to create wallets, accounts, import existing seed, export seed, read/list wallets, accounts, read deposit-data and sign transactions.
+
+```
+# Ability to list existing wallets ("list")
+path "ethereum/wallets" {
+  capabilities = ["list"]
+}
+
+# Ability to create wallets ("create")
+path "ethereum/wallets/+" {
+  capabilities = ["create"]
+}
+
+# Ability to list existing accounts ("list")
+path "ethereum/wallets/+/accounts/" {
+  capabilities = ["list"]
+}
+
+# Ability to create create accounts ("create") and read existing account ("read")
+path "ethereum/wallets/+/accounts/+" {
+  capabilities = ["create", "read"]
+}
+
+# Ability to read deposit data ("read")
+path "ethereum/wallets/+/+/+/deposit-data/" {
+  capabilities = ["read"]
+}
+
+# Ability to sign data ("create")
+path "ethereum/wallets/+/+/+/sign-*" {
+  capabilities = ["create"]
+}
+
+# Ability to export seed ("read")
+path "ethereum/export" {
+  capabilities = ["read"]
+}
+
+# Ability to import seed ("create")
+path "ethereum/import" {
+  capabilities = ["create"]
+}
+```
