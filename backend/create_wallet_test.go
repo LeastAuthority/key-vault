@@ -32,27 +32,31 @@ func getBackend(t *testing.T) (logical.Backend, logical.Storage) {
 func TestWalletCreate(t *testing.T) {
 	b, _ := getBackend(t)
 
-	req := logical.TestRequest(t, logical.UpdateOperation, "wallets")
-	data := map[string]interface{}{
-		"walletName": "wallet1",
-	}
-	req.Data = data
+	req := logical.TestRequest(t, logical.CreateOperation, "wallets/wallet1")
+	storage := req.Storage
 	res, err := b.HandleRequest(context.Background(), req)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
-	req = logical.TestRequest(t, logical.UpdateOperation, "accounts")
-	data = map[string]interface{}{
-		"walletName":  "wallet1",
-		"accountName": "account1",
-	}
-	req.Data = data
+	req = logical.TestRequest(t, logical.CreateOperation, "wallets/wallet1/accounts/account1")
+	req.Storage = storage
 	res, err = b.HandleRequest(context.Background(), req)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
+	req = logical.TestRequest(t, logical.ListOperation, "wallets/wallet1/accounts/")
+	req.Storage = storage
+	res, err = b.HandleRequest(context.Background(), req)
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	//data = map[string]interface{}{
+	//	"walletName":  "wallet1",
+	//	"accountName": "account1",
+	//}
+	//req.Data = data
 	if res.Error() != nil {
 		t.Error(res.Error())
 	}
