@@ -521,3 +521,29 @@ path "ethereum/import" {
   capabilities = ["create"]
 }
 ```
+
+## How to use policies?
+
+  1. Create a new policy named admin:
+
+        ```sh
+        $ vault policy write admin policies/admin-policy.hcl
+        ```
+
+  2. Create a token attached to admin policy:
+
+        ```sh
+        $ vault token create -policy="admin"
+        ```
+
+  3. Create a new policy named signer:
+ 
+        ```sh
+        $ vault policy write signer policies/signer-policy.hcl
+        ```
+
+  4. Create a token attached to signer policy:
+
+        ```sh
+        $ vault token create -policy="signer"
+        ```

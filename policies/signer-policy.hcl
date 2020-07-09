@@ -3,7 +3,7 @@ path "ethereum/wallets/+/accounts/" {
   capabilities = ["list"]
 }
 
-# Ability to create create accounts ("create") and read existing account ("read")
+# Ability to read existing account ("read")
 path "ethereum/wallets/+/accounts/+" {
   capabilities = ["read"]
 }
