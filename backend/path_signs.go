@@ -165,6 +165,30 @@ func (b *backend) pathWalletsAccountSignAttestation(ctx context.Context, req *lo
 	targetEpoch := data.Get("targetEpoch").(int)
 	targetRoot := data.Get("targetRoot").(string)
 
+	// Decode domain
+	domainBytes, err := hex.DecodeString(domain)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode domain")
+	}
+
+	// Decode beacon block root
+	beaconBlockRootBytes, err := hex.DecodeString(beaconBlockRoot)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode beacon block root")
+	}
+
+	// Decode source root
+	sourceRootBytes, err := hex.DecodeString(sourceRoot)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode source root")
+	}
+
+	// Decode target root
+	targetRootBytes, err := hex.DecodeString(targetRoot)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode target root")
+	}
+
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
@@ -179,28 +203,23 @@ func (b *backend) pathWalletsAccountSignAttestation(ctx context.Context, req *lo
 		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
-	//_, err = wallet.CreateValidatorAccount(accountName)
-	//if err != nil {
-	//	return nil, err
-	//}
-
 	protector := slashing_protection.NewNormalProtection(storage)
 	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
 
 	res, err := signer.SignBeaconAttestation(&pb.SignBeaconAttestationRequest{
 		Id:     &pb.SignBeaconAttestationRequest_Account{Account: accountName},
-		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
+		Domain: domainBytes,
 		Data: &pb.AttestationData{
 			Slot:            uint64(slot),
 			CommitteeIndex:  uint64(committeeIndex),
-			BeaconBlockRoot: ignoreError(hex.DecodeString(beaconBlockRoot)).([]byte),
+			BeaconBlockRoot: beaconBlockRootBytes,
 			Source: &pb.Checkpoint{
 				Epoch: uint64(sourceEpoch),
-				Root:  ignoreError(hex.DecodeString(sourceRoot)).([]byte),
+				Root:  sourceRootBytes,
 			},
 			Target: &pb.Checkpoint{
 				Epoch: uint64(targetEpoch),
-				Root:  ignoreError(hex.DecodeString(targetRoot)).([]byte),
+				Root:  targetRootBytes,
 			},
 		},
 	})
@@ -225,6 +244,30 @@ func (b *backend) pathWalletsAccountSignProposal(ctx context.Context, req *logic
 	stateRoot := data.Get("stateRoot").(string)
 	bodyRoot := data.Get("bodyRoot").(string)
 
+	// Decode domain
+	domainBytes, err := hex.DecodeString(domain)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode domain")
+	}
+
+	// Decode parent root
+	parentRootBytes, err := hex.DecodeString(parentRoot)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode parent root")
+	}
+
+	// Decode state root
+	stateRootBytes, err := hex.DecodeString(stateRoot)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode state root")
+	}
+
+	// Decode body root
+	bodyRootBytes, err := hex.DecodeString(bodyRoot)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode body root")
+	}
+
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
@@ -241,13 +284,13 @@ func (b *backend) pathWalletsAccountSignProposal(ctx context.Context, req *logic
 
 	proposalRequest := &pb.SignBeaconProposalRequest{
 		Id:     &pb.SignBeaconProposalRequest_Account{Account: accountName},
-		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
+		Domain: domainBytes,
 		Data: &pb.BeaconBlockHeader{
 			Slot:          uint64(slot),
 			ProposerIndex: uint64(proposerIndex),
-			ParentRoot:    ignoreError(hex.DecodeString(parentRoot)).([]byte),
-			StateRoot:     ignoreError(hex.DecodeString(stateRoot)).([]byte),
-			BodyRoot:      ignoreError(hex.DecodeString(bodyRoot)).([]byte),
+			ParentRoot:    parentRootBytes,
+			StateRoot:     stateRootBytes,
+			BodyRoot:      bodyRootBytes,
 		},
 	}
 
@@ -272,6 +315,18 @@ func (b *backend) pathWalletsAccountSignAggregation(ctx context.Context, req *lo
 	domain := data.Get("domain").(string)
 	dataToSign := data.Get("dataToSign").(string)
 
+	// Decode domain
+	domainBytes, err := hex.DecodeString(domain)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode domain")
+	}
+
+	// Decode data to sign
+	dataToSignBytes, err := hex.DecodeString(dataToSign)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode data to sign")
+	}
+
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
@@ -288,8 +343,8 @@ func (b *backend) pathWalletsAccountSignAggregation(ctx context.Context, req *lo
 
 	proposalRequest := &pb.SignRequest{
 		Id:     &pb.SignRequest_Account{Account: accountName},
-		Domain: ignoreError(hex.DecodeString(domain)).([]byte),
-		Data:   ignoreError(hex.DecodeString(dataToSign)).([]byte),
+		Domain: domainBytes,
+		Data:   dataToSignBytes,
 	}
 
 	protector := slashing_protection.NewNormalProtection(storage)
@@ -305,8 +360,4 @@ func (b *backend) pathWalletsAccountSignAggregation(ctx context.Context, req *lo
 			"signature": res.GetSignature(),
 		},
 	}, nil
-}
-
-func ignoreError(val interface{}, err error) interface{} {
-	return val
 }
