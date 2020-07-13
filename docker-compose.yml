@@ -11,7 +11,7 @@ services:
       - 8200:8200
     volumes:
       - ./data:/data
-      - ./keys:/keys
+      - ./policies:/policies
     environment:
       VAULT_ADDR: http://127.0.0.1:8200
       VAULT_API_ADDR: http://127.0.0.1:8200
@@ -20,14 +20,15 @@ services:
     # command: server -dev -dev-root-token-id=root -dev-plugin-dir=./vault/plugins
     cap_add:
       - IPC_LOCK
+    restart: unless-stopped
 
   vault-image:
-    image: bloxstaking/key-vault:version-0.0.8
+    image: bloxstaking/key-vault:version-0.0.9
     ports:
       - 8200:8200
     volumes:
       - ./data:/data
-      - ./keys:/keys
+      - ./policies:/policies
     environment:
       VAULT_ADDR: http://127.0.0.1:8200
       VAULT_API_ADDR: http://127.0.0.1:8200
@@ -36,3 +37,4 @@ services:
     # command: server -dev -dev-root-token-id=root -dev-plugin-dir=./vault/plugins
     cap_add:
       - IPC_LOCK
+    restart: unless-stopped

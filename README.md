@@ -453,3 +453,97 @@ The example below shows output for the successful creation of `/ethereum/wallets
     "auth": null
 }
 ```
+
+## Access Policies
+The plugin's endpoint paths are designed such that admin-level access policies vs. signer-level access policies can be easily separated.
+
+### Sample Signer Level Policy:
+Use the following policy to assign to a signer level access token, with the abilities to list accounts and sign transactions.
+
+```
+# Ability to list existing accounts ("list")
+path "ethereum/wallets/+/accounts/" {
+  capabilities = ["list"]
+}
+
+# Ability to create create accounts ("create") and read existing account ("read")
+path "ethereum/wallets/+/accounts/+" {
+  capabilities = ["read"]
+}
+
+# Ability to sign data ("create")
+path "ethereum/wallets/+/+/+/sign-*" {
+  capabilities = ["create"]
+}
+```
+
+### Sample Admin Level Policy:
+Use the following policy to assign to a admin level access token, with the full ability to create wallets, accounts, import existing seed, export seed, read/list wallets, accounts, read deposit-data and sign transactions.
+
+```
+# Ability to list existing wallets ("list")
+path "ethereum/wallets" {
+  capabilities = ["list"]
+}
+
+# Ability to create wallets ("create")
+path "ethereum/wallets/+" {
+  capabilities = ["create"]
+}
+
+# Ability to list existing accounts ("list")
+path "ethereum/wallets/+/accounts/" {
+  capabilities = ["list"]
+}
+
+# Ability to create create accounts ("create") and read existing account ("read")
+path "ethereum/wallets/+/accounts/+" {
+  capabilities = ["create", "read"]
+}
+
+# Ability to read deposit data ("read")
+path "ethereum/wallets/+/+/+/deposit-data/" {
+  capabilities = ["read"]
+}
+
+# Ability to sign data ("create")
+path "ethereum/wallets/+/+/+/sign-*" {
+  capabilities = ["create"]
+}
+
+# Ability to export seed ("read")
+path "ethereum/export" {
+  capabilities = ["read"]
+}
+
+# Ability to import seed ("create")
+path "ethereum/import" {
+  capabilities = ["create"]
+}
+```
+
+## How to use policies?
+
+  1. Create a new policy named admin:
+
+        ```sh
+        $ vault policy write admin policies/admin-policy.hcl
+        ```
+
+  2. Create a token attached to admin policy:
+
+        ```sh
+        $ vault token create -policy="admin"
+        ```
+
+  3. Create a new policy named signer:
+ 
+        ```sh
+        $ vault policy write signer policies/signer-policy.hcl
+        ```
+
+  4. Create a token attached to signer policy:
+
+        ```sh
+        $ vault token create -policy="signer"
+        ```
