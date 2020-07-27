@@ -3,7 +3,7 @@ module github.com/bloxapp/vault-plugin-secrets-eth2.0
 go 1.14
 
 require (
-	github.com/bloxapp/KeyVault v0.0.0-20200721084524-07c55c8fe9a1
+	github.com/bloxapp/KeyVault v0.1.10
 	github.com/hashicorp/go-hclog v0.14.1
 	github.com/hashicorp/vault/api v1.0.4
 	github.com/hashicorp/vault/sdk v0.1.13
