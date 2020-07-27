@@ -34,6 +34,11 @@ func accountsPaths(b *backend) []*framework.Path {
 			Fields: map[string]*framework.FieldSchema{
 				"wallet_name":  &framework.FieldSchema{Type: framework.TypeString},
 				"account_name": &framework.FieldSchema{Type: framework.TypeString},
+				"key": &framework.FieldSchema{
+					Type:        framework.TypeString,
+					Description: "Private Key",
+					Default:     "",
+				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
@@ -60,6 +65,18 @@ func accountsPaths(b *backend) []*framework.Path {
 func (b *backend) pathWalletsAccountCreate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	walletName := data.Get("wallet_name").(string)
 	accountName := data.Get("account_name").(string)
+	key := data.Get("key").(string)
+	var keyBytes []byte
+	var err error
+
+	if len(key) != 0 {
+		// Decode key
+		keyBytes, err = hex.DecodeString(key)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to HEX decode key")
+		}
+	}
+
 	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
 	options := vault.PortfolioOptions{}
 	options.SetStorage(storage)
@@ -74,7 +91,7 @@ func (b *backend) pathWalletsAccountCreate(ctx context.Context, req *logical.Req
 		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
-	account, err := wallet.CreateValidatorAccount(accountName)
+	account, err := wallet.CreateValidatorAccount(accountName, keyBytes)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create a new validator account")
 	}

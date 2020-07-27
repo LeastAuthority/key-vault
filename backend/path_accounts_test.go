@@ -23,6 +23,30 @@ func TestAccountCreate(t *testing.T) {
 		require.NotNil(t, res.Data["account"])
 	})
 
+	t.Run("Successfully Create Account using private key", func(t *testing.T) {
+		req := logical.TestRequest(t, logical.CreateOperation, "wallets/wallet1/accounts/account2")
+		req.Storage = storage
+		data := map[string]interface{}{
+			"key": "08f880baca147c33bea67304a54da5252a1c2b972993d2dabc8e6625240116be",
+		}
+		req.Data = data
+		res, err := b.HandleRequest(context.Background(), req)
+		require.NoError(t, err)
+		require.NotNil(t, res.Data["account"])
+	})
+
+	t.Run("Fail on create account using random key", func(t *testing.T) {
+		req := logical.TestRequest(t, logical.CreateOperation, "wallets/wallet1/accounts/account2")
+		req.Storage = storage
+		data := map[string]interface{}{
+			"key": "2131868",
+		}
+		req.Data = data
+		res, err := b.HandleRequest(context.Background(), req)
+		require.Nil(t, res)
+		require.EqualError(t, err, "failed to HEX decode key: encoding/hex: odd length hex string")
+	})
+
 	t.Run("Create Account with empty name", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "wallets/wallet1/accounts/ ")
 		req.Storage = storage
