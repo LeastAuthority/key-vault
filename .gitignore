@@ -5,3 +5,6 @@ logs/*
 
 .idea
 keys
+
+# go dependancy
+/go.sum
