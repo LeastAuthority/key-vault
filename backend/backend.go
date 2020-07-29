@@ -26,14 +26,15 @@ func Backend() (*backend, error) {
 	b.Backend = &framework.Backend{
 		Help: "",
 		Paths: framework.PathAppend(
-			portfoliosPaths(&b),
-			walletsPaths(&b),
+			adminPaths(&b),
+			//portfoliosPaths(&b),
+			//walletsPaths(&b),
 			accountsPaths(&b),
-			signsPaths(&b),
+			//signsPaths(&b),
 		),
 		PathsSpecial: &logical.Paths{
 			SealWrapStorage: []string{
-				"wallets/",
+				"wallet/",
 			},
 		},
 		Secrets:     []*framework.Secret{},
