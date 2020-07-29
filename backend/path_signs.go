@@ -150,6 +150,29 @@ func signsPaths(b *backend) []*framework.Path {
 }
 
 func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	// bring up KeyVault and wallet
+	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	options := vault.KeyVaultOptions{}
+	options.SetStorage(storage)
+
+	kv, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open key vault")
+	}
+
+	wallet, err := kv.Wallet()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve wallet")
+	}
+
+	// try to lock signature lock, if it fails return error
+	lock := DBLock{storage:req.Storage, id:wallet.ID()}
+	err = lock.Lock()
+	if err != nil {
+		return nil, err
+	}
+	defer lock.UnLock()
+
 	accountName := data.Get("account_name").(string)
 	domain := data.Get("domain").(string)
 	slot := data.Get("slot").(int)
@@ -184,20 +207,6 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 		return nil, errors.Wrap(err, "failed to HEX decode target root")
 	}
 
-	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
-	options := vault.KeyVaultOptions{}
-	options.SetStorage(storage)
-
-	kv, err := vault.OpenKeyVault(&options)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open key vault")
-	}
-
-	wallet, err := kv.Wallet()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to retrieve wallet")
-	}
-
 	protector := slashing_protection.NewNormalProtection(storage)
 	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
 
@@ -230,6 +239,29 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 }
 
 func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	// bring up KeyVault and wallet
+	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	options := vault.KeyVaultOptions{}
+	options.SetStorage(storage)
+
+	kv, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open key vault")
+	}
+
+	wallet, err := kv.Wallet()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
+	}
+
+	// try to lock signature lock, if it fails return error
+	lock := DBLock{storage:req.Storage, id:wallet.ID()}
+	err = lock.Lock()
+	if err != nil {
+		return nil, err
+	}
+	defer lock.UnLock()
+
 	accountName := data.Get("account_name").(string)
 	domain := data.Get("domain").(string)
 	slot := data.Get("slot").(int)
@@ -262,20 +294,6 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 		return nil, errors.Wrap(err, "failed to HEX decode body root")
 	}
 
-	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
-	options := vault.KeyVaultOptions{}
-	options.SetStorage(storage)
-
-	kv, err := vault.OpenKeyVault(&options)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open key vault")
-	}
-
-	wallet, err := kv.Wallet()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
-	}
-
 	proposalRequest := &v1.SignBeaconProposalRequest{
 		Id:     &v1.SignBeaconProposalRequest_Account{Account: accountName},
 		Domain: domainBytes,
@@ -304,6 +322,29 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 }
 
 func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	// bring up KeyVault and wallet
+	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	options := vault.KeyVaultOptions{}
+	options.SetStorage(storage)
+
+	kv, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open key vault")
+	}
+
+	wallet, err := kv.Wallet()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
+	}
+
+	// try to lock signature lock, if it fails return error
+	lock := DBLock{storage:req.Storage, id:wallet.ID()}
+	err = lock.Lock()
+	if err != nil {
+		return nil, err
+	}
+	defer lock.UnLock()
+
 	accountName := data.Get("account_name").(string)
 	domain := data.Get("domain").(string)
 	dataToSign := data.Get("dataToSign").(string)
@@ -318,20 +359,6 @@ func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request,
 	dataToSignBytes, err := hex.DecodeString(dataToSign)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to HEX decode data to sign")
-	}
-
-	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
-	options := vault.KeyVaultOptions{}
-	options.SetStorage(storage)
-
-	kv, err := vault.OpenKeyVault(&options)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open key vault")
-	}
-
-	wallet, err := kv.Wallet()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
 	proposalRequest := &v1.SignRequest{
