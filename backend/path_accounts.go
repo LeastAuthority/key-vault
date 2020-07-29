@@ -2,8 +2,8 @@ package backend
 
 import (
 	"context"
+	"encoding/hex"
 	vault "github.com/bloxapp/KeyVault"
-	"github.com/bloxapp/KeyVault/core"
 	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
@@ -144,9 +144,15 @@ func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Reque
 		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
-	var accounts []core.ValidatorAccount
+	var accounts []map[string]string
 	for a := range wallet.Accounts() {
-		accounts = append(accounts, a)
+		accObj := map[string]string{
+			"id": a.ID().String(),
+			"name": a.Name(),
+			"validationPubKey": hex.EncodeToString(a.ValidatorPublicKey().Marshal()),
+			"withdrawalPubKey": hex.EncodeToString(a.WithdrawalPublicKey().Marshal()),
+		}
+		accounts = append(accounts, accObj)
 	}
 
 	return &logical.Response{

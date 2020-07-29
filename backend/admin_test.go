@@ -18,21 +18,43 @@ func _byteArray(input string) []byte {
 	return res
 }
 
-func TestPushUpdate(t *testing.T) {
-	b, _ := getBackend(t)
+func baseInmemStorage() (*in_memory.InMemStore, error) {
 	store := in_memory.NewInMemStore()
-	var logicalStorage logical.Storage
 
 	// wallet
 	wallet := wallet_hd.NewHDWallet(&core.WalletContext{Storage:store})
 	err := store.SaveWallet(wallet)
-	require.NoError(t, err)
+	if err != nil {
+		return nil, err
+	}
 
 	// account
 	acc,err := wallet.CreateValidatorAccount(_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"), "acc")
-	require.NoError(t, err)
+	if err != nil {
+		return nil, err
+	}
 	err = store.SaveAccount(acc)
+	if err != nil {
+		return nil, err
+	}
+
+	return store, nil
+}
+
+
+func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (*hashicorp.HashicorpVaultStore, error) {
+	inMem, err := baseInmemStorage()
+	if err != nil {
+		return nil, err
+	}
+	return hashicorp.FromInMemoryStore(inMem, logicalStorage, ctx)
+}
+
+func TestPushUpdate(t *testing.T) {
+	b, _ := getBackend(t)
+	store, err := baseInmemStorage()
 	require.NoError(t, err)
+	var logicalStorage logical.Storage
 
 	// marshal and to string
 	byts, err := json.Marshal(store)
@@ -52,6 +74,12 @@ func TestPushUpdate(t *testing.T) {
 	})
 
 	t.Run("verify wallet and account", func(t *testing.T) {
+		// get wallet and account
+		wallet, err := store.OpenWallet()
+		require.NoError(t, err)
+		acc, err := wallet.AccountByName("acc")
+		require.NoError(t, err)
+
 		vault := hashicorp.NewHashicorpVaultStore(logicalStorage, context.Background())
 		wallet2,err := vault.OpenWallet()
 		require.NoError(t, err)

@@ -22,3 +22,6 @@ replace github.com/ethereum/go-ethereum => github.com/prysmaticlabs/bazel-go-eth
 replace github.com/herumi/bls-eth-go-binary => github.com/herumi/bls-eth-go-binary v0.0.0-20200605082007-3a76b4c6c599
 
 replace github.com/prysmaticlabs/prysm => github.com/prysmaticlabs/prysm v1.0.0-alpha.10
+
+// for dev only
+replace github.com/bloxapp/KeyVault => github.com/bloxapp/KeyVault v0.1.11-0.20200729110808-5ab8f3c6331f
