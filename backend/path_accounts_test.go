@@ -138,6 +138,13 @@ func TestAccountsList(t *testing.T) {
 		require.NotNil(t, res.Data["accounts"])
 		require.Len(t, res.Data["accounts"], 1)
 		require.Equal(t, res.Data["accounts"].([]map[string]string)[0]["name"], "acc")
+
+		// make sure only the following fields are present to prevent accidental secret sharing
+		keys := make([]string, 0)
+		for k := range res.Data["accounts"].([]map[string]string)[0] {
+			keys = append(keys, k)
+		}
+		require.Equal(t, keys, []string{"id","name","validationPubKey","withdrawalPubKey"})
 	})
 
 	//
