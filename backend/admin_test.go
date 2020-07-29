@@ -29,7 +29,7 @@ func baseInmemStorage() (*in_memory.InMemStore, error) {
 	}
 
 	// account
-	acc,err := wallet.CreateValidatorAccount(_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"), "acc")
+	acc,err := wallet.CreateValidatorAccount(_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"), "test_account")
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func TestPushUpdate(t *testing.T) {
 		// get wallet and account
 		wallet, err := store.OpenWallet()
 		require.NoError(t, err)
-		acc, err := wallet.AccountByName("acc")
+		acc, err := wallet.AccountByName("test_account")
 		require.NoError(t, err)
 
 		vault := hashicorp.NewHashicorpVaultStore(logicalStorage, context.Background())
@@ -85,7 +85,7 @@ func TestPushUpdate(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, wallet.ID().String(), wallet2.ID().String())
 
-		acc2, err := wallet2.AccountByName("acc")
+		acc2, err := wallet2.AccountByName("test_account")
 		require.NoError(t, err)
 		require.Equal(t, acc.ID().String(), acc2.ID().String())
 	})
