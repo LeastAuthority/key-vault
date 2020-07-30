@@ -3,16 +3,17 @@ package backend
 import (
 	"context"
 	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
 type DBLock struct {
-	id uuid.UUID
+	id      uuid.UUID
 	storage logical.Storage
 }
 
-func (lock *DBLock) Lock () error {
+func (lock *DBLock) Lock() error {
 	// if locked return error
 	locked, err := lock.IsLocked()
 	if err != nil {
@@ -24,14 +25,14 @@ func (lock *DBLock) Lock () error {
 
 	// add lock to db
 	entry := &logical.StorageEntry{
-		Key:     lock.key(),
+		Key:      lock.key(),
 		Value:    []byte("1"),
 		SealWrap: false,
 	}
 	return lock.storage.Put(context.Background(), entry)
 }
 
-func (lock *DBLock) UnLock () error {
+func (lock *DBLock) UnLock() error {
 	// check if locked
 	locked, err := lock.IsLocked()
 	if err != nil {
@@ -54,6 +55,6 @@ func (lock *DBLock) IsLocked() (bool, error) {
 	return entry != nil, err
 }
 
-func (lock *DBLock)key () string {
+func (lock *DBLock) key() string {
 	return fmt.Sprintf("lock/%s", lock.id.String())
 }
