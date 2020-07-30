@@ -103,7 +103,7 @@ This endpoint will list all accounts of key-vault stores at a path.
 
 #### Sample Response
 
-The example below shows output for a query path of `/ethereum/accounts` when there are 1 account.
+The example below shows output for a query path of `/ethereum/accounts` when there is 1 account.
 
 ```
 {
