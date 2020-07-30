@@ -36,7 +36,7 @@ func TestAccountsList(t *testing.T) {
 	b, _ := getBackend(t)
 
 	t.Run("Successfully List Accounts", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.ListOperation, "wallet/accounts/")
+		req := logical.TestRequest(t, logical.ListOperation, "accounts/")
 
 		// setup logical storage
 		_, err := baseHashicorpStorage(req.Storage, context.Background())
