@@ -50,7 +50,7 @@ func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (
 	return hashicorp.FromInMemoryStore(inMem, logicalStorage, ctx)
 }
 
-func TestPushUpdate(t *testing.T) {
+func TestStorage(t *testing.T) {
 	b, _ := getBackend(t)
 	store, err := baseInmemStorage()
 	require.NoError(t, err)
@@ -62,7 +62,7 @@ func TestPushUpdate(t *testing.T) {
 	data := hex.EncodeToString(bytes)
 
 	// test
-	t.Run("import from in-memory to hashicorp vault", func(t *testing.T) {
+	t.Run("Successfully update storage: import from in-memory to hashicorp vault", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "storage")
 		logicalStorage = req.Storage
 		req.Data = map[string]interface{}{
@@ -73,7 +73,7 @@ func TestPushUpdate(t *testing.T) {
 		require.True(t, res.Data["status"].(bool))
 	})
 
-	t.Run("verify wallet and account", func(t *testing.T) {
+	t.Run("Verify wallet and account", func(t *testing.T) {
 		// get wallet and account
 		wallet, err := store.OpenWallet()
 		require.NoError(t, err)
