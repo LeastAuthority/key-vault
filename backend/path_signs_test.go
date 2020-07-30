@@ -23,7 +23,6 @@ func TestSignAttestation(t *testing.T) {
 		err := setupStorageWithWalletAndAccounts(req.Storage)
 		require.NoError(t, err)
 
-
 		data := map[string]interface{}{
 			"domain": "",
 		}

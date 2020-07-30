@@ -228,7 +228,7 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 		},
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to sign data")
+		return nil, errors.Wrap(err, "failed to sign attestation")
 	}
 
 	return &logical.Response{
