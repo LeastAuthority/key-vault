@@ -46,7 +46,7 @@ func TestSignAttestation(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = b.HandleRequest(context.Background(), req)
-		require.EqualError(t, err, "failed to sign data: account not found")
+		require.EqualError(t, err, "failed to sign attestation: account not found")
 	})
 }
 
