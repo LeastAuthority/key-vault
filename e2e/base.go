@@ -10,6 +10,11 @@ import (
 	"strings"
 )
 
+type E2EBaseSetup struct {
+	RootKey string
+	baseUrl string
+}
+
 const (
 	pluginContainerName         = "vault-plugin-secrets-eth20_vault_1"
 	logSignalingPluginInstalled = "core: successfully reloaded plugin: plugin=ethsign path=ethereum/"
@@ -90,17 +95,17 @@ func rootAccessToken(workingDir string) (string, error) {
 	return string(content), nil
 }
 
-func SetupE2EEnv() error {
+func SetupE2EEnv() (*E2EBaseSetup,error) {
 	workingDir, err := os.Getwd()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	fmt.Printf("working dir: %s\n", workingDir)
 
 	// step 1 - Cleanup
 	err = Cleanup(workingDir)
 	if err != nil {
-		return err
+		return nil,err
 	}
 	fmt.Printf("Cleanup done\n")
 
@@ -108,12 +113,12 @@ func SetupE2EEnv() error {
 	cmd := exec.Command("docker-compose", "up","vault")
 	pipe, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
+		return nil,err
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		return err
+		return nil,err
 	}
 
 	// step 3 - wait for plugin to be active
@@ -123,9 +128,12 @@ func SetupE2EEnv() error {
 	// step 4 - get root access token
 	token, err := rootAccessToken(workingDir)
 	if err != nil {
-		return err
+		return nil,err
 	}
 	fmt.Printf("root token: %s\n", token)
 
-	return nil
+	return &E2EBaseSetup{
+		RootKey: token,
+		baseUrl: "https://localhost:8200",
+	}, nil
 }
