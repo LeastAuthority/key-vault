@@ -42,12 +42,7 @@ func (setup *E2EBaseSetup) SignAttestation(account string, data map[string]inter
 	if err != nil {
 		return nil,err
 	}
-	respBody := string(respBodyByts)
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil,fmt.Errorf("error: could not sign attesttation: respose: %s\n", respBody)
-	}
 
 	// parse to json
 	retObj := make(map[string]interface{})
@@ -56,12 +51,16 @@ func (setup *E2EBaseSetup) SignAttestation(account string, data map[string]inter
 		return nil, err
 	}
 
-	sigStr := retObj["data"].(map[string]interface{})["signature"].(string)
-	ret, err := hex.DecodeString(sigStr)
-	if err != nil {
-		return nil, err
+	if resp.StatusCode != http.StatusOK {
+		return nil,fmt.Errorf("%s", retObj["errors"].([]interface{})[0])
+	} else {
+		sigStr := retObj["data"].(map[string]interface{})["signature"].(string)
+		ret, err := hex.DecodeString(sigStr)
+		if err != nil {
+			return nil, err
+		}
+		return ret, nil
 	}
-	return ret, nil
 }
 
 func (setup *E2EBaseSetup) PushUpdatedDb() error {

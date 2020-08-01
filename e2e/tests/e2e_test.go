@@ -12,6 +12,7 @@ type E2ETest interface {
 
 var tests = []E2ETest {
 	&AttestationSigning{},
+	&AttestationDoubleSigning{},
 }
 
 func TestE2E(t *testing.T) {
