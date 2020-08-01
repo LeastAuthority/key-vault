@@ -8,6 +8,7 @@ import (
 	"github.com/bloxapp/KeyVault/stores/in_memory"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
+	types "github.com/wealdtech/go-eth2-types/v2"
 )
 
 func adminPaths(b *backend) []*framework.Path {
@@ -21,13 +22,18 @@ func adminPaths(b *backend) []*framework.Path {
 			},
 			ExistenceCheck: b.pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
-				logical.UpdateOperation: b.pathPushUpdate,
+				logical.CreateOperation: b.pathPushUpdate,
 			},
 		},
 	}
 }
 
 func (b *backend) pathPushUpdate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	err := types.InitBLS() // very important
+	if err != nil {
+		return nil,err
+	}
+
 	keyVaultData := data.Get("data").(string)
 	byts, err := hex.DecodeString(keyVaultData)
 	if err != nil {

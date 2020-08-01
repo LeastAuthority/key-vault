@@ -13,7 +13,7 @@ require (
 	github.com/prysmaticlabs/prysm v0.3.10
 	github.com/stretchr/testify v1.6.1
 	github.com/wealdtech/eth2-signer-api v1.3.0
-	github.com/wealdtech/go-eth2-types/v2 v2.4.2 // indirect
+	github.com/wealdtech/go-eth2-types/v2 v2.4.2
 )
 
 replace gopkg.in/urfave/cli.v2 => github.com/urfave/cli/v2 v2.1.1
@@ -25,4 +25,4 @@ replace github.com/herumi/bls-eth-go-binary => github.com/herumi/bls-eth-go-bina
 replace github.com/prysmaticlabs/prysm => github.com/prysmaticlabs/prysm v1.0.0-alpha.10
 
 // for dev only
-replace github.com/bloxapp/KeyVault => github.com/bloxapp/KeyVault v0.1.11-0.20200730060732-87cef7682cdd
+replace github.com/bloxapp/KeyVault => github.com/bloxapp/KeyVault v0.1.11-0.20200731145903-ab8eb0af2f7c

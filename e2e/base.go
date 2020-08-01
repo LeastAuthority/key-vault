@@ -10,11 +10,6 @@ import (
 	"strings"
 )
 
-type E2EBaseSetup struct {
-	RootKey string
-	baseUrl string
-}
-
 const (
 	pluginContainerName         = "vault-plugin-secrets-eth20_vault_1"
 	logSignalingPluginInstalled = "core: successfully reloaded plugin: plugin=ethsign path=ethereum/"
@@ -43,16 +38,15 @@ func Cleanup(workingDir string) error {
 	}
 	containerList := string(byts)
 	if !strings.Contains(containerList, pluginContainerName) {
-		fmt.Printf("Cleanup: NO previous container\n")
 		return nil
 	}
 
 	// kill process
 	killCmd := exec.Command("docker", "kill", pluginContainerName)
-	err = killCmd.Run()
-	if err != nil {
-		return err
-	}
+	_ = killCmd.Run()
+	//if err != nil {
+	//	return err
+	//}
 	fmt.Printf("Cleanup: killing previous container\n")
 
 	// remove container and volumes
@@ -92,7 +86,10 @@ func rootAccessToken(workingDir string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(content), nil
+
+	ret := string(content)
+	ret = strings.TrimSuffix(ret, "\n")
+	return ret, nil
 }
 
 func SetupE2EEnv() (*E2EBaseSetup,error) {
@@ -100,14 +97,14 @@ func SetupE2EEnv() (*E2EBaseSetup,error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("working dir: %s\n", workingDir)
+	fmt.Printf("e2e: working dir: %s\n", workingDir)
 
 	// step 1 - Cleanup
 	err = Cleanup(workingDir)
 	if err != nil {
 		return nil,err
 	}
-	fmt.Printf("Cleanup done\n")
+	fmt.Printf("e2e: Cleanup done\n")
 
 	// step 2 - run docker compose
 	cmd := exec.Command("docker-compose", "up","vault")
@@ -123,17 +120,17 @@ func SetupE2EEnv() (*E2EBaseSetup,error) {
 
 	// step 3 - wait for plugin to be active
 	<- pluginRunning(pipe)
-	fmt.Printf("Plugin installed and running\n")
+	fmt.Printf("e2e: Plugin installed and running\n")
 
 	// step 4 - get root access token
 	token, err := rootAccessToken(workingDir)
 	if err != nil {
 		return nil,err
 	}
-	fmt.Printf("root token: %s\n", token)
+	fmt.Printf("e2e: root token: %s\n", token)
 
 	return &E2EBaseSetup{
 		RootKey: token,
-		baseUrl: "https://localhost:8200",
+		baseUrl: "http://localhost:8200",
 	}, nil
 }

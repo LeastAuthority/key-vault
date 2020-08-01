@@ -13,7 +13,7 @@ import (
 func accountsPaths(b *backend) []*framework.Path {
 	return []*framework.Path{
 		&framework.Path{
-			Pattern:         "wallet" + "/accounts/",
+			Pattern:         "wallet/accounts/",
 			HelpSynopsis:    "List wallet accounts",
 			HelpDescription: ``,
 			Fields: map[string]*framework.FieldSchema{

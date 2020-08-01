@@ -10,6 +10,7 @@ import (
 	"github.com/bloxapp/KeyVault/wallet_hd"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/stretchr/testify/require"
+	types "github.com/wealdtech/go-eth2-types/v2"
 	"testing"
 )
 
@@ -51,6 +52,8 @@ func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (
 }
 
 func TestPushUpdate(t *testing.T) {
+	require.NoError(t, types.InitBLS())
+
 	b, _ := getBackend(t)
 	store, err := baseInmemStorage()
 	require.NoError(t, err)
@@ -63,7 +66,7 @@ func TestPushUpdate(t *testing.T) {
 
 	// test
 	t.Run("import from in-memory to hashicorp vault", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.UpdateOperation, "admin/pushUpdate")
+		req := logical.TestRequest(t, logical.CreateOperation, "admin/pushUpdate")
 		logicalStorage = req.Storage
 		req.Data = map[string]interface{}{
 			"data": data,
