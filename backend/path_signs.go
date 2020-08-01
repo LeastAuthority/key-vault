@@ -233,7 +233,7 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"signature": res.GetSignature(),
+			"signature": hex.EncodeToString(res.GetSignature()),
 		},
 	}, nil
 }
@@ -316,7 +316,7 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"signature": res.GetSignature(),
+			"signature": hex.EncodeToString(res.GetSignature()),
 		},
 	}, nil
 }
@@ -377,7 +377,7 @@ func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request,
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"signature": res.GetSignature(),
+			"signature": hex.EncodeToString(res.GetSignature()),
 		},
 	}, nil
 }

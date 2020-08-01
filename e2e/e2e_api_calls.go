@@ -56,9 +56,12 @@ func (setup *E2EBaseSetup) SignAttestation(account string, data map[string]inter
 		return nil, err
 	}
 
-	fmt.Printf("e2e: signed attestation\n")
-
-	return []byte(retObj["data"].(map[string]interface{})["signature"].(string)), nil
+	sigStr := retObj["data"].(map[string]interface{})["signature"].(string)
+	ret, err := hex.DecodeString(sigStr)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
 }
 
 func (setup *E2EBaseSetup) PushUpdatedDb() error {

@@ -2,14 +2,11 @@ package tests
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 )
 
-func ignoreError(val interface{}, err error) interface{} {
-	return val
-}
 
 type AttestationSigning struct {
 
@@ -47,7 +44,7 @@ func (t *AttestationSigning)Run() error {
 		return err
 	}
 
-	expecetd := ignoreError(hex.DecodeString("b3234e48fa4d7b9df6f743aad1fa1c54889b3a1cff0649441731a129359c7ad568a2fce3181ed2b767a369684974f67a1960ec139595aa5347883698ab0af2236310cf4f1d59483abe2cefcfc3a79b453a7ffea4d2268aad314fdac5b468984f")).([]byte)
+	expecetd := shared.HexToBytes("b3234e48fa4d7b9df6f743aad1fa1c54889b3a1cff0649441731a129359c7ad568a2fce3181ed2b767a369684974f67a1960ec139595aa5347883698ab0af2236310cf4f1d59483abe2cefcfc3a79b453a7ffea4d2268aad314fdac5b468984f")
 	if bytes.Compare(sig, expecetd) != 0 {
 		return fmt.Errorf("e2e: attestation signature not valid")
 	}
