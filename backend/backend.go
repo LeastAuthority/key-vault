@@ -26,7 +26,7 @@ func Backend() (*backend, error) {
 	b.Backend = &framework.Backend{
 		Help: "",
 		Paths: framework.PathAppend(
-			adminPaths(&b),
+			storagePaths(&b),
 			accountsPaths(&b),
 			signsPaths(&b),
 		),

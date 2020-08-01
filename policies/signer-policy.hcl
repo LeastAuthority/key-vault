@@ -1,14 +1,9 @@
-# Ability to list existing accounts ("list")
-path "ethereum/wallets/+/accounts/" {
+# Ability to list existing wallet accounts ("list")
+path "ethereum/accounts" {
   capabilities = ["list"]
 }
 
-# Ability to read existing account ("read")
-path "ethereum/wallets/+/accounts/+" {
-  capabilities = ["read"]
-}
-
 # Ability to sign data ("create")
-path "ethereum/wallets/+/+/+/sign-*" {
+path "ethereum/accounts/+/sign-*" {
   capabilities = ["create"]
 }

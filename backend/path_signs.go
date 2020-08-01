@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"encoding/hex"
+
 	vault "github.com/bloxapp/KeyVault"
 	"github.com/bloxapp/KeyVault/slashing_protection"
 	store "github.com/bloxapp/KeyVault/stores/hashicorp"
@@ -10,13 +11,13 @@ import (
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
-	"github.com/wealdtech/eth2-signer-api/pb/v1"
+	v1 "github.com/wealdtech/eth2-signer-api/pb/v1"
 )
 
 func signsPaths(b *backend) []*framework.Path {
 	return []*framework.Path{
 		&framework.Path{
-			Pattern:         "wallet/accounts/" + framework.GenericNameRegex("account_name") + "/sign-attestation",
+			Pattern:         "accounts/" + framework.GenericNameRegex("account_name") + "/sign-attestation",
 			HelpSynopsis:    "Sign attestation",
 			HelpDescription: `Sign attestation`,
 			Fields: map[string]*framework.FieldSchema{
@@ -73,7 +74,7 @@ func signsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:         "wallet/accounts/" + framework.GenericNameRegex("account_name") + "/sign-proposal",
+			Pattern:         "accounts/" + framework.GenericNameRegex("account_name") + "/sign-proposal",
 			HelpSynopsis:    "Sign proposal",
 			HelpDescription: `Sign proposal`,
 			Fields: map[string]*framework.FieldSchema{
@@ -120,7 +121,7 @@ func signsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:         "wallet/accounts/" + framework.GenericNameRegex("account_name") + "/sign-aggregation",
+			Pattern:         "accounts/" + framework.GenericNameRegex("account_name") + "/sign-aggregation",
 			HelpSynopsis:    "Sign aggregation",
 			HelpDescription: `Sign aggregation`,
 			Fields: map[string]*framework.FieldSchema{
@@ -166,7 +167,7 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 	}
 
 	// try to lock signature lock, if it fails return error
-	lock := DBLock{storage:req.Storage, id:wallet.ID()}
+	lock := DBLock{storage: req.Storage, id: wallet.ID()}
 	err = lock.Lock()
 	if err != nil {
 		return nil, err
@@ -255,7 +256,7 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 	}
 
 	// try to lock signature lock, if it fails return error
-	lock := DBLock{storage:req.Storage, id:wallet.ID()}
+	lock := DBLock{storage: req.Storage, id: wallet.ID()}
 	err = lock.Lock()
 	if err != nil {
 		return nil, err
@@ -338,7 +339,7 @@ func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request,
 	}
 
 	// try to lock signature lock, if it fails return error
-	lock := DBLock{storage:req.Storage, id:wallet.ID()}
+	lock := DBLock{storage: req.Storage, id: wallet.ID()}
 	err = lock.Lock()
 	if err != nil {
 		return nil, err

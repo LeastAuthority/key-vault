@@ -9,7 +9,7 @@ import (
 )
 
 func setupStorageWithWalletAndAccounts(storage logical.Storage) error {
-	_,err := baseHashicorpStorage(storage, context.Background())
+	_, err := baseHashicorpStorage(storage, context.Background())
 	return err
 }
 
@@ -17,7 +17,7 @@ func TestSignAttestation(t *testing.T) {
 	b, _ := getBackend(t)
 
 	t.Run("Successfully Sign Attestation", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-attestation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -33,13 +33,13 @@ func TestSignAttestation(t *testing.T) {
 	})
 
 	t.Run("Sign Attestation in non existing key vault", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-attestation")
 		_, err := b.HandleRequest(context.Background(), req)
 		require.EqualError(t, err, "failed to open key vault: wallet not found")
 	})
 
 	t.Run("Sign Attestation of unknown account", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/unknown_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/unknown_account/sign-attestation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -54,7 +54,7 @@ func TestSignProposal(t *testing.T) {
 	b, _ := getBackend(t)
 
 	t.Run("Successfully Sign Proposal", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-proposal")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-proposal")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -66,13 +66,13 @@ func TestSignProposal(t *testing.T) {
 	})
 
 	t.Run("Sign Proposal in non existing key vault", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-proposal")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-proposal")
 		_, err := b.HandleRequest(context.Background(), req)
 		require.EqualError(t, err, "failed to open key vault: wallet not found")
 	})
 
 	t.Run("Sign Proposal of unknown account", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/unknown_account/sign-proposal")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/unknown_account/sign-proposal")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -87,7 +87,7 @@ func TestSignAggregation(t *testing.T) {
 	b, _ := getBackend(t)
 
 	t.Run("Successfully Sign Aggregation", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-aggregation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-aggregation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -98,13 +98,13 @@ func TestSignAggregation(t *testing.T) {
 	})
 
 	t.Run("Sign Aggregation in non existing key vault", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-aggregation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-aggregation")
 		_, err := b.HandleRequest(context.Background(), req)
 		require.EqualError(t, err, "failed to open key vault: wallet not found")
 	})
 
 	t.Run("Sign Aggregation of unknown account", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/unknown_account/sign-aggregation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/unknown_account/sign-aggregation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
