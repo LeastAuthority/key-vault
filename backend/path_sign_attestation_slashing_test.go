@@ -2,7 +2,6 @@ package backend
 
 import (
 	"context"
-	"encoding/hex"
 	"testing"
 
 	"github.com/hashicorp/vault/sdk/logical"
@@ -41,7 +40,7 @@ func TestAttestationSlashing(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, res.Data)
 		require.Equal(t,
-			ignoreError(hex.DecodeString("b3234e48fa4d7b9df6f743aad1fa1c54889b3a1cff0649441731a129359c7ad568a2fce3181ed2b767a369684974f67a1960ec139595aa5347883698ab0af2236310cf4f1d59483abe2cefcfc3a79b453a7ffea4d2268aad314fdac5b468984f")).([]byte),
+			"b3234e48fa4d7b9df6f743aad1fa1c54889b3a1cff0649441731a129359c7ad568a2fce3181ed2b767a369684974f67a1960ec139595aa5347883698ab0af2236310cf4f1d59483abe2cefcfc3a79b453a7ffea4d2268aad314fdac5b468984f",
 			res.Data["signature"],
 		)
 	})
@@ -65,7 +64,7 @@ func TestAttestationSlashing(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, res.Data)
 		require.Equal(t,
-			ignoreError(hex.DecodeString("b3234e48fa4d7b9df6f743aad1fa1c54889b3a1cff0649441731a129359c7ad568a2fce3181ed2b767a369684974f67a1960ec139595aa5347883698ab0af2236310cf4f1d59483abe2cefcfc3a79b453a7ffea4d2268aad314fdac5b468984f")).([]byte),
+			"b3234e48fa4d7b9df6f743aad1fa1c54889b3a1cff0649441731a129359c7ad568a2fce3181ed2b767a369684974f67a1960ec139595aa5347883698ab0af2236310cf4f1d59483abe2cefcfc3a79b453a7ffea4d2268aad314fdac5b468984f",
 			res.Data["signature"],
 		)
 	})
@@ -160,7 +159,7 @@ func TestAttestationSlashing(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, res.Data)
 		require.Equal(t,
-			ignoreError(hex.DecodeString("a720ff1e58bbafa59a7e6adc0e0bc1991fede153982a63bdf00e9a898165c1f39408da5170a765bacff1ff0bfe33425e016abf5e5b9a7e8c1323fb26be0a185a78b9a6d798756fd056ba1072d3b449ac8a695e10c5c979c2cfca37394b6bc0af")).([]byte),
+			"a720ff1e58bbafa59a7e6adc0e0bc1991fede153982a63bdf00e9a898165c1f39408da5170a765bacff1ff0bfe33425e016abf5e5b9a7e8c1323fb26be0a185a78b9a6d798756fd056ba1072d3b449ac8a695e10c5c979c2cfca37394b6bc0af",
 			res.Data["signature"],
 		)
 	})

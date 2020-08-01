@@ -109,7 +109,7 @@ func (setup *E2EBaseSetup) PushUpdatedDb() error {
 		return fmt.Errorf("error: could not update vault: respose: %s", respBody)
 	}
 
-	fmt.Printf("e2e: setup hashicorp vault db")
+	fmt.Printf("e2e: setup hashicorp vault db\n")
 
 	return nil
 }

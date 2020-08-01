@@ -22,7 +22,7 @@ func TestProposalSlashing(t *testing.T) {
 	b, _ := getBackend(t)
 
 	t.Run("Successfully Sign proposal", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-proposal")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-proposal")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -35,7 +35,7 @@ func TestProposalSlashing(t *testing.T) {
 	})
 
 	t.Run("Successfully Sign proposal (exactly same)", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-proposal")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-proposal")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -54,7 +54,7 @@ func TestProposalSlashing(t *testing.T) {
 	})
 
 	t.Run("Sign double proposal(different state root), should error", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-proposal")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-proposal")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -74,7 +74,7 @@ func TestProposalSlashing(t *testing.T) {
 	})
 
 	t.Run("Sign double proposal(different parent root), should error", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-proposal")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-proposal")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -94,7 +94,7 @@ func TestProposalSlashing(t *testing.T) {
 	})
 
 	t.Run("Sign double proposal(different body root), should error", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "wallet/accounts/test_account/sign-proposal")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-proposal")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)

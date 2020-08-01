@@ -20,6 +20,8 @@ func _byteArray(input string) []byte {
 }
 
 func baseInmemStorage() (*in_memory.InMemStore, error) {
+	types.InitBLS()
+
 	store := in_memory.NewInMemStore()
 
 	// wallet
@@ -66,7 +68,7 @@ func TestPushUpdate(t *testing.T) {
 
 	// test
 	t.Run("import from in-memory to hashicorp vault", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "admin/pushUpdate")
+		req := logical.TestRequest(t, logical.CreateOperation, "storage")
 		logicalStorage = req.Storage
 		req.Data = map[string]interface{}{
 			"data": data,
