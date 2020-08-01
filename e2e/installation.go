@@ -17,9 +17,9 @@ const (
 	rootTokenSuffix             = dataDirSuffix + "keys/vault.root.token"
 )
 
-func Cleanup(workingDir string) error {
+func (setup *E2EBaseSetup) Cleanup() error {
 	// Cleanup data dir
-	dataDir := fmt.Sprintf("%s%s", workingDir, dataDirSuffix)
+	dataDir := fmt.Sprintf("%s%s", setup.WorkingDir, dataDirSuffix)
 	_, err := os.Stat(dataDir)
 	if !os.IsNotExist(err) {
 		err := os.RemoveAll(dataDir)
@@ -68,7 +68,7 @@ func pluginRunning(closer io.ReadCloser) <- chan bool {
 	go func() {
 		for scanner.Scan() {
 			newLine := scanner.Text()
-			fmt.Println(newLine)
+			//fmt.Println(newLine)
 
 			if strings.Contains(newLine, logSignalingPluginInstalled) {
 				ret <- true
@@ -93,14 +93,18 @@ func rootAccessToken(workingDir string) (string, error) {
 }
 
 func SetupE2EEnv() (*E2EBaseSetup,error) {
+	ret := &E2EBaseSetup{}
+
 	workingDir, err := os.Getwd()
+	workingDir = strings.ReplaceAll(workingDir, "/e2e/tests", "") // since tests run from 2e2/tests.. remove that from working dir
 	if err != nil {
 		return nil, err
 	}
 	fmt.Printf("e2e: working dir: %s\n", workingDir)
+	ret.WorkingDir = workingDir
 
 	// step 1 - Cleanup
-	err = Cleanup(workingDir)
+	err = ret.Cleanup()
 	if err != nil {
 		return nil,err
 	}
