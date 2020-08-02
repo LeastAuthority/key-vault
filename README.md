@@ -94,7 +94,7 @@
 
 ### LIST ACCOUNTS
 
-This endpoint will list all accounts of key-vault stores at a path.
+This endpoint will list all accounts of key-vault.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
@@ -124,6 +124,36 @@ The example below shows output for a query path of `/ethereum/accounts` when the
     "wrap_info": null,
     "warnings": null,
     "auth": null
+}
+```
+
+### UPDATE STORAGE
+
+This endpoint will update the storage.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `POST`  | `:mount-path/storage`  | `200 application/json` |
+
+
+#### Sample Response
+
+The example below shows output for a query path of `/ethereum/storage`.
+
+```
+{
+    {
+        "request_id": "d53d5075-6a3b-2642-ffde-0714beb595f5",
+        "lease_id": "",
+        "renewable": false,
+        "lease_duration": 0,
+        "data": {
+            "status": true
+        },
+        "wrap_info": null,
+        "warnings": null,
+        "auth": null
+    }
 }
 ```
 
