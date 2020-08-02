@@ -8,12 +8,11 @@ require (
 	github.com/hashicorp/go-hclog v0.14.1
 	github.com/hashicorp/vault/api v1.0.4
 	github.com/hashicorp/vault/sdk v0.1.13
-	github.com/herumi/bls-eth-go-binary v0.0.0-20200624084043-9b7da5962ccb // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/prysmaticlabs/prysm v0.3.10
 	github.com/stretchr/testify v1.6.1
 	github.com/wealdtech/eth2-signer-api v1.3.0
-	github.com/wealdtech/go-eth2-types/v2 v2.4.2
+	github.com/wealdtech/go-eth2-types/v2 v2.5.0
 )
 
 replace gopkg.in/urfave/cli.v2 => github.com/urfave/cli/v2 v2.1.1

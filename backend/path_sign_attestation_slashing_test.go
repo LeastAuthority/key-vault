@@ -40,7 +40,7 @@ func TestAttestationSlashing(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, res.Data)
 		require.Equal(t,
-			"b3234e48fa4d7b9df6f743aad1fa1c54889b3a1cff0649441731a129359c7ad568a2fce3181ed2b767a369684974f67a1960ec139595aa5347883698ab0af2236310cf4f1d59483abe2cefcfc3a79b453a7ffea4d2268aad314fdac5b468984f",
+			"a53b6728fc2cc52abb0059da9b2e7cb01f33cd95fd6c9db7f2b821fa58a58d5ef2bc5dda058d570a7f240bf24b335eee066b2ab8dbf5a989157dd51b647733665f7c1be0d1c285b02efdbb37cd4e0ace0529b8e02c944386e3b110c32b019c63",
 			res.Data["signature"],
 		)
 	})
@@ -64,7 +64,7 @@ func TestAttestationSlashing(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, res.Data)
 		require.Equal(t,
-			"b3234e48fa4d7b9df6f743aad1fa1c54889b3a1cff0649441731a129359c7ad568a2fce3181ed2b767a369684974f67a1960ec139595aa5347883698ab0af2236310cf4f1d59483abe2cefcfc3a79b453a7ffea4d2268aad314fdac5b468984f",
+			"a53b6728fc2cc52abb0059da9b2e7cb01f33cd95fd6c9db7f2b821fa58a58d5ef2bc5dda058d570a7f240bf24b335eee066b2ab8dbf5a989157dd51b647733665f7c1be0d1c285b02efdbb37cd4e0ace0529b8e02c944386e3b110c32b019c63",
 			res.Data["signature"],
 		)
 	})
@@ -159,7 +159,7 @@ func TestAttestationSlashing(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, res.Data)
 		require.Equal(t,
-			"a720ff1e58bbafa59a7e6adc0e0bc1991fede153982a63bdf00e9a898165c1f39408da5170a765bacff1ff0bfe33425e016abf5e5b9a7e8c1323fb26be0a185a78b9a6d798756fd056ba1072d3b449ac8a695e10c5c979c2cfca37394b6bc0af",
+			"918b8b0128d263a8a7f42b8c19e57c92844cd826ef6c8c7eb78b789591a934b0a89dd615ad381808cac4ae464066fb85067b806bf359321c4600b1390e037de31ad54151fbc63dc18c1e6bcec7f56e18100cc1430091e0eb28a42c4787ce5f86",
 			res.Data["signature"],
 		)
 	})

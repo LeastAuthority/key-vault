@@ -44,7 +44,7 @@ func (t *AttestationSigning)Run() error {
 		return err
 	}
 
-	expecetd := shared.HexToBytes("b3234e48fa4d7b9df6f743aad1fa1c54889b3a1cff0649441731a129359c7ad568a2fce3181ed2b767a369684974f67a1960ec139595aa5347883698ab0af2236310cf4f1d59483abe2cefcfc3a79b453a7ffea4d2268aad314fdac5b468984f")
+	expecetd := shared.HexToBytes("a53b6728fc2cc52abb0059da9b2e7cb01f33cd95fd6c9db7f2b821fa58a58d5ef2bc5dda058d570a7f240bf24b335eee066b2ab8dbf5a989157dd51b647733665f7c1be0d1c285b02efdbb37cd4e0ace0529b8e02c944386e3b110c32b019c63")
 	if bytes.Compare(sig, expecetd) != 0 {
 		return fmt.Errorf("e2e: attestation signature not valid")
 	}
