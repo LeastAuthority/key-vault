@@ -24,4 +24,4 @@ replace github.com/herumi/bls-eth-go-binary => github.com/herumi/bls-eth-go-bina
 replace github.com/prysmaticlabs/prysm => github.com/prysmaticlabs/prysm v1.0.0-alpha.10
 
 // for dev only
-replace github.com/bloxapp/KeyVault => github.com/bloxapp/KeyVault v0.1.11-0.20200802075723-d18f3f5d519f
+replace github.com/bloxapp/KeyVault => github.com/bloxapp/KeyVault v0.1.11-0.20200802155454-064a7bf53382
