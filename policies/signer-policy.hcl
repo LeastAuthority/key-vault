@@ -4,6 +4,6 @@ path "ethereum/accounts" {
 }
 
 # Ability to sign data ("create")
-path "ethereum/accounts/+/sign-*" {
+path "ethereum/accounts/sign-*" {
   capabilities = ["create"]
 }

@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"testing"
+
 	"github.com/bloxapp/KeyVault/core"
 	"github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/bloxapp/KeyVault/stores/in_memory"
@@ -11,7 +13,6 @@ import (
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/stretchr/testify/require"
 	types "github.com/wealdtech/go-eth2-types/v2"
-	"testing"
 )
 
 func _byteArray(input string) []byte {
@@ -25,14 +26,14 @@ func baseInmemStorage() (*in_memory.InMemStore, error) {
 	store := in_memory.NewInMemStore()
 
 	// wallet
-	wallet := wallet_hd.NewHDWallet(&core.WalletContext{Storage:store})
+	wallet := wallet_hd.NewHDWallet(&core.WalletContext{Storage: store})
 	err := store.SaveWallet(wallet)
 	if err != nil {
 		return nil, err
 	}
 
 	// account
-	acc,err := wallet.CreateValidatorAccount(_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"), "test_account")
+	acc, err := wallet.CreateValidatorAccount(_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"), "test_account")
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +45,6 @@ func baseInmemStorage() (*in_memory.InMemStore, error) {
 	return store, nil
 }
 
-
 func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (*hashicorp.HashicorpVaultStore, error) {
 	inMem, err := baseInmemStorage()
 	if err != nil {
@@ -53,7 +53,7 @@ func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (
 	return hashicorp.FromInMemoryStore(inMem, logicalStorage, ctx)
 }
 
-func TestPushUpdate(t *testing.T) {
+func TestStorage(t *testing.T) {
 	require.NoError(t, types.InitBLS())
 
 	b, _ := getBackend(t)
@@ -82,15 +82,15 @@ func TestPushUpdate(t *testing.T) {
 		// get wallet and account
 		wallet, err := store.OpenWallet()
 		require.NoError(t, err)
-		acc, err := wallet.AccountByName("test_account")
+		acc, err := wallet.AccountByPublicKey("ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279")
 		require.NoError(t, err)
 
 		vault := hashicorp.NewHashicorpVaultStore(logicalStorage, context.Background())
-		wallet2,err := vault.OpenWallet()
+		wallet2, err := vault.OpenWallet()
 		require.NoError(t, err)
 		require.Equal(t, wallet.ID().String(), wallet2.ID().String())
 
-		acc2, err := wallet2.AccountByName("test_account")
+		acc2, err := wallet2.AccountByPublicKey("ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279")
 		require.NoError(t, err)
 		require.Equal(t, acc.ID().String(), acc2.ID().String())
 	})

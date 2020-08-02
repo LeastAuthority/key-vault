@@ -14,7 +14,7 @@ import (
 const (
 	pluginContainerName         = "vault-plugin-secrets-eth20_vault_1"
 	logSignalingPluginInstalled = "core: successfully reloaded plugin: plugin=ethsign path=ethereum/"
-	dataDirSuffix				= "/data/"
+	dataDirSuffix               = "/data/"
 	rootTokenSuffix             = dataDirSuffix + "keys/vault.root.token"
 )
 
@@ -30,10 +30,9 @@ func (setup *E2EBaseSetup) Cleanup() error {
 		fmt.Printf("Cleanup: deleted data dir\n")
 	}
 
-
 	// check if running
 	listCmd := exec.Command("docker", "container", "ps", "-ls")
-	byts,err := listCmd.CombinedOutput()
+	byts, err := listCmd.CombinedOutput()
 	if err != nil {
 		return err
 	}
@@ -61,7 +60,7 @@ func (setup *E2EBaseSetup) Cleanup() error {
 	return nil
 }
 
-func pluginRunning(closer io.ReadCloser) <- chan bool {
+func pluginRunning(closer io.ReadCloser) <-chan bool {
 	ret := make(chan bool)
 
 	scanner := bufio.NewScanner(closer)
@@ -94,7 +93,8 @@ func rootAccessToken(workingDir string) (string, error) {
 }
 
 var buildOnce sync.Once
-func SetupE2EEnv() (*E2EBaseSetup,error) {
+
+func SetupE2EEnv() (*E2EBaseSetup, error) {
 	var err error
 	ret := &E2EBaseSetup{}
 
@@ -109,7 +109,7 @@ func SetupE2EEnv() (*E2EBaseSetup,error) {
 	// step 1 - Cleanup
 	err = ret.Cleanup()
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	fmt.Printf("e2e: Cleanup done\n")
 
@@ -122,29 +122,29 @@ func SetupE2EEnv() (*E2EBaseSetup,error) {
 		fmt.Printf("e2e: Built Vault docker\n")
 	})
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	// step 3 - run docker compose
-	cmd := exec.Command("docker-compose", "up","vault")
+	cmd := exec.Command("docker-compose", "up", "vault")
 	pipe, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	// step 4 - wait for plugin to be active
-	<- pluginRunning(pipe)
+	<-pluginRunning(pipe)
 	fmt.Printf("e2e: Plugin installed and running\n")
 
 	// step 5 - get root access token
 	token, err := rootAccessToken(workingDir)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	fmt.Printf("e2e: root token: %s\n", token)
 

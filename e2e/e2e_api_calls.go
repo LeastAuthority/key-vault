@@ -5,42 +5,43 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 )
 
 type E2EBaseSetup struct {
 	WorkingDir string
-	RootKey string
-	baseUrl string
+	RootKey    string
+	baseUrl    string
 }
 
-func (setup *E2EBaseSetup) SignAttestation(account string, data map[string]interface{}) ([]byte,error) {
+func (setup *E2EBaseSetup) SignAttestation(data map[string]interface{}) ([]byte, error) {
 	// body
 	body, err := json.Marshal(data)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/accounts/%s/sign-attestation", setup.baseUrl, account)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/accounts/sign-attestation", setup.baseUrl)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
 	if err != nil {
-		return nil,nil
+		return nil, nil
 	}
-	req.Header.Set("Authorization", "Bearer " + setup.RootKey)
+	req.Header.Set("Authorization", "Bearer "+setup.RootKey)
 
 	// Do request
 	httpClient := http.Client{}
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	// Read response body
 	respBodyByts, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -52,7 +53,7 @@ func (setup *E2EBaseSetup) SignAttestation(account string, data map[string]inter
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil,fmt.Errorf("%s", retObj["errors"].([]interface{})[0])
+		return nil, fmt.Errorf("%s", retObj["errors"].([]interface{})[0])
 	} else {
 		sigStr := retObj["data"].(map[string]interface{})["signature"].(string)
 		ret, err := hex.DecodeString(sigStr)
@@ -63,9 +64,9 @@ func (setup *E2EBaseSetup) SignAttestation(account string, data map[string]inter
 	}
 }
 
-func (setup *E2EBaseSetup) PushUpdatedDb() error {
+func (setup *E2EBaseSetup) UpdateStorage() error {
 	// get store
-	store,err := shared.BaseInmemStorage()
+	store, err := shared.BaseInmemStorage()
 	if err != nil {
 		return err
 	}
@@ -88,7 +89,7 @@ func (setup *E2EBaseSetup) PushUpdatedDb() error {
 	if err != nil {
 		return nil
 	}
-	req.Header.Set("Authorization", "Bearer " + setup.RootKey)
+	req.Header.Set("Authorization", "Bearer "+setup.RootKey)
 
 	// Do request
 	httpClient := http.Client{}

@@ -164,11 +164,11 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/accounts/:account_name/sign-attestation`  | `200 application/json` |
+| `POST`  | `:mount-path/accounts/sign-attestation`  | `200 application/json` |
 
 #### Parameters
 
-* `account_name` (`string: <required>`) - Specifies the name of the account to sign. This is specified as part of the URL.
+* `public_key` (`string: <required>`) - Specifies the public key of the account to sign.
 * `domain` (`string: <required>`) - Specifies the domain.
 * `slot` (`int: <required>`) - Specifies the slot.
 * `committeeIndex` (`int: <required>`) - Specifies the committeeIndex.
@@ -203,11 +203,11 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/accounts/:account_name/sign-proposal`  | `200 application/json` |
+| `POST`  | `:mount-path/accounts/sign-proposal`  | `200 application/json` |
 
 #### Parameters
 
-* `account_name` (`string: <required>`) - Specifies the name of the account to sign. This is specified as part of the URL.
+* `public_key` (`string: <required>`) - Specifies the public key of the account to sign.
 * `domain` (`string: <required>`) - Specifies the domain.
 * `slot` (`int: <required>`) - Specifies the slot.
 * `proposerIndex` (`int: <required>`) - Specifies the proposerIndex.
@@ -240,11 +240,11 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/accounts/:account_name/sign-aggregation`  | `200 application/json` |
+| `POST`  | `:mount-path/accounts/sign-aggregation`  | `200 application/json` |
 
 #### Parameters
 
-* `account_name` (`string: <required>`) - Specifies the name of the account to sign. This is specified as part of the URL.
+* `public_key` (`string: <required>`) - Specifies the public key of the account to sign.
 * `domain` (`string: <required>`) - Specifies the domain.
 * `dataToSign` (`string: <required>`) - Specifies the slot.
 
@@ -281,7 +281,7 @@ path "ethereum/accounts" {
 }
 
 # Ability to sign data ("create")
-path "ethereum/accounts/+/sign-*" {
+path "ethereum/accounts/sign-*" {
   capabilities = ["create"]
 }
 ```
@@ -296,7 +296,7 @@ path "ethereum/accounts" {
 }
 
 # Ability to sign data ("create")
-path "ethereum/accounts/+/sign-*" {
+path "ethereum/accounts/sign-*" {
   capabilities = ["create"]
 }
 

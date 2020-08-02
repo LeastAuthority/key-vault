@@ -9,7 +9,7 @@ type E2ETest interface {
 	Run(t *testing.T)
 }
 
-var tests = []E2ETest {
+var tests = []E2ETest{
 	&AttestationSigning{},
 	&AttestationDoubleSigning{},
 }
@@ -20,6 +20,5 @@ func TestE2E(t *testing.T) {
 			tst.Run(t)
 		})
 	}
-
 
 }
