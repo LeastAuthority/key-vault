@@ -24,7 +24,7 @@ func (setup *E2EBaseSetup) SignAttestation(account string, data map[string]inter
 	}
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/wallet/accounts/%s/sign-attestation", setup.baseUrl, account)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/accounts/%s/sign-attestation", setup.baseUrl, account)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
 	if err != nil {
 		return nil,nil
@@ -83,7 +83,7 @@ func (setup *E2EBaseSetup) PushUpdatedDb() error {
 	})
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/admin/pushUpdate", setup.baseUrl)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/storage", setup.baseUrl)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
 	if err != nil {
 		return nil

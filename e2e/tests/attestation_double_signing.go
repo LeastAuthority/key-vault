@@ -3,7 +3,8 @@ package tests
 import (
 	"fmt"
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
-	"strings"
+	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 
@@ -11,20 +12,17 @@ type AttestationDoubleSigning struct {
 
 }
 
-func (t *AttestationDoubleSigning)Name() string {
+func (test *AttestationDoubleSigning)Name() string {
 	return "Test double attestation signing, different block root"
 }
 
-func (t *AttestationDoubleSigning)Run() error {
+func (test *AttestationDoubleSigning)Run(t *testing.T) {
 	setup, err := e2e.SetupE2EEnv()
-	if err != nil {
-		return err
-	}
+	require.NoError(t, err)
 
+	// setup vault with db
 	err = setup.PushUpdatedDb()
-	if err != nil {
-		return err
-	}
+	require.NoError(t, err)
 
 	// first sig
 	_,err = setup.SignAttestation(
@@ -40,9 +38,7 @@ func (t *AttestationDoubleSigning)Run() error {
 			"targetRoot": "17959acc370274756fa5e9fdd7e7adf17204f49cc8457e49438c42c4883cbfb0",
 		},
 	)
-	if err != nil {
-		return err
-	}
+	require.NoError(t, err)
 
 	// second sig, different block root
 	_,err = setup.SignAttestation(
@@ -58,14 +54,11 @@ func (t *AttestationDoubleSigning)Run() error {
 			"targetRoot": "17959acc370274756fa5e9fdd7e7adf17204f49cc8457e49438c42c4883cbfb0",
 		},
 	)
-	if err == nil {
-		return fmt.Errorf("signed a double attestation, should have errored")
-	}
 	expectedErr := fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: slashable attestation (DoubleVote), not signing\n\n")
-	if strings.Compare(err.Error(), expectedErr) != 0 {
-		return fmt.Errorf("\nExpected: %s\nUnexpected: %s", expectedErr, err.Error())
-	}
+	require.Error(t, err)
+	require.EqualError(t, err, expectedErr)
 
-	return nil
+	// cleanup
+	require.NoError(t, setup.Cleanup())
 }
 

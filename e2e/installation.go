@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 )
 
 const (
@@ -68,7 +69,7 @@ func pluginRunning(closer io.ReadCloser) <- chan bool {
 	go func() {
 		for scanner.Scan() {
 			newLine := scanner.Text()
-			//fmt.Println(newLine)
+			fmt.Println(newLine)
 
 			if strings.Contains(newLine, logSignalingPluginInstalled) {
 				ret <- true
@@ -92,7 +93,9 @@ func rootAccessToken(workingDir string) (string, error) {
 	return ret, nil
 }
 
+var buildOnce sync.Once
 func SetupE2EEnv() (*E2EBaseSetup,error) {
+	var err error
 	ret := &E2EBaseSetup{}
 
 	workingDir, err := os.Getwd()
@@ -110,7 +113,19 @@ func SetupE2EEnv() (*E2EBaseSetup,error) {
 	}
 	fmt.Printf("e2e: Cleanup done\n")
 
-	// step 2 - run docker compose
+	// step 2 - build (once per run)
+	buildOnce.Do(func() {
+		build := exec.Command("docker-compose", "build", "vault")
+		build.Stdout = os.Stdout
+		build.Stderr = os.Stderr
+		err = build.Run()
+		fmt.Printf("e2e: Built Vault docker\n")
+	})
+	if err != nil {
+		return nil,err
+	}
+
+	// step 3 - run docker compose
 	cmd := exec.Command("docker-compose", "up","vault")
 	pipe, err := cmd.StdoutPipe()
 	if err != nil {
@@ -122,11 +137,11 @@ func SetupE2EEnv() (*E2EBaseSetup,error) {
 		return nil,err
 	}
 
-	// step 3 - wait for plugin to be active
+	// step 4 - wait for plugin to be active
 	<- pluginRunning(pipe)
 	fmt.Printf("e2e: Plugin installed and running\n")
 
-	// step 4 - get root access token
+	// step 5 - get root access token
 	token, err := rootAccessToken(workingDir)
 	if err != nil {
 		return nil,err

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"github.com/bloxapp/KeyVault"
 
 	"github.com/pkg/errors"
 
@@ -34,6 +35,8 @@ func storagePaths(b *backend) []*framework.Path {
 }
 
 func (b *backend) pathStorageUpdate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	KeyVault.InitCrypto()
+
 	storage := data.Get("data").(string)
 	storageBytes, err := hex.DecodeString(storage)
 	if err != nil {
