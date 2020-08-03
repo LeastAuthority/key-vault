@@ -90,6 +90,9 @@ github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kB
 github.com/bloxapp/KeyVault v0.1.11-0.20200802075723-d18f3f5d519f/go.mod h1:DBGa3AiaBhFyrYDkKzNO3Fg0u7zzeMs54QR07er/qoo=
 github.com/bloxapp/KeyVault v0.1.11-0.20200802155454-064a7bf53382 h1:zh5bIBy/LhLTWs4iqhAC6xrkHjjj1UEOdOb6wkWgCbQ=
 github.com/bloxapp/KeyVault v0.1.11-0.20200802155454-064a7bf53382/go.mod h1:DBGa3AiaBhFyrYDkKzNO3Fg0u7zzeMs54QR07er/qoo=
+github.com/bloxapp/KeyVault v0.2.0 h1:Jra0gQvl1lZ707flsiV/C0VO0UHMK0Y/zcCK1AextlQ=
+github.com/bloxapp/KeyVault v0.2.0/go.mod h1:DBGa3AiaBhFyrYDkKzNO3Fg0u7zzeMs54QR07er/qoo=
+github.com/bloxapp/KeyVault v0.2.1/go.mod h1:Y7dx8BJ52KQsCX0DpJ1ystz7BIs/o5+4eCzvEOVCKwM=
 github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40/go.mod h1:8rLXio+WjiTceGBHIoTvn60HIbs7Hm7bcHjyrSqYB9c=
 github.com/boltdb/bolt v1.3.1/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=
 github.com/bradfitz/go-smtpd v0.0.0-20170404230938-deb6d6237625/go.mod h1:HYsPBTaaSFSlLx/70C2HPIMNZpVV8+vt/A+FMnYP11g=
@@ -954,6 +957,7 @@ github.com/wealdtech/go-bytesutil v1.1.0/go.mod h1:jENeMqeTEU8FNZyDFRVc7KqBdRKSn
 github.com/wealdtech/go-bytesutil v1.1.1 h1:ocEg3Ke2GkZ4vQw5lp46rmO+pfqCCTgq35gqOy8JKVc=
 github.com/wealdtech/go-bytesutil v1.1.1/go.mod h1:jENeMqeTEU8FNZyDFRVc7KqBdRKSnJ9CCh26TcuNb9s=
 github.com/wealdtech/go-ecodec v1.1.0/go.mod h1:PSdBFEB6cltdT7V4E1jbboufMZTZXcQOKG/2PeEjKK4=
+github.com/wealdtech/go-eth2-types v1.0.0 h1:ggrbQ5HeFcxVm20zxVWr8Sc3uCditaetzWB/Ax/4g0w=
 github.com/wealdtech/go-eth2-types v1.0.0/go.mod h1:fWUgtKQ7hiNVl6263bGeyjlydYuaxkxcUIPIopgz2CM=
 github.com/wealdtech/go-eth2-types/v2 v2.3.1/go.mod h1:FubkGSavaa+rvmHDMTUVoPdFh00wKg0k5QPW6G52mhw=
 github.com/wealdtech/go-eth2-types/v2 v2.5.0 h1:L8sl3yoICAbn3134CBLNUt0o5h2voe0Es2KD5O9r8YQ=
@@ -973,6 +977,7 @@ github.com/wealdtech/go-eth2-wallet-store-s3 v1.6.3/go.mod h1:wS8sqBuIcn9QuLR1Vl
 github.com/wealdtech/go-eth2-wallet-store-scratch v1.3.0/go.mod h1:NaV/et5zTaqHhTpdpSveUYE2czCFAD8f07eABh/0pso=
 github.com/wealdtech/go-eth2-wallet-store-scratch v1.3.3/go.mod h1:/tvALCsQ07lvqlU+IKKAdwYFYyjIO628bu/Ssv0JRv4=
 github.com/wealdtech/go-eth2-wallet-types v1.8.0/go.mod h1:5A83MUBhmLgxpg9X5eqvnDIOYfn329caf5DOcv7pcY0=
+github.com/wealdtech/go-eth2-wallet-types v1.10.0 h1:iQx3MxMQQwoEfyPDHy5vtKYVtrUjY4nzEODbUPcz2bg=
 github.com/wealdtech/go-eth2-wallet-types v1.10.0/go.mod h1:vwK05jlJM/ibZs/QCqJ4dOhsjjpNcIP4X7Vx6WYXLGI=
 github.com/wealdtech/go-eth2-wallet-types/v2 v2.0.2/go.mod h1:d7WZ9WvtL3vGSHtSh/jnVh4YO93verLL1dRW2NK5sN4=
 github.com/wealdtech/go-eth2-wallet-types/v2 v2.6.0 h1:vBrH5icPPSeb14cdShA7/P2PBZOgZscJ2IhBlTIaFrA=

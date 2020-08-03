@@ -3,7 +3,7 @@ module github.com/bloxapp/vault-plugin-secrets-eth2.0
 go 1.14
 
 require (
-	github.com/bloxapp/KeyVault v0.1.10
+	github.com/bloxapp/KeyVault v0.2.1
 	github.com/google/uuid v1.1.1
 	github.com/hashicorp/go-hclog v0.14.1
 	github.com/hashicorp/vault/api v1.0.4
@@ -13,6 +13,8 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/wealdtech/eth2-signer-api v1.3.0
 	github.com/wealdtech/go-eth2-types/v2 v2.5.0
+	github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4 v1.1.0
+	github.com/wealdtech/go-eth2-wallet-types/v2 v2.6.0
 )
 
 replace gopkg.in/urfave/cli.v2 => github.com/urfave/cli/v2 v2.1.1
@@ -22,6 +24,3 @@ replace github.com/ethereum/go-ethereum => github.com/prysmaticlabs/bazel-go-eth
 replace github.com/herumi/bls-eth-go-binary => github.com/herumi/bls-eth-go-binary v0.0.0-20200605082007-3a76b4c6c599
 
 replace github.com/prysmaticlabs/prysm => github.com/prysmaticlabs/prysm v1.0.0-alpha.10
-
-// for dev only
-replace github.com/bloxapp/KeyVault => github.com/bloxapp/KeyVault v0.1.11-0.20200802155454-064a7bf53382
