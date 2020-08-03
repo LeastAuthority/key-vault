@@ -15,6 +15,14 @@ import (
 	types "github.com/wealdtech/go-eth2-wallet-types/v2"
 )
 
+const (
+	WalletDataPath = "wallet/data"
+
+	AccountBase = "wallet/accounts/"
+	AccountPath = AccountBase + "%s"
+)
+
+// HashicorpVaultStore implements store.Store interface using Vault.
 type HashicorpVaultStore struct {
 	storage logical.Storage
 	ctx     context.Context
@@ -23,6 +31,7 @@ type HashicorpVaultStore struct {
 	encryptionPassword []byte
 }
 
+// NewHashicorpVaultStore is the constructor of HashicorpVaultStore.
 func NewHashicorpVaultStore(storage logical.Storage, ctx context.Context) *HashicorpVaultStore {
 	return &HashicorpVaultStore{
 		storage: storage,
@@ -30,13 +39,7 @@ func NewHashicorpVaultStore(storage logical.Storage, ctx context.Context) *Hashi
 	}
 }
 
-const (
-	WalletDataPath = "wallet/data"
-
-	AccountBase = "wallet/accounts/"
-	AccountPath = AccountBase + "%s"
-)
-
+// FromInMemoryStore creates the HashicorpVaultStore based on the given in-memory store.
 func FromInMemoryStore(inMem *in_memory.InMemStore, storage logical.Storage, ctx context.Context) (*HashicorpVaultStore, error) {
 	// first delete old data
 	// delete all accounts
