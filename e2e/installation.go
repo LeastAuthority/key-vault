@@ -134,7 +134,7 @@ func SetupE2EEnv(t *testing.T) *BaseSetup {
 	require.NoError(t, err)
 	fmt.Printf("e2e: root token: %s\n", token)
 
-	return &E2EBaseSetup{
+	return &BaseSetup{
 		RootKey: token,
 		baseURL: "http://localhost:8200",
 	}
