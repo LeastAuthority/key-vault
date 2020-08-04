@@ -49,7 +49,7 @@ func (b *backend) pathStorageUpdate(ctx context.Context, req *logical.Request, d
 		return nil, errors.Wrap(err, "failed to JSON un-marshal storage")
 	}
 
-	_, err = store.FromInMemoryStore(inMemStore, req.Storage, ctx)
+	_, err = store.FromInMemoryStore(ctx, inMemStore, req.Storage)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to update storage")
 	}

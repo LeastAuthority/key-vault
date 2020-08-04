@@ -21,7 +21,7 @@ func Factory(ctx context.Context, conf *logical.BackendConfig) (logical.Backend,
 }
 
 // Backend returns the backend
-func Backend() (*backend, error) {
+func Backend() (logical.Backend, error) {
 	var b backend
 	b.Backend = &framework.Backend{
 		Help: "",

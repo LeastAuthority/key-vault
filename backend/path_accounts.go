@@ -28,7 +28,7 @@ func accountsPaths(b *backend) []*framework.Path {
 }
 
 func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
-	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 

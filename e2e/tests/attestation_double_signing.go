@@ -4,17 +4,21 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 )
 
+// AttestationDoubleSigning tests double signing case
 type AttestationDoubleSigning struct {
 }
 
+// Name returns the name of the test.
 func (test *AttestationDoubleSigning) Name() string {
 	return "Test double attestation signing, different block root"
 }
 
+// Run runs the test.
 func (test *AttestationDoubleSigning) Run(t *testing.T) {
 	setup := e2e.SetupE2EEnv(t)
 

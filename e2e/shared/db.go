@@ -14,6 +14,7 @@ func _byteArray(input string) []byte {
 	return res
 }
 
+// BaseInmemStorage creates the in-memory storage and creates the base account.
 func BaseInmemStorage() (*in_memory.InMemStore, error) {
 	types.InitBLS()
 	store := in_memory.NewInMemStore()

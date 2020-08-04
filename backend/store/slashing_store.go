@@ -11,6 +11,7 @@ import (
 	e2types "github.com/wealdtech/go-eth2-types/v2"
 )
 
+// Paths
 const (
 	WalletAttestationsBase      = "attestations/%s/"
 	WalletAttestationPath       = WalletAttestationsBase + "%d"     // account/attestation
@@ -18,6 +19,7 @@ const (
 	WalletProposalsPath         = "proposals/%s/%d/"                // account/proposal
 )
 
+// SaveAttestation implements Storage imterface.
 func (store *HashicorpVaultStore) SaveAttestation(key e2types.PublicKey, req *core.BeaconAttestation) error {
 	path := fmt.Sprintf(WalletAttestationPath, store.identfierFromKey(key), req.Target.Epoch)
 	data, err := json.Marshal(req)
@@ -33,6 +35,7 @@ func (store *HashicorpVaultStore) SaveAttestation(key e2types.PublicKey, req *co
 	return store.storage.Put(store.ctx, entry)
 }
 
+// RetrieveAttestation implements Storage imterface.
 func (store *HashicorpVaultStore) RetrieveAttestation(key e2types.PublicKey, epoch uint64) (*core.BeaconAttestation, error) {
 	path := fmt.Sprintf(WalletAttestationPath, store.identfierFromKey(key), epoch)
 	entry, err := store.storage.Get(store.ctx, path)
@@ -53,7 +56,7 @@ func (store *HashicorpVaultStore) RetrieveAttestation(key e2types.PublicKey, epo
 	return ret, nil
 }
 
-// both epochStart and epochEnd reflect saved attestations by their target epoch
+// ListAttestations both epochStart and epochEnd reflect saved attestations by their target epoch
 func (store *HashicorpVaultStore) ListAttestations(key e2types.PublicKey, epochStart uint64, epochEnd uint64) ([]*core.BeaconAttestation, error) {
 	ret := make([]*core.BeaconAttestation, 0)
 
@@ -71,6 +74,7 @@ func (store *HashicorpVaultStore) ListAttestations(key e2types.PublicKey, epochS
 	return ret, nil
 }
 
+// SaveProposal implements Storage imterface.
 func (store *HashicorpVaultStore) SaveProposal(key e2types.PublicKey, req *core.BeaconBlockHeader) error {
 	path := fmt.Sprintf(WalletProposalsPath, store.identfierFromKey(key), req.Slot)
 	data, err := json.Marshal(req)
@@ -86,6 +90,7 @@ func (store *HashicorpVaultStore) SaveProposal(key e2types.PublicKey, req *core.
 	return store.storage.Put(store.ctx, entry)
 }
 
+// RetrieveProposal implements Storage imterface.
 func (store *HashicorpVaultStore) RetrieveProposal(key e2types.PublicKey, slot uint64) (*core.BeaconBlockHeader, error) {
 	path := fmt.Sprintf(WalletProposalsPath, store.identfierFromKey(key), slot)
 	entry, err := store.storage.Get(store.ctx, path)
@@ -106,6 +111,7 @@ func (store *HashicorpVaultStore) RetrieveProposal(key e2types.PublicKey, slot u
 	return ret, nil
 }
 
+// SaveLatestAttestation implements Storage imterface.
 func (store *HashicorpVaultStore) SaveLatestAttestation(key e2types.PublicKey, req *core.BeaconAttestation) error {
 	path := fmt.Sprintf(WalletLatestAttestationPath, store.identfierFromKey(key))
 	data, err := json.Marshal(req)
@@ -121,6 +127,7 @@ func (store *HashicorpVaultStore) SaveLatestAttestation(key e2types.PublicKey, r
 	return store.storage.Put(store.ctx, entry)
 }
 
+// RetrieveLatestAttestation implements Storage imterface.
 func (store *HashicorpVaultStore) RetrieveLatestAttestation(key e2types.PublicKey) (*core.BeaconAttestation, error) {
 	path := fmt.Sprintf(WalletLatestAttestationPath, store.identfierFromKey(key))
 	entry, err := store.storage.Get(store.ctx, path)

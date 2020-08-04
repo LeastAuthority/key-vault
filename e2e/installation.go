@@ -22,7 +22,8 @@ const (
 	rootTokenSuffix             = dataDirSuffix + "keys/vault.root.token"
 )
 
-func (setup *E2EBaseSetup) Cleanup(t *testing.T) {
+// Cleanup cleans up the environment
+func (setup *BaseSetup) Cleanup(t *testing.T) {
 	// Cleanup data dir
 	dataDir := fmt.Sprintf("%s%s", setup.WorkingDir, dataDirSuffix)
 	_, err := os.Stat(dataDir)
@@ -92,8 +93,9 @@ func rootAccessToken(t *testing.T, workingDir string) (string, error) {
 
 var buildOnce sync.Once
 
-func SetupE2EEnv(t *testing.T) *E2EBaseSetup {
-	ret := &E2EBaseSetup{}
+// SetupE2EEnv sets up environment for e2e tests
+func SetupE2EEnv(t *testing.T) *BaseSetup {
+	ret := &BaseSetup{}
 
 	workingDir, err := os.Getwd()
 	workingDir = strings.ReplaceAll(workingDir, "/e2e/tests", "") // since tests run from 2e2/tests.. remove that from working dir
@@ -134,6 +136,6 @@ func SetupE2EEnv(t *testing.T) *E2EBaseSetup {
 
 	return &E2EBaseSetup{
 		RootKey: token,
-		baseUrl: "http://localhost:8200",
+		baseURL: "http://localhost:8200",
 	}
 }

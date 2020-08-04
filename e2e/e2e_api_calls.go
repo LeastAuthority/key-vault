@@ -11,13 +11,15 @@ import (
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 )
 
-type E2EBaseSetup struct {
+// BaseSetup implements mechanism, to setup base env for e2e tests.
+type BaseSetup struct {
 	WorkingDir string
 	RootKey    string
-	baseUrl    string
+	baseURL    string
 }
 
-func (setup *E2EBaseSetup) SignAttestation(data map[string]interface{}) ([]byte, error) {
+// SignAttestation tests the sign attestation endpoint.
+func (setup *BaseSetup) SignAttestation(data map[string]interface{}) ([]byte, error) {
 	// body
 	body, err := json.Marshal(data)
 	if err != nil {
@@ -25,7 +27,7 @@ func (setup *E2EBaseSetup) SignAttestation(data map[string]interface{}) ([]byte,
 	}
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/accounts/sign-attestation", setup.baseUrl)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/accounts/sign-attestation", setup.baseURL)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, nil
@@ -54,17 +56,18 @@ func (setup *E2EBaseSetup) SignAttestation(data map[string]interface{}) ([]byte,
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("%s", retObj["errors"].([]interface{})[0])
-	} else {
-		sigStr := retObj["data"].(map[string]interface{})["signature"].(string)
-		ret, err := hex.DecodeString(sigStr)
-		if err != nil {
-			return nil, err
-		}
-		return ret, nil
 	}
+
+	sigStr := retObj["data"].(map[string]interface{})["signature"].(string)
+	ret, err := hex.DecodeString(sigStr)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
 }
 
-func (setup *E2EBaseSetup) UpdateStorage() error {
+// UpdateStorage updates the storage.
+func (setup *BaseSetup) UpdateStorage() error {
 	// get store
 	store, err := shared.BaseInmemStorage()
 	if err != nil {
@@ -84,7 +87,7 @@ func (setup *E2EBaseSetup) UpdateStorage() error {
 	})
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/storage", setup.baseUrl)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/storage", setup.baseURL)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
 	if err != nil {
 		return nil

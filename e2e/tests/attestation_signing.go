@@ -3,18 +3,22 @@ package tests
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
-	"github.com/stretchr/testify/require"
 )
 
+// AttestationSigning tests sign attestation endpoint.
 type AttestationSigning struct {
 }
 
+// Name returns the name of the test.
 func (test *AttestationSigning) Name() string {
 	return "Test attestation signing"
 }
 
+// Run run the test.
 func (test *AttestationSigning) Run(t *testing.T) {
 	setup := e2e.SetupE2EEnv(t)
 

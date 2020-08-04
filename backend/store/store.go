@@ -15,6 +15,7 @@ import (
 	types "github.com/wealdtech/go-eth2-wallet-types/v2"
 )
 
+// Paths
 const (
 	WalletDataPath = "wallet/data"
 
@@ -32,7 +33,7 @@ type HashicorpVaultStore struct {
 }
 
 // NewHashicorpVaultStore is the constructor of HashicorpVaultStore.
-func NewHashicorpVaultStore(storage logical.Storage, ctx context.Context) *HashicorpVaultStore {
+func NewHashicorpVaultStore(ctx context.Context, storage logical.Storage) *HashicorpVaultStore {
 	return &HashicorpVaultStore{
 		storage: storage,
 		ctx:     ctx,
@@ -40,15 +41,15 @@ func NewHashicorpVaultStore(storage logical.Storage, ctx context.Context) *Hashi
 }
 
 // FromInMemoryStore creates the HashicorpVaultStore based on the given in-memory store.
-func FromInMemoryStore(inMem *in_memory.InMemStore, storage logical.Storage, ctx context.Context) (*HashicorpVaultStore, error) {
+func FromInMemoryStore(ctx context.Context, inMem *in_memory.InMemStore, storage logical.Storage) (*HashicorpVaultStore, error) {
 	// first delete old data
 	// delete all accounts
 	res, err := storage.List(ctx, AccountBase)
 	if err != nil {
 		return nil, err
 	}
-	for _, accountId := range res {
-		path := fmt.Sprintf(AccountPath, accountId)
+	for _, accountID := range res {
+		path := fmt.Sprintf(AccountPath, accountID)
 		err = storage.Delete(ctx, path)
 		if err != nil {
 			return nil, err
@@ -64,7 +65,7 @@ func FromInMemoryStore(inMem *in_memory.InMemStore, storage logical.Storage, ctx
 	}
 
 	// get new store
-	newStore := NewHashicorpVaultStore(storage, ctx)
+	newStore := NewHashicorpVaultStore(ctx, storage)
 
 	// save wallet
 	wallet, err := inMem.OpenWallet()
@@ -87,10 +88,12 @@ func FromInMemoryStore(inMem *in_memory.InMemStore, storage logical.Storage, ctx
 	return newStore, nil
 }
 
+// Name returns the name of the store.
 func (store *HashicorpVaultStore) Name() string {
 	return "Hashicorp Vault"
 }
 
+// SaveWallet implements Storage interface.
 func (store *HashicorpVaultStore) SaveWallet(wallet core.Wallet) error {
 	// data
 	data, err := json.Marshal(wallet)
@@ -109,7 +112,7 @@ func (store *HashicorpVaultStore) SaveWallet(wallet core.Wallet) error {
 	return store.storage.Put(store.ctx, entry)
 }
 
-// will return nil,nil if no wallet was found
+// OpenWallet returns nil,nil if no wallet was found
 func (store *HashicorpVaultStore) OpenWallet() (core.Wallet, error) {
 	path := WalletDataPath
 	entry, err := store.storage.Get(store.ctx, path)
@@ -132,7 +135,7 @@ func (store *HashicorpVaultStore) OpenWallet() (core.Wallet, error) {
 	return ret, nil
 }
 
-// will return an empty array for no accounts
+// ListAccounts returns an empty array for no accounts
 func (store *HashicorpVaultStore) ListAccounts() ([]core.ValidatorAccount, error) {
 	w, err := store.OpenWallet()
 	if err != nil {
@@ -147,6 +150,7 @@ func (store *HashicorpVaultStore) ListAccounts() ([]core.ValidatorAccount, error
 	return ret, nil
 }
 
+// SaveAccount stores the given account in DB.
 func (store *HashicorpVaultStore) SaveAccount(account core.ValidatorAccount) error {
 	// data
 	data, err := json.Marshal(account)
@@ -164,9 +168,9 @@ func (store *HashicorpVaultStore) SaveAccount(account core.ValidatorAccount) err
 	return store.storage.Put(store.ctx, entry)
 }
 
-// will return nil,nil if no account was found
-func (store *HashicorpVaultStore) OpenAccount(accountId uuid.UUID) (core.ValidatorAccount, error) {
-	path := fmt.Sprintf(AccountPath, accountId)
+// OpenAccount opens an account by the given ID. Returns nil,nil if no account was found.
+func (store *HashicorpVaultStore) OpenAccount(accountID uuid.UUID) (core.ValidatorAccount, error) {
+	path := fmt.Sprintf(AccountPath, accountID)
 	entry, err := store.storage.Get(store.ctx, path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get record with path '%s'", path)
@@ -186,7 +190,7 @@ func (store *HashicorpVaultStore) OpenAccount(accountId uuid.UUID) (core.Validat
 	return ret, nil
 }
 
-// could also bee set to nil
+// SetEncryptor sets the given encryptor. Could be nil value.
 func (store *HashicorpVaultStore) SetEncryptor(encryptor types.Encryptor, password []byte) {
 	store.encryptor = encryptor
 	store.encryptionPassword = password
