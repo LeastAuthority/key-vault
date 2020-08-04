@@ -18,6 +18,18 @@ variables:
 
 
 #blox-infra-stage
+Run tests of the applcation:
+  stage: test
+  image: golang:1.14-stretch
+  tags:
+    - blox-infra-stage
+
+  script:
+    - go get -u golang.org/x/lint/golint
+    - go get -u golang.org/x/tools/cmd/goimports
+    - ./scripts/lint.sh .
+    - go test -cover -race -p 1 ./...
+
 Build stage Docker image:
   stage: build
   tags:
