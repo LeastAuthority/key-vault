@@ -7,12 +7,13 @@ import (
 	"testing"
 
 	"github.com/bloxapp/KeyVault/core"
-	"github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/bloxapp/KeyVault/stores/in_memory"
 	"github.com/bloxapp/KeyVault/wallet_hd"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/stretchr/testify/require"
 	types "github.com/wealdtech/go-eth2-types/v2"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
 )
 
 func _byteArray(input string) []byte {
@@ -23,11 +24,11 @@ func _byteArray(input string) []byte {
 func baseInmemStorage() (*in_memory.InMemStore, error) {
 	types.InitBLS()
 
-	store := in_memory.NewInMemStore()
+	inMemStore := in_memory.NewInMemStore()
 
 	// wallet
-	wallet := wallet_hd.NewHDWallet(&core.WalletContext{Storage: store})
-	err := store.SaveWallet(wallet)
+	wallet := wallet_hd.NewHDWallet(&core.WalletContext{Storage: inMemStore})
+	err := inMemStore.SaveWallet(wallet)
 	if err != nil {
 		return nil, err
 	}
@@ -37,32 +38,32 @@ func baseInmemStorage() (*in_memory.InMemStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = store.SaveAccount(acc)
-	if err != nil {
+
+	if err := inMemStore.SaveAccount(acc); err != nil {
 		return nil, err
 	}
 
-	return store, nil
+	return inMemStore, nil
 }
 
-func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (*hashicorp.HashicorpVaultStore, error) {
+func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (*store.HashicorpVaultStore, error) {
 	inMem, err := baseInmemStorage()
 	if err != nil {
 		return nil, err
 	}
-	return hashicorp.FromInMemoryStore(inMem, logicalStorage, ctx)
+	return store.FromInMemoryStore(inMem, logicalStorage, ctx)
 }
 
 func TestStorage(t *testing.T) {
 	require.NoError(t, types.InitBLS())
 
 	b, _ := getBackend(t)
-	store, err := baseInmemStorage()
+	inMemStore, err := baseInmemStorage()
 	require.NoError(t, err)
 	var logicalStorage logical.Storage
 
 	// marshal and to string
-	byts, err := json.Marshal(store)
+	byts, err := json.Marshal(inMemStore)
 	require.NoError(t, err)
 	data := hex.EncodeToString(byts)
 
@@ -80,12 +81,12 @@ func TestStorage(t *testing.T) {
 
 	t.Run("verify wallet and account", func(t *testing.T) {
 		// get wallet and account
-		wallet, err := store.OpenWallet()
+		wallet, err := inMemStore.OpenWallet()
 		require.NoError(t, err)
 		acc, err := wallet.AccountByPublicKey("ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279")
 		require.NoError(t, err)
 
-		vault := hashicorp.NewHashicorpVaultStore(logicalStorage, context.Background())
+		vault := store.NewHashicorpVaultStore(logicalStorage, context.Background())
 		wallet2, err := vault.OpenWallet()
 		require.NoError(t, err)
 		require.Equal(t, wallet.ID().String(), wallet2.ID().String())

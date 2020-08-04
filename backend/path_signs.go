@@ -6,12 +6,13 @@ import (
 
 	vault "github.com/bloxapp/KeyVault"
 	"github.com/bloxapp/KeyVault/slashing_protection"
-	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/bloxapp/KeyVault/validator_signer"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
 	v1 "github.com/wealdtech/eth2-signer-api/pb/v1"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
 )
 
 func signsPaths(b *backend) []*framework.Path {

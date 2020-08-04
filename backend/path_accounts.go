@@ -5,10 +5,11 @@ import (
 	"encoding/hex"
 
 	vault "github.com/bloxapp/KeyVault"
-	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
 )
 
 func accountsPaths(b *backend) []*framework.Path {

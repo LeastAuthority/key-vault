@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+
 	"github.com/bloxapp/KeyVault"
-
-	"github.com/pkg/errors"
-
-	"github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/bloxapp/KeyVault/stores/in_memory"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
+	"github.com/pkg/errors"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
 )
 
 func storagePaths(b *backend) []*framework.Path {
@@ -49,7 +49,7 @@ func (b *backend) pathStorageUpdate(ctx context.Context, req *logical.Request, d
 		return nil, errors.Wrap(err, "failed to JSON un-marshal storage")
 	}
 
-	_, err = hashicorp.FromInMemoryStore(inMemStore, req.Storage, ctx)
+	_, err = store.FromInMemoryStore(inMemStore, req.Storage, ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to update storage")
 	}
