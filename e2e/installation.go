@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -9,6 +10,9 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -18,27 +22,24 @@ const (
 	rootTokenSuffix             = dataDirSuffix + "keys/vault.root.token"
 )
 
-func (setup *E2EBaseSetup) Cleanup() error {
+func (setup *E2EBaseSetup) Cleanup(t *testing.T) {
 	// Cleanup data dir
 	dataDir := fmt.Sprintf("%s%s", setup.WorkingDir, dataDirSuffix)
 	_, err := os.Stat(dataDir)
 	if !os.IsNotExist(err) {
 		err := os.RemoveAll(dataDir)
-		if err != nil {
-			return err
-		}
+		require.NoError(t, err)
 		fmt.Printf("Cleanup: deleted data dir\n")
 	}
 
 	// check if running
 	listCmd := exec.Command("docker", "container", "ps", "-ls")
 	byts, err := listCmd.CombinedOutput()
-	if err != nil {
-		return err
-	}
+	require.NoError(t, err)
+
 	containerList := string(byts)
 	if !strings.Contains(containerList, pluginContainerName) {
-		return nil
+		return
 	}
 
 	// kill process
@@ -52,12 +53,8 @@ func (setup *E2EBaseSetup) Cleanup() error {
 	// remove container and volumes
 	removeCmd := exec.Command("docker", "rm", pluginContainerName, "--volumes")
 	err = removeCmd.Run()
-	if err != nil {
-		return err
-	}
+	require.NoError(t, err)
 	fmt.Printf("Cleanup: deleting previous container\n")
-
-	return nil
 }
 
 func pluginRunning(closer io.ReadCloser) <-chan bool {
@@ -81,36 +78,31 @@ func pluginRunning(closer io.ReadCloser) <-chan bool {
 	return ret
 }
 
-func rootAccessToken(workingDir string) (string, error) {
-	content, err := ioutil.ReadFile(fmt.Sprintf("%s%s", workingDir, rootTokenSuffix))
-	if err != nil {
-		return "", err
-	}
+func rootAccessToken(t *testing.T, workingDir string) (string, error) {
+	var data bytes.Buffer
+	cmd := exec.Command("docker-compose", "exec", "-T", "vault", "cat", rootTokenSuffix)
+	cmd.Stdout = &data
+	require.NoError(t, cmd.Run())
 
-	ret := string(content)
-	ret = strings.TrimSuffix(ret, "\n")
-	return ret, nil
+	token, err := ioutil.ReadAll(&data)
+	require.NoError(t, err)
+
+	return strings.TrimSuffix(string(token), "\n"), nil
 }
 
 var buildOnce sync.Once
 
-func SetupE2EEnv() (*E2EBaseSetup, error) {
-	var err error
+func SetupE2EEnv(t *testing.T) *E2EBaseSetup {
 	ret := &E2EBaseSetup{}
 
 	workingDir, err := os.Getwd()
 	workingDir = strings.ReplaceAll(workingDir, "/e2e/tests", "") // since tests run from 2e2/tests.. remove that from working dir
-	if err != nil {
-		return nil, err
-	}
+	require.NoError(t, err)
 	fmt.Printf("e2e: working dir: %s\n", workingDir)
 	ret.WorkingDir = workingDir
 
 	// step 1 - Cleanup
-	err = ret.Cleanup()
-	if err != nil {
-		return nil, err
-	}
+	ret.Cleanup(t)
 	fmt.Printf("e2e: Cleanup done\n")
 
 	// step 2 - build (once per run)
@@ -118,38 +110,30 @@ func SetupE2EEnv() (*E2EBaseSetup, error) {
 		build := exec.Command("docker-compose", "build", "vault")
 		build.Stdout = os.Stdout
 		build.Stderr = os.Stderr
-		err = build.Run()
+		require.NoError(t, build.Run())
 		fmt.Printf("e2e: Built Vault docker\n")
 	})
-	if err != nil {
-		return nil, err
-	}
+	require.NoError(t, err)
 
 	// step 3 - run docker compose
 	cmd := exec.Command("docker-compose", "up", "vault")
 	pipe, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
+	require.NoError(t, err)
 
 	err = cmd.Start()
-	if err != nil {
-		return nil, err
-	}
+	require.NoError(t, err)
 
 	// step 4 - wait for plugin to be active
 	<-pluginRunning(pipe)
 	fmt.Printf("e2e: Plugin installed and running\n")
 
 	// step 5 - get root access token
-	token, err := rootAccessToken(workingDir)
-	if err != nil {
-		return nil, err
-	}
+	token, err := rootAccessToken(t, workingDir)
+	require.NoError(t, err)
 	fmt.Printf("e2e: root token: %s\n", token)
 
 	return &E2EBaseSetup{
 		RootKey: token,
 		baseUrl: "http://localhost:8200",
-	}, nil
+	}
 }

@@ -16,11 +16,10 @@ func (test *AttestationSigning) Name() string {
 }
 
 func (test *AttestationSigning) Run(t *testing.T) {
-	setup, err := e2e.SetupE2EEnv()
-	require.NoError(t, err)
+	setup := e2e.SetupE2EEnv(t)
 
 	// setup vault with db
-	err = setup.UpdateStorage()
+	err := setup.UpdateStorage()
 	require.NoError(t, err)
 
 	// sign
@@ -43,5 +42,5 @@ func (test *AttestationSigning) Run(t *testing.T) {
 	require.Equal(t, expecetd, sig)
 
 	// cleanup
-	require.NoError(t, setup.Cleanup())
+	setup.Cleanup(t)
 }
