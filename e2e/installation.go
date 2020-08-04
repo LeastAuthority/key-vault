@@ -95,6 +95,11 @@ var buildOnce sync.Once
 
 // SetupE2EEnv sets up environment for e2e tests
 func SetupE2EEnv(t *testing.T) *BaseSetup {
+	return &BaseSetup{
+		RootKey: "sometoken",
+		baseURL: "http://localhost:8200",
+	}
+
 	ret := &BaseSetup{}
 
 	workingDir, err := os.Getwd()

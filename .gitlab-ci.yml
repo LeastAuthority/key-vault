@@ -1,4 +1,5 @@
 stages:
+  - lint
   - test
   - build
   - deploy
@@ -19,16 +20,23 @@ variables:
 
 
 #blox-infra-stage
-Run tests of the applcation:
-  stage: test
+Run linter:
+  stage: lint
   image: golang:1.14-stretch
   tags:
     - blox-infra-stage
-
   script:
     - go get -u golang.org/x/lint/golint
     - go get -u golang.org/x/tools/cmd/goimports
     - ./scripts/lint.sh .
+
+Run tests of the application:
+  stage: test
+  tags:
+    - blox-infra-stage
+  script:
+    - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
+    - docker run -d -e VAULT_ADDR=http://127.0.0.1:8200 -e VAULT_API_ADDR=http://127.0.0.1:8200 -e VAULT_CLIENT_TIMEOUT="30s" -e UNSEAL="true" $IMAGE_NAME:$CI_BUILD_REF
     - go test -cover -race -p 1 ./...
 
 Build stage Docker image:
