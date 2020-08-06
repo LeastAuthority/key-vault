@@ -6,22 +6,27 @@ import (
 
 	vault "github.com/bloxapp/KeyVault"
 	"github.com/bloxapp/KeyVault/slashing_protection"
-	store "github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/bloxapp/KeyVault/validator_signer"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
 	v1 "github.com/wealdtech/eth2-signer-api/pb/v1"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
 )
 
 func signsPaths(b *backend) []*framework.Path {
 	return []*framework.Path{
 		&framework.Path{
-			Pattern:         "accounts/" + framework.GenericNameRegex("account_name") + "/sign-attestation",
+			Pattern:         "accounts/sign-attestation",
 			HelpSynopsis:    "Sign attestation",
 			HelpDescription: `Sign attestation`,
 			Fields: map[string]*framework.FieldSchema{
-				"account_name": &framework.FieldSchema{Type: framework.TypeString},
+				"public_key": &framework.FieldSchema{
+					Type:        framework.TypeString,
+					Description: "Public key of the account",
+					Default:     "",
+				},
 				"domain": &framework.FieldSchema{
 					Type:        framework.TypeString,
 					Description: "Domain",
@@ -74,11 +79,15 @@ func signsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:         "accounts/" + framework.GenericNameRegex("account_name") + "/sign-proposal",
+			Pattern:         "accounts/sign-proposal",
 			HelpSynopsis:    "Sign proposal",
 			HelpDescription: `Sign proposal`,
 			Fields: map[string]*framework.FieldSchema{
-				"account_name": &framework.FieldSchema{Type: framework.TypeString},
+				"public_key": &framework.FieldSchema{
+					Type:        framework.TypeString,
+					Description: "Public key of the account",
+					Default:     "",
+				},
 				"domain": &framework.FieldSchema{
 					Type:        framework.TypeString,
 					Description: "Domain",
@@ -121,11 +130,15 @@ func signsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:         "accounts/" + framework.GenericNameRegex("account_name") + "/sign-aggregation",
+			Pattern:         "accounts/sign-aggregation",
 			HelpSynopsis:    "Sign aggregation",
 			HelpDescription: `Sign aggregation`,
 			Fields: map[string]*framework.FieldSchema{
-				"account_name": &framework.FieldSchema{Type: framework.TypeString},
+				"public_key": &framework.FieldSchema{
+					Type:        framework.TypeString,
+					Description: "Public key of the account",
+					Default:     "",
+				},
 				"domain": &framework.FieldSchema{
 					Type:        framework.TypeString,
 					Description: "Domain",
@@ -174,7 +187,7 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 	}
 	defer lock.UnLock()
 
-	accountName := data.Get("account_name").(string)
+	publicKey := data.Get("public_key").(string)
 	domain := data.Get("domain").(string)
 	slot := data.Get("slot").(int)
 	committeeIndex := data.Get("committeeIndex").(int)
@@ -183,6 +196,12 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 	sourceRoot := data.Get("sourceRoot").(string)
 	targetEpoch := data.Get("targetEpoch").(int)
 	targetRoot := data.Get("targetRoot").(string)
+
+	// Decode public key
+	publicKeyBytes, err := hex.DecodeString(publicKey)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode public key")
+	}
 
 	// Decode domain
 	domainBytes, err := hex.DecodeString(domain)
@@ -212,7 +231,7 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
 
 	res, err := signer.SignBeaconAttestation(&v1.SignBeaconAttestationRequest{
-		Id:     &v1.SignBeaconAttestationRequest_Account{Account: accountName},
+		Id:     &v1.SignBeaconAttestationRequest_PublicKey{PublicKey: publicKeyBytes},
 		Domain: domainBytes,
 		Data: &v1.AttestationData{
 			Slot:            uint64(slot),
@@ -263,13 +282,19 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 	}
 	defer lock.UnLock()
 
-	accountName := data.Get("account_name").(string)
+	publicKey := data.Get("public_key").(string)
 	domain := data.Get("domain").(string)
 	slot := data.Get("slot").(int)
 	proposerIndex := data.Get("proposerIndex").(int)
 	parentRoot := data.Get("parentRoot").(string)
 	stateRoot := data.Get("stateRoot").(string)
 	bodyRoot := data.Get("bodyRoot").(string)
+
+	// Decode public key
+	publicKeyBytes, err := hex.DecodeString(publicKey)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode public key")
+	}
 
 	// Decode domain
 	domainBytes, err := hex.DecodeString(domain)
@@ -296,7 +321,7 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 	}
 
 	proposalRequest := &v1.SignBeaconProposalRequest{
-		Id:     &v1.SignBeaconProposalRequest_Account{Account: accountName},
+		Id:     &v1.SignBeaconProposalRequest_PublicKey{PublicKey: publicKeyBytes},
 		Domain: domainBytes,
 		Data: &v1.BeaconBlockHeader{
 			Slot:          uint64(slot),
@@ -346,9 +371,15 @@ func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request,
 	}
 	defer lock.UnLock()
 
-	accountName := data.Get("account_name").(string)
+	publicKey := data.Get("public_key").(string)
 	domain := data.Get("domain").(string)
 	dataToSign := data.Get("dataToSign").(string)
+
+	// Decode public key
+	publicKeyBytes, err := hex.DecodeString(publicKey)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to HEX decode public key")
+	}
 
 	// Decode domain
 	domainBytes, err := hex.DecodeString(domain)
@@ -363,7 +394,7 @@ func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request,
 	}
 
 	proposalRequest := &v1.SignRequest{
-		Id:     &v1.SignRequest_Account{Account: accountName},
+		Id:     &v1.SignRequest_PublicKey{PublicKey: publicKeyBytes},
 		Domain: domainBytes,
 		Data:   dataToSignBytes,
 	}

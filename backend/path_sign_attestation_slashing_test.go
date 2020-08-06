@@ -14,6 +14,7 @@ func ignoreError(val interface{}, err error) interface{} {
 
 func basicAttestationData() map[string]interface{} {
 	return map[string]interface{}{
+		"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
 		"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 		"slot":            284115,
 		"committeeIndex":  2,
@@ -29,7 +30,7 @@ func TestAttestationSlashing(t *testing.T) {
 	b, _ := getBackend(t)
 
 	t.Run("Successfully Sign Attestation", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -46,7 +47,7 @@ func TestAttestationSlashing(t *testing.T) {
 	})
 
 	t.Run("Sign duplicated Attestation (exactly same), should sign", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -70,7 +71,7 @@ func TestAttestationSlashing(t *testing.T) {
 	})
 
 	t.Run("Sign double Attestation (different block root), should return error", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -93,7 +94,7 @@ func TestAttestationSlashing(t *testing.T) {
 	})
 
 	t.Run("Sign double Attestation (different source root), should return error", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -116,7 +117,7 @@ func TestAttestationSlashing(t *testing.T) {
 	})
 
 	t.Run("Sign double Attestation (different target root), should return error", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -139,7 +140,7 @@ func TestAttestationSlashing(t *testing.T) {
 	})
 
 	t.Run("Sign Attestation (different domain), should sign", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -165,7 +166,7 @@ func TestAttestationSlashing(t *testing.T) {
 	})
 
 	t.Run("Sign surrounding Attestation, should error", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -179,6 +180,7 @@ func TestAttestationSlashing(t *testing.T) {
 		// add another attestation building on the base
 		// 8877 <- 8878 <- 8879
 		req.Data = map[string]interface{}{
+			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284116,
 			"committeeIndex":  2,
@@ -196,6 +198,7 @@ func TestAttestationSlashing(t *testing.T) {
 		// 	<- 8880
 		// slashable
 		req.Data = map[string]interface{}{
+			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284117,
 			"committeeIndex":  2,
@@ -212,7 +215,7 @@ func TestAttestationSlashing(t *testing.T) {
 	})
 
 	t.Run("Sign surrounded Attestation, should error", func(t *testing.T) {
-		req := logical.TestRequest(t, logical.CreateOperation, "accounts/test_account/sign-attestation")
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -226,6 +229,7 @@ func TestAttestationSlashing(t *testing.T) {
 		// add another attestation building on the base
 		// 8877 <- 8878 <- 8879 <----------------------9000
 		req.Data = map[string]interface{}{
+			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284116,
 			"committeeIndex":  2,
@@ -243,6 +247,7 @@ func TestAttestationSlashing(t *testing.T) {
 		// 								8900 <- 8901
 		// slashable
 		req.Data = map[string]interface{}{
+			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284117,
 			"committeeIndex":  2,

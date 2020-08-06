@@ -4,14 +4,16 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"testing"
+
 	"github.com/bloxapp/KeyVault/core"
-	"github.com/bloxapp/KeyVault/stores/hashicorp"
 	"github.com/bloxapp/KeyVault/stores/in_memory"
 	"github.com/bloxapp/KeyVault/wallet_hd"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/stretchr/testify/require"
 	types "github.com/wealdtech/go-eth2-types/v2"
-	"testing"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
 )
 
 func _byteArray(input string) []byte {
@@ -22,47 +24,46 @@ func _byteArray(input string) []byte {
 func baseInmemStorage() (*in_memory.InMemStore, error) {
 	types.InitBLS()
 
-	store := in_memory.NewInMemStore()
+	inMemStore := in_memory.NewInMemStore()
 
 	// wallet
-	wallet := wallet_hd.NewHDWallet(&core.WalletContext{Storage:store})
-	err := store.SaveWallet(wallet)
+	wallet := wallet_hd.NewHDWallet(&core.WalletContext{Storage: inMemStore})
+	err := inMemStore.SaveWallet(wallet)
 	if err != nil {
 		return nil, err
 	}
 
 	// account
-	acc,err := wallet.CreateValidatorAccount(_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"), "test_account")
-	if err != nil {
-		return nil, err
-	}
-	err = store.SaveAccount(acc)
+	acc, err := wallet.CreateValidatorAccount(_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"), "test_account")
 	if err != nil {
 		return nil, err
 	}
 
-	return store, nil
+	if err := inMemStore.SaveAccount(acc); err != nil {
+		return nil, err
+	}
+
+	return inMemStore, nil
 }
 
-
-func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (*hashicorp.HashicorpVaultStore, error) {
+func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (*store.HashicorpVaultStore, error) {
 	inMem, err := baseInmemStorage()
 	if err != nil {
 		return nil, err
 	}
-	return hashicorp.FromInMemoryStore(inMem, logicalStorage, ctx)
+	return store.FromInMemoryStore(inMem, logicalStorage, ctx)
 }
 
-func TestPushUpdate(t *testing.T) {
+func TestStorage(t *testing.T) {
 	require.NoError(t, types.InitBLS())
 
 	b, _ := getBackend(t)
-	store, err := baseInmemStorage()
+	inMemStore, err := baseInmemStorage()
 	require.NoError(t, err)
 	var logicalStorage logical.Storage
 
 	// marshal and to string
-	byts, err := json.Marshal(store)
+	byts, err := json.Marshal(inMemStore)
 	require.NoError(t, err)
 	data := hex.EncodeToString(byts)
 
@@ -80,17 +81,17 @@ func TestPushUpdate(t *testing.T) {
 
 	t.Run("verify wallet and account", func(t *testing.T) {
 		// get wallet and account
-		wallet, err := store.OpenWallet()
+		wallet, err := inMemStore.OpenWallet()
 		require.NoError(t, err)
-		acc, err := wallet.AccountByName("test_account")
+		acc, err := wallet.AccountByPublicKey("ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279")
 		require.NoError(t, err)
 
-		vault := hashicorp.NewHashicorpVaultStore(logicalStorage, context.Background())
-		wallet2,err := vault.OpenWallet()
+		vault := store.NewHashicorpVaultStore(logicalStorage, context.Background())
+		wallet2, err := vault.OpenWallet()
 		require.NoError(t, err)
 		require.Equal(t, wallet.ID().String(), wallet2.ID().String())
 
-		acc2, err := wallet2.AccountByName("test_account")
+		acc2, err := wallet2.AccountByPublicKey("ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279")
 		require.NoError(t, err)
 		require.Equal(t, acc.ID().String(), acc2.ID().String())
 	})
