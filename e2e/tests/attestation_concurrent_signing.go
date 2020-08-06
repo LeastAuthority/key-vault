@@ -23,13 +23,13 @@ func (test *AttestationConcurrentSigning)Run(t *testing.T) {
 	require.NoError(t, err)
 
 	// setup vault with db
-	err = setup.PushUpdatedDb()
+	err = setup.UpdateStorage()
 	require.NoError(t, err)
 
 	// sign and save the valid attestation
 	_,err = setup.SignAttestation(
-		"test_account",
 		map[string]interface{}{
+			"public_key": "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
 			"domain": "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot": 284115,
 			"committeeIndex": 1,
@@ -65,8 +65,8 @@ func (test *AttestationConcurrentSigning) runSlashableAttestation(setup *e2e.E2E
 	}
 
 	_,err := setup.SignAttestation(
-		"test_account",
 		map[string]interface{}{
+			"public_key": "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
 			"domain": "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot": 284115,
 			"committeeIndex": randomCommittee(),
