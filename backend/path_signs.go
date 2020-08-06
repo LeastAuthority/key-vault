@@ -179,8 +179,13 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 		return nil, errors.Wrap(err, "failed to retrieve wallet")
 	}
 
+	account, err := wallet.AccountByPublicKey(data.Get("public_key").(string))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve account")
+	}
+
 	// try to lock signature lock, if it fails return error
-	lock := DBLock{storage: req.Storage, id: wallet.ID()}
+	lock := DBLock{storage: req.Storage, id: account.ID()}
 	err = lock.Lock()
 	if err != nil {
 		return nil, err
@@ -274,8 +279,13 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
+	account, err := wallet.AccountByPublicKey(data.Get("public_key").(string))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve account")
+	}
+
 	// try to lock signature lock, if it fails return error
-	lock := DBLock{storage: req.Storage, id: wallet.ID()}
+	lock := DBLock{storage: req.Storage, id: account.ID()}
 	err = lock.Lock()
 	if err != nil {
 		return nil, err

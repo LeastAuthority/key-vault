@@ -11,6 +11,7 @@ type E2ETest interface {
 
 var tests = []E2ETest{
 	&AttestationSigning{},
+	&AttestationSigningAccountNotFound{},
 	&AttestationDoubleSigning{},
 	&AttestationConcurrentSigning{},
 }

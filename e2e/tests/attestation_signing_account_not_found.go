@@ -1,0 +1,46 @@
+package tests
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
+	"github.com/stretchr/testify/require"
+)
+
+type AttestationSigningAccountNotFound struct {
+}
+
+func (test *AttestationSigningAccountNotFound) Name() string {
+	return "Test attestation signing account not found"
+}
+
+func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
+	setup, err := e2e.SetupE2EEnv()
+	require.NoError(t, err)
+
+	// setup vault with db
+	err = setup.UpdateStorage()
+	require.NoError(t, err)
+
+	// sign
+	_, err = setup.SignAttestation(
+		map[string]interface{}{
+			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3278", // this account is not found
+			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
+			"slot":            284115,
+			"committeeIndex":  2,
+			"beaconBlockRoot": "7b5679277ca45ea74e1deebc9d3e8c0e7d6c570b3cfaf6884be144a81dac9a0e",
+			"sourceEpoch":     8877,
+			"sourceRoot":      "7402fdc1ce16d449d637c34a172b349a12b2bae8d6d77e401006594d8057c33d",
+			"targetEpoch":     8878,
+			"targetRoot":      "17959acc370274756fa5e9fdd7e7adf17204f49cc8457e49438c42c4883cbfb0",
+		},
+	)
+	require.Error(t, err)
+	expectedErr := fmt.Sprintf("1 error occurred:\n\t* failed to retrieve account: account not found\n\n")
+	require.EqualError(t, err, expectedErr)
+
+	// cleanup
+	require.NoError(t, setup.Cleanup())
+}

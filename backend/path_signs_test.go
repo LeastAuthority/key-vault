@@ -50,7 +50,7 @@ func TestSignAttestation(t *testing.T) {
 		}
 		req.Data = data
 		_, err = b.HandleRequest(context.Background(), req)
-		require.EqualError(t, err, "failed to sign attestation: account not found")
+		require.EqualError(t, err, "failed to retrieve account: account not found")
 	})
 }
 
@@ -91,7 +91,7 @@ func TestSignProposal(t *testing.T) {
 		}
 		req.Data = data
 		_, err = b.HandleRequest(context.Background(), req)
-		require.EqualError(t, err, "failed to sign data: account not found")
+		require.EqualError(t, err, "failed to retrieve account: account not found")
 	})
 }
 

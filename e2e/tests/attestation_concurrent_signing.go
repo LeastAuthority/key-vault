@@ -43,7 +43,7 @@ func (test *AttestationConcurrentSigning)Run(t *testing.T) {
 	require.NoError(t, err)
 
 	var wg sync.WaitGroup
-	for i := 0 ; i < 10 ; i++ {
+	for i := 0 ; i < 5 ; i++ {
 		go func () {
 			wg.Add(1)
 			require.NoError(t, test.runSlashableAttestation(setup))
