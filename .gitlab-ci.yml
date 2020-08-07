@@ -45,10 +45,13 @@ Run application for testing:
 
 Run tests of the application:
   stage: test
+  image: golang:1.14-stretch
   tags:
     - blox-infra-stage
   script:
-    - kubectl -n validators get po -o wide | grep $IMAGE_NAME
+    - export PLUGIN_ADDRESS=$(kubectl get pods -n validators --selector=job-name=vault-plugin-secrets-test --output=jsonpath='{.items[*].status.podIPs[0].ip}')
+    - echo $PLUGIN_ADDRESS
+    - go test -cover -race -p 1 ./...
 
 Build stage Docker image:
   stage: build
