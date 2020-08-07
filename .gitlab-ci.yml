@@ -32,14 +32,15 @@ Run linter:
 
 Run tests of the application:
   stage: test
-  image: golang:1.14-stretch
   tags:
     - blox-infra-stage
   script:
+    - apk add bash
     - export K8S_API_VERSION=$INFRA_STAGE_K8_API_VERSION
     - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
     - .k8/scripts/deploy-single-yaml.sh $IMAGE_NAME $CI_BUILD_REF validators $TESTS_YAML blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION
-    - go test -cover -race -p 1 ./...
+    - docker run -it $IMAGE_NAME:$CI_BUILD_REF --test
+#    - go test -cover -race -p 1 ./...
 
 Build stage Docker image:
   stage: build
