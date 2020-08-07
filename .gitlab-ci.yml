@@ -32,6 +32,7 @@ Run linter:
 
 Run tests of the application:
   stage: test
+  image: golang:1.14-stretch
   tags:
     - blox-infra-stage
   script:
