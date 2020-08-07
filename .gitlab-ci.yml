@@ -16,7 +16,7 @@ variables:
   DOCKER_REPO_INFRA_STAGE: $ACCOUNT_ID_INFRA_STAGE.dkr.ecr.$AWS_REGION_INFRA_STAGE.amazonaws.com/$IMAGE_NAME
   APP_REPLICAS_INFRA_STAGE: "1"
   ECRLOGIN_INFRA_STAGE: "aws ecr get-login --registry-ids $ACCOUNT_ID_INFRA_STAGE --region $AWS_REGION_INFRA_STAGE --no-include-email"
-
+  TESTS_YAML: "jobs/valut-plugin-secrets-tests-job.yml"
 
 
 #blox-infra-stage
@@ -35,8 +35,11 @@ Run tests of the application:
   tags:
     - blox-infra-stage
   script:
+    - apk add bash
+    - export K8S_API_VERSION=$INFRA_STAGE_K8_API_VERSION
     - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
-    - docker run -d -e VAULT_ADDR=http://127.0.0.1:8200 -e VAULT_API_ADDR=http://127.0.0.1:8200 -e VAULT_CLIENT_TIMEOUT="30s" -e UNSEAL="true" $IMAGE_NAME:$CI_BUILD_REF
+    - .k8/scripts/deploy-single-yaml.sh $IMAGE_NAME $CI_BUILD_REF validators $TESTS_YAML blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION
+    - .k8/scripts/check-tests-status.sh
     - go test -cover -race -p 1 ./...
 
 Build stage Docker image:
