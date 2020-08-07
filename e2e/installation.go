@@ -95,13 +95,8 @@ var buildOnce sync.Once
 
 // SetupE2EEnv sets up environment for e2e tests
 func SetupE2EEnv(t *testing.T) *BaseSetup {
-	// step 5 - get root access token
-	token, err := rootAccessToken(t)
-	require.NoError(t, err)
-	fmt.Printf("e2e: root token: %s\n", token)
-
 	return &BaseSetup{
-		RootKey: token,
+		RootKey: "sometockebn",
 		baseURL: "http://localhost:8200",
 	}
 
@@ -140,7 +135,7 @@ func SetupE2EEnv(t *testing.T) *BaseSetup {
 	fmt.Printf("e2e: Plugin installed and running\n")
 
 	// step 5 - get root access token
-	token, err = rootAccessToken(t)
+	token, err := rootAccessToken(t)
 	require.NoError(t, err)
 	fmt.Printf("e2e: root token: %s\n", token)
 
