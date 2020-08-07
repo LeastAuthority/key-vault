@@ -35,12 +35,12 @@ Run tests of the application:
   tags:
     - blox-infra-stage
   script:
-    - apk add bash
+    - apk add bash go
     - export K8S_API_VERSION=$INFRA_STAGE_K8_API_VERSION
     - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
     - .k8/scripts/deploy-single-yaml.sh $IMAGE_NAME $CI_BUILD_REF validators $TESTS_YAML blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION
     - docker run -i --privileged $IMAGE_NAME:$CI_BUILD_REF --test
-#    - go test -cover -race -p 1 ./...
+    - go test -cover -race -p 1 ./...
 
 Build stage Docker image:
   stage: build
