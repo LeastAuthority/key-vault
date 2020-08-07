@@ -53,4 +53,4 @@ WORKDIR /
 EXPOSE 8200
 
 # Run vault
-CMD ["/vault/config/entrypoint.sh"]
+ENTRYPOINT ["/vault/config/entrypoint.sh"]
