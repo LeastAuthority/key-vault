@@ -36,13 +36,15 @@ Run tests of the application:
     - blox-infra-stage
   before_script:
     - apk update
-    - export DOCKER_REPO_PATH=/go/src/github.com/bloxapp/vault-plugin-secrets-eth2.0
+    - apk add bash go=1.14.6-r0
+    - go version
   script:
     - export K8S_API_VERSION=$INFRA_STAGE_K8_API_VERSION
     - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
     - .k8/scripts/deploy-single-yaml.sh $IMAGE_NAME $CI_BUILD_REF validators $TESTS_YAML blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION
+    - go test -cover -race -p 1 ./...
 #    - docker run -i --privileged $IMAGE_NAME:$CI_BUILD_REF --test
-    - docker run -v "$PWD:$DOCKER_REPO_PATH" -i golang:1.14-stretch /bin/bash -c "cd $DOCKER_REPO_PATH && go get -t && go test -cover -race -p 1 ./..."
+#    - docker run -v "$PWD:$DOCKER_REPO_PATH" -i golang:1.14-stretch /bin/bash -c "cd $DOCKER_REPO_PATH && go get -t && go test -cover -race -p 1 ./..."
 
 Build stage Docker image:
   stage: build
