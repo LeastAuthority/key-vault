@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 )
 
 type AttestationSigningAccountNotFound struct {
@@ -16,11 +17,10 @@ func (test *AttestationSigningAccountNotFound) Name() string {
 }
 
 func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
-	setup, err := e2e.SetupE2EEnv()
-	require.NoError(t, err)
+	setup := e2e.SetupE2EEnv(t)
 
 	// setup vault with db
-	err = setup.UpdateStorage()
+	err := setup.UpdateStorage()
 	require.NoError(t, err)
 
 	// sign
@@ -42,5 +42,5 @@ func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
 	require.EqualError(t, err, expectedErr)
 
 	// cleanup
-	require.NoError(t, setup.Cleanup())
+	setup.Cleanup(t)
 }
