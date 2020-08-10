@@ -49,6 +49,9 @@ Run tests of the application:
   tags:
     - blox-infra-stage
   script:
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl
+    - chmod +x ./kubectl
+    - mv ./kubectl /usr/bin/kubectl
     - export PLUGIN_ADDRESS=$(kubectl get pods -n validators --selector=job-name=vault-plugin-secrets-test --output=jsonpath='{.items[*].status.podIPs[0].ip}')
     - echo $PLUGIN_ADDRESS
     - go test -cover -race -p 1 ./...
