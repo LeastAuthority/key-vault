@@ -96,8 +96,8 @@ var buildOnce sync.Once
 // SetupE2EEnv sets up environment for e2e tests
 func SetupE2EEnv(t *testing.T) *BaseSetup {
 	return &BaseSetup{
-		RootKey: "sometockebn",
-		baseURL: "http://localhost:8200",
+		RootKey: os.Getenv("PLUGIN_AUTH_TOKEN"),
+		baseURL: fmt.Sprintf("http://%s:8200", os.Getenv("PLUGIN_ADDRESS")),
 	}
 
 	ret := &BaseSetup{}
