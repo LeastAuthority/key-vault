@@ -53,7 +53,9 @@ Run tests of the application:
     - mv ./kubectl /usr/bin/kubectl
   script:
     - export PLUGIN_ADDRESS=$(kubectl get pods -n validators --selector=job-name=vault-plugin-secrets-test --output=jsonpath='{.items[*].status.podIPs[0].ip}')
-    - export PLUGIN_AUTH_TOKEN=$(kubectl exec -n validators --stdin --tty vault-plugin-secrets-test -- cat /data/keys/vault.root.token)
+    - export POD_NAME=$(kubectl get pods --selector=job-name=vault-plugin-secrets-test  -o=jsonpath='{.items[0].metadata.name}' -n validators)
+    - export PLUGIN_AUTH_TOKEN=$(kubectl exec -n validators --stdin --tty $POD_NAME -- cat /data/keys/vault.root.token)
+    - echo $POD_NAME
     - echo $PLUGIN_ADDRESS
     - echo $PLUGIN_AUTH_TOKEN
     - go get -t
