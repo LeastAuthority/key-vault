@@ -6,8 +6,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 )
 
 type AttestationConcurrentSigning struct {
