@@ -60,6 +60,7 @@ Run tests of the application:
     - echo $PLUGIN_AUTH_TOKEN
     - go get -t
     - go test -cover -race -p 1 ./...
+    - kubectl delete job vault-plugin-secrets-test -n validators
 
 Build stage Docker image:
   stage: build
