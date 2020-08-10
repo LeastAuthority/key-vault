@@ -17,7 +17,7 @@ variables:
   DOCKER_REPO_INFRA_STAGE: $ACCOUNT_ID_INFRA_STAGE.dkr.ecr.$AWS_REGION_INFRA_STAGE.amazonaws.com/$IMAGE_NAME
   APP_REPLICAS_INFRA_STAGE: "1"
   ECRLOGIN_INFRA_STAGE: "aws ecr get-login --registry-ids $ACCOUNT_ID_INFRA_STAGE --region $AWS_REGION_INFRA_STAGE --no-include-email"
-
+  TESTS_YAML: "jobs/valut-plugin-secrets-tests-job.yml"
 
 #blox-infra-stage
 Run linter:
@@ -39,11 +39,8 @@ Run application for testing:
     - apk add bash
   script:
     - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
-    - docker run -d -e VAULT_ADDR=http://127.0.0.1:8200 -e VAULT_API_ADDR=http://127.0.0.1:8200 -e VAULT_CLIENT_TIMEOUT="30s" -e UNSEAL="true" $IMAGE_NAME:$CI_BUILD_REF
+    - .k8/scripts/deploy-single-yaml.sh $IMAGE_NAME $CI_BUILD_REF validators $TESTS_YAML blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION
     - echo "PLUGIN_AUTH_TOKEN=$(docker exec -i vault-plugin-secrets-eth20_vault_1 cat /data/keys/vault.root.token)"
-  artifacts:
-    reports:
-      dotenv: pre-test.env
 
 Run tests of the application:
   stage: test
@@ -56,12 +53,11 @@ Run tests of the application:
     - mv ./kubectl /usr/bin/kubectl
   script:
     - export PLUGIN_ADDRESS=$(kubectl get pods -n validators --selector=job-name=vault-plugin-secrets-test --output=jsonpath='{.items[*].status.podIPs[0].ip}')
-    - echo $PLUGIN_AUTH_TOKEN
+    - export PLUGIN_AUTH_TOKEN=$(docker exec -i vault-plugin-secrets-eth20_vault_1 cat /data/keys/vault.root.token)
     - echo $PLUGIN_ADDRESS
+    - echo $PLUGIN_AUTH_TOKEN
     - go get -t
     - go test -cover -race -p 1 ./...
-  dependencies:
-    - pre-test
 
 Build stage Docker image:
   stage: build
