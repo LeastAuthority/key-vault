@@ -9,13 +9,16 @@ import (
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 )
 
+// AttestationSigningAccountNotFound tests sign attestation when account not found
 type AttestationSigningAccountNotFound struct {
 }
 
+// Name returns the name of the test
 func (test *AttestationSigningAccountNotFound) Name() string {
 	return "Test attestation signing account not found"
 }
 
+// Run runs the test.
 func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
 	setup := e2e.SetupE2EEnv(t)
 

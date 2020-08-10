@@ -11,13 +11,16 @@ import (
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 )
 
+// AttestationConcurrentSigning tests signing method concurrently.
 type AttestationConcurrentSigning struct {
 }
 
+// Name returns the name of the test.
 func (test *AttestationConcurrentSigning) Name() string {
 	return "Test attestation concurrent signing"
 }
 
+// Run runs the test.
 func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 	setup := e2e.SetupE2EEnv(t)
 
