@@ -28,7 +28,6 @@ func (test *AttestationDoubleSigning) Run(t *testing.T) {
 	storage := setup.UpdateStorage(t)
 	account := shared.RetrieveAccount(t, storage)
 	pubKey := hex.EncodeToString(account.ValidatorPublicKey().Marshal())
-	fmt.Println("pubKey", pubKey)
 
 	// first sig
 	_, err := setup.SignAttestation(

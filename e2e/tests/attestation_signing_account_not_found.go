@@ -40,7 +40,7 @@ func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
 		},
 	)
 	require.Error(t, err)
-	expectedErr := fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: account not found\n\n")
+	expectedErr := fmt.Sprintf("1 error occurred:\n\t* failed to retrieve account: account not found\n\n")
 	require.EqualError(t, err, expectedErr)
 
 	// cleanup
