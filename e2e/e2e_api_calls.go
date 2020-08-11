@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/bloxapp/KeyVault/core"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"

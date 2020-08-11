@@ -7,11 +7,10 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 )
 
 // AttestationConcurrentSigning tests signing method concurrently.
