@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/bloxapp/KeyVault/core"
@@ -20,6 +21,20 @@ type BaseSetup struct {
 	WorkingDir string
 	RootKey    string
 	baseURL    string
+}
+
+// SetupE2EEnv sets up environment for e2e tests
+func SetupE2EEnv(t *testing.T) *BaseSetup {
+	authToken := os.Getenv("VAULT_PLUGIN_AUTH_TOKEN")
+	require.NotEmpty(t, authToken)
+
+	host := os.Getenv("VAULT_PLUGIN_HOST")
+	require.NotEmpty(t, host)
+
+	return &BaseSetup{
+		RootKey: authToken,
+		baseURL: fmt.Sprintf("http://%s:8200", host),
+	}
 }
 
 // SignAttestation tests the sign attestation endpoint.

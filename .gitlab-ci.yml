@@ -47,7 +47,7 @@ Run application for testing:
     - printenv | grep DOCKER
     - kubectl delete job vault-plugin-secrets-test -n validators
     - .k8/scripts/deploy-single-yaml.sh $DOCKER_REPO_INFRA_STAGE $CI_BUILD_REF validators $TESTS_YAML blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION
-    - sleep 10
+    - sleep 15
 
 Run tests of the application:
   stage: test
@@ -60,11 +60,11 @@ Run tests of the application:
     - mv ./kubectl /usr/bin/kubectl
   script:
     - export POD_NAME=$(kubectl get pods --selector=job-name=vault-plugin-secrets-test  -o=jsonpath='{.items[0].metadata.name}' -n validators)
-    - export PLUGIN_ADDRESS=$(kubectl get pods -n validators --selector=job-name=vault-plugin-secrets-test --output=jsonpath='{.items[*].status.podIPs[0].ip}')
-    - export PLUGIN_AUTH_TOKEN=$(kubectl exec -n validators --stdin $POD_NAME -- cat /data/keys/vault.root.token)
+    - export VAULT_PLUGIN_HOST=$(kubectl get pods -n validators --selector=job-name=vault-plugin-secrets-test --output=jsonpath='{.items[*].status.podIPs[0].ip}')
+    - export VAULT_PLUGIN_AUTH_TOKEN=$(kubectl exec -n validators --stdin $POD_NAME -- cat /data/keys/vault.root.token)
     - echo $POD_NAME
-    - echo $PLUGIN_ADDRESS
-    - echo $PLUGIN_AUTH_TOKEN
+    - echo $VAULT_PLUGIN_HOST
+    - echo $VAULT_PLUGIN_AUTH_TOKEN
     - kubectl -n validators logs  -c vault-plugin-secrets-test $POD_NAME
     - go get -t
     - go test -cover -race -p 1 ./...

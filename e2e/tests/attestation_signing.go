@@ -61,9 +61,6 @@ func (test *AttestationSigning) Run(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, res.GetSignature(), sig)
-
-	// cleanup
-	setup.Cleanup(t)
 }
 
 func (test *AttestationSigning) dataToAttestationRequest(t *testing.T, pubKey []byte, data map[string]interface{}) *v1.SignBeaconAttestationRequest {

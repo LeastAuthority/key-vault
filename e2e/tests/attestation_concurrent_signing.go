@@ -47,6 +47,7 @@ func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 	)
 	require.NoError(t, err)
 
+	// Send requests in parallel
 	t.Run("concurrent signing", func(t *testing.T) {
 		t.Parallel()
 		for i := 0; i < 5; i++ {
@@ -56,21 +57,6 @@ func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 			})
 		}
 	})
-
-	/*var wg sync.WaitGroup
-	for i := 0; i < 5; i++ {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
-			t.Run("concurrent signing "+strconv.Itoa(i), func(t *testing.T) {
-				runSlashableAttestation(t, setup, pubKey)
-			})
-		}(i)
-	}
-	wg.Wait()*/
-
-	// cleanup
-	setup.Cleanup(t)
 }
 
 // will return no error if trying to sign a slashable attestation will not work

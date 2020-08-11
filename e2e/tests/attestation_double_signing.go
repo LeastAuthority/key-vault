@@ -62,7 +62,4 @@ func (test *AttestationDoubleSigning) Run(t *testing.T) {
 	expectedErr := fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: slashable attestation (DoubleVote), not signing\n\n")
 	require.Error(t, err)
 	require.EqualError(t, err, expectedErr)
-
-	// cleanup
-	setup.Cleanup(t)
 }
