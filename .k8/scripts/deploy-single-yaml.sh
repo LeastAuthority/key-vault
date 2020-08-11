@@ -3,7 +3,7 @@
 set -x
 
 if [[ -z $1 ]]; then
-  echo "Please provide IMAGENAME"
+  echo "Please provide DOCKERREPO"
   exit 1
 fi
 
@@ -43,7 +43,7 @@ if [[ -z $8 ]]; then
 fi
 
 
-IMAGENAME=$1
+DOCKERREPO=$1
 IMAGETAG=$2
 NAMESPACE=$3
 YAML_FILE=$4
@@ -52,7 +52,7 @@ K8S_CONTEXT=$6
 DOMAIN_SUFFIX=$7
 K8S_API_VERSION=$8
 
-echo $IMAGENAME
+echo $DOCKERREPO
 echo $IMAGETAG
 echo $NAMESPACE
 echo $YAML_FILE
@@ -69,7 +69,7 @@ fi
 
 if [[ -f .k8/${YAML_FILE} ]]; then
    sed -i -e "s|REPLACE_NAMESPACE|${NAMESPACE}|g" \
-          -e "s|REPLACE_IMAGE|${IMAGENAME}|g" \
+          -e "s|REPLACE_DOCKER_REPO|${DOCKERREPO}|g" \
           -e "s|REPLACE_DOMAIN_SUFFIX|${DOMAIN_SUFFIX}|g" \
           -e "s|REPLACE_API_VERSION|${K8S_API_VERSION}|g" \
           -e "s|REPLACE_IMAGETAG|${IMAGETAG}|g" ".k8/${YAML_FILE}" || exit 1
