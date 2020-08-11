@@ -1,11 +1,7 @@
 package tests
 
 import (
-	"fmt"
 	"testing"
-
-	"github.com/bloxapp/KeyVault/core"
-	"github.com/stretchr/testify/require"
 )
 
 type E2E interface {
@@ -26,14 +22,4 @@ func TestE2E(t *testing.T) {
 			tst.Run(t)
 		})
 	}
-}
-
-func TestNewSeed(t *testing.T) {
-	entropy, err := core.GenerateNewEntropy()
-	require.NoError(t, err)
-
-	seed, err := core.SeedFromEntropy(entropy, "test_password")
-	require.NoError(t, err)
-
-	fmt.Println(string(seed))
 }

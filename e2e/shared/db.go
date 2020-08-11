@@ -1,7 +1,6 @@
 package shared
 
 import (
-	"encoding/hex"
 	"testing"
 
 	"github.com/bloxapp/KeyVault/core"
@@ -13,11 +12,6 @@ import (
 
 // AccountName is the test account name.
 const AccountName = "test_account"
-
-func _byteArray(input string) []byte {
-	res, _ := hex.DecodeString(input)
-	return res
-}
 
 // BaseInmemStorage creates the in-memory storage and creates the base account.
 func BaseInmemStorage(t *testing.T) (*in_memory.InMemStore, error) {
