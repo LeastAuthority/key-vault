@@ -11,6 +11,8 @@ import (
 	types "github.com/wealdtech/go-eth2-types/v2"
 )
 
+const AccountName = "test_account"
+
 func _byteArray(input string) []byte {
 	res, _ := hex.DecodeString(input)
 	return res
@@ -35,7 +37,7 @@ func BaseInmemStorage(t *testing.T) (*in_memory.InMemStore, error) {
 
 	// account
 	// acc, err := wallet.CreateValidatorAccount(_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"), "test_account")
-	acc, err := wallet.CreateValidatorAccount(seed, "test_account")
+	acc, err := wallet.CreateValidatorAccount(seed, AccountName)
 	if err != nil {
 		return nil, err
 	}
@@ -45,4 +47,17 @@ func BaseInmemStorage(t *testing.T) (*in_memory.InMemStore, error) {
 	}
 
 	return store, nil
+}
+
+// RetrieveAccount retrieves test account fro the storage.
+func RetrieveAccount(t *testing.T, store core.Storage) core.ValidatorAccount {
+	accounts, err := store.ListAccounts()
+	require.NoError(t, err)
+
+	for _, acc := range accounts {
+		if acc.Name() == AccountName {
+			return acc
+		}
+	}
+	return nil
 }

@@ -1,6 +1,8 @@
 package tests
 
 import (
+	"encoding/hex"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -23,12 +25,15 @@ func (test *AttestationSigning) Run(t *testing.T) {
 	setup := e2e.SetupE2EEnv(t)
 
 	// setup vault with db
-	setup.UpdateStorage(t)
+	storage := setup.UpdateStorage(t)
+	account := shared.RetrieveAccount(t, storage)
+	pubKey := hex.EncodeToString(account.ValidatorPublicKey().Marshal())
+	fmt.Println("pubKey", pubKey)
 
 	// sign
 	sig, err := setup.SignAttestation(
 		map[string]interface{}{
-			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
+			"public_key":      pubKey,
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284115,
 			"committeeIndex":  2,
@@ -41,8 +46,8 @@ func (test *AttestationSigning) Run(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	expecetd := shared.HexToBytes("a53b6728fc2cc52abb0059da9b2e7cb01f33cd95fd6c9db7f2b821fa58a58d5ef2bc5dda058d570a7f240bf24b335eee066b2ab8dbf5a989157dd51b647733665f7c1be0d1c285b02efdbb37cd4e0ace0529b8e02c944386e3b110c32b019c63")
-	require.Equal(t, expecetd, sig)
+	expected := shared.HexToBytes("a53b6728fc2cc52abb0059da9b2e7cb01f33cd95fd6c9db7f2b821fa58a58d5ef2bc5dda058d570a7f240bf24b335eee066b2ab8dbf5a989157dd51b647733665f7c1be0d1c285b02efdbb37cd4e0ace0529b8e02c944386e3b110c32b019c63")
+	require.Equal(t, expected, sig)
 
 	// cleanup
 	setup.Cleanup(t)

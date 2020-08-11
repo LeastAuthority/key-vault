@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/bloxapp/KeyVault/core"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
@@ -70,7 +72,7 @@ func (setup *BaseSetup) SignAttestation(data map[string]interface{}) ([]byte, er
 }
 
 // UpdateStorage updates the storage.
-func (setup *BaseSetup) UpdateStorage(t *testing.T) error {
+func (setup *BaseSetup) UpdateStorage(t *testing.T) core.Storage {
 	// get store
 	store, err := shared.BaseInmemStorage(t)
 	require.NoError(t, err)
@@ -106,11 +108,9 @@ func (setup *BaseSetup) UpdateStorage(t *testing.T) error {
 	respBody := string(respBodyByts)
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error: could not update vault: respose: %s", respBody)
-	}
+	require.Equal(t, http.StatusOK, resp.StatusCode, respBody)
 
 	fmt.Printf("e2e: setup hashicorp vault db\n")
 
-	return nil
+	return store
 }
