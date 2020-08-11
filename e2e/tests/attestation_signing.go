@@ -47,7 +47,7 @@ func (test *AttestationSigning) Run(t *testing.T) {
 	require.NoError(t, err)
 
 	actualHex := hex.EncodeToString(sig)
-	expected := "a53b6728fc2cc52abb0059da9b2e7cb01f33cd95fd6c9db7f2b821fa58a58d5ef2bc5dda058d570a7f240bf24b335eee066b2ab8dbf5a989157dd51b647733665f7c1be0d1c285b02efdbb37cd4e0ace0529b8e02c944386e3b110c32b019c63"
+	expected := "89807a4941144deb709e4f74827475d422914511c4936885c52099c2484f6001b5aed37c4a5d64723aaf620a7a96aa630f59a9add3117ab4c6c9ebf8bd66415acaf9199702b6e6a54a3aba90debb0615e20c9df3b08df60b31b378f543040ee8"
 	require.Equal(t, expected, actualHex)
 
 	// cleanup

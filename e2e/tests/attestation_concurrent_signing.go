@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/rand"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -51,10 +52,12 @@ func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
-		go func() {
+		go func(i int) {
 			defer wg.Done()
-			test.runSlashableAttestation(t, setup, pubKey)
-		}()
+			t.Run("concurrent signing "+strconv.Itoa(i), func(t *testing.T) {
+				runSlashableAttestation(t, setup, pubKey)
+			})
+		}(i)
 	}
 	wg.Wait()
 
@@ -63,7 +66,7 @@ func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 }
 
 // will return no error if trying to sign a slashable attestation will not work
-func (test *AttestationConcurrentSigning) runSlashableAttestation(t *testing.T, setup *e2e.BaseSetup, pubKey string) {
+func runSlashableAttestation(t *testing.T, setup *e2e.BaseSetup, pubKey string) {
 	randomCommittee := func() int {
 		max := 1000
 		min := 2
@@ -87,5 +90,5 @@ func (test *AttestationConcurrentSigning) runSlashableAttestation(t *testing.T, 
 
 	protected := err.Error() == fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: slashable attestation (DoubleVote), not signing\n\n") ||
 		err.Error() == fmt.Sprintf("1 error occurred:\n\t* locked\n\n")
-	require.True(t, protected)
+	require.True(t, protected, err.Error())
 }
