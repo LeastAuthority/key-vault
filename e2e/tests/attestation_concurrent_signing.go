@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -31,7 +30,6 @@ func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 	store := setup.UpdateStorage(t)
 	account := shared.RetrieveAccount(t, store)
 	pubKey := hex.EncodeToString(account.ValidatorPublicKey().Marshal())
-	fmt.Println("pubKey", pubKey)
 
 	// sign and save the valid attestation
 	_, err := setup.SignAttestation(
@@ -49,7 +47,17 @@ func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	var wg sync.WaitGroup
+	t.Run("concurrent signing", func(t *testing.T) {
+		t.Parallel()
+		for i := 0; i < 5; i++ {
+			t.Run("concurrent signing "+strconv.Itoa(i), func(t *testing.T) {
+				t.Parallel()
+				runSlashableAttestation(t, setup, pubKey)
+			})
+		}
+	})
+
+	/*var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
 		go func(i int) {
@@ -59,7 +67,7 @@ func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 			})
 		}(i)
 	}
-	wg.Wait()
+	wg.Wait()*/
 
 	// cleanup
 	setup.Cleanup(t)
