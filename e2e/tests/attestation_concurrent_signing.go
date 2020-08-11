@@ -50,10 +50,10 @@ func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 
 	var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
+		wg.Add(1)
 		go func() {
-			wg.Add(1)
-			require.NoError(t, test.runSlashableAttestation(setup))
-			wg.Done()
+			defer wg.Done()
+			test.runSlashableAttestation(t, setup, pubKey)
 		}()
 	}
 	wg.Wait()
@@ -63,7 +63,7 @@ func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 }
 
 // will return no error if trying to sign a slashable attestation will not work
-func (test *AttestationConcurrentSigning) runSlashableAttestation(setup *e2e.BaseSetup) error {
+func (test *AttestationConcurrentSigning) runSlashableAttestation(t *testing.T, setup *e2e.BaseSetup, pubKey string) {
 	randomCommittee := func() int {
 		max := 1000
 		min := 2
@@ -72,7 +72,7 @@ func (test *AttestationConcurrentSigning) runSlashableAttestation(setup *e2e.Bas
 
 	_, err := setup.SignAttestation(
 		map[string]interface{}{
-			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
+			"public_key":      pubKey,
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284115,
 			"committeeIndex":  randomCommittee(),
@@ -83,12 +83,9 @@ func (test *AttestationConcurrentSigning) runSlashableAttestation(setup *e2e.Bas
 			"targetRoot":      "17959acc370274756fa5e9fdd7e7adf17204f49cc8457e49438c42c4883cbfb0",
 		},
 	)
-	if err == nil {
-		return fmt.Errorf("did not slash")
-	} else if err.Error() == fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: slashable attestation (DoubleVote), not signing\n\n") {
-		return nil
-	} else if err.Error() == fmt.Sprintf("1 error occurred:\n\t* locked\n\n") {
-		return nil
-	}
-	return err
+	require.Error(t, err, "did not slash")
+
+	protected := err.Error() == fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: slashable attestation (DoubleVote), not signing\n\n") ||
+		err.Error() == fmt.Sprintf("1 error occurred:\n\t* locked\n\n")
+	require.True(t, protected)
 }

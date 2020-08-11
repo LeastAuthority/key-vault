@@ -49,7 +49,7 @@ func (test *AttestationDoubleSigning) Run(t *testing.T) {
 	// second sig, different block root
 	_, err = setup.SignAttestation(
 		map[string]interface{}{
-			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
+			"public_key":      pubKey,
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284115,
 			"committeeIndex":  2,
