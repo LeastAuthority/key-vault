@@ -11,6 +11,7 @@ import (
 	types "github.com/wealdtech/go-eth2-types/v2"
 )
 
+// AccountName is the test account name.
 const AccountName = "test_account"
 
 func _byteArray(input string) []byte {
