@@ -24,6 +24,8 @@ const (
 
 // Cleanup cleans up the environment
 func (setup *BaseSetup) Cleanup(t *testing.T) {
+	return
+
 	// Cleanup data dir
 	dataDir := fmt.Sprintf("%s%s", setup.WorkingDir, dataDirSuffix)
 	_, err := os.Stat(dataDir)
