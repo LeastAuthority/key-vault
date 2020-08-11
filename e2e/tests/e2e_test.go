@@ -2,9 +2,10 @@ package tests
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/bloxapp/KeyVault/core"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 type E2E interface {
