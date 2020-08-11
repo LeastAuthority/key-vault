@@ -23,8 +23,7 @@ func (test *AttestationSigning) Run(t *testing.T) {
 	setup := e2e.SetupE2EEnv(t)
 
 	// setup vault with db
-	err := setup.UpdateStorage()
-	require.NoError(t, err)
+	setup.UpdateStorage(t)
 
 	// sign
 	sig, err := setup.SignAttestation(

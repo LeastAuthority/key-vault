@@ -23,11 +23,10 @@ func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
 	setup := e2e.SetupE2EEnv(t)
 
 	// setup vault with db
-	err := setup.UpdateStorage()
-	require.NoError(t, err)
+	setup.UpdateStorage(t)
 
 	// sign
-	_, err = setup.SignAttestation(
+	_, err := setup.SignAttestation(
 		map[string]interface{}{
 			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3278", // this account is not found
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",

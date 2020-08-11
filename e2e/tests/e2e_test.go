@@ -1,15 +1,18 @@
 package tests
 
 import (
+	"fmt"
+	"github.com/bloxapp/KeyVault/core"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
-type E2ETest interface {
+type E2E interface {
 	Name() string
 	Run(t *testing.T)
 }
 
-var tests = []E2ETest{
+var tests = []E2E{
 	&AttestationSigning{},
 	&AttestationSigningAccountNotFound{},
 	&AttestationDoubleSigning{},
@@ -22,5 +25,14 @@ func TestE2E(t *testing.T) {
 			tst.Run(t)
 		})
 	}
+}
 
+func TestNewSeed(t *testing.T) {
+	entropy, err := core.GenerateNewEntropy()
+	require.NoError(t, err)
+
+	seed, err := core.SeedFromEntropy(entropy, "test_password")
+	require.NoError(t, err)
+
+	fmt.Println(string(seed))
 }

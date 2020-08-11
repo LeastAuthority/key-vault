@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 )
@@ -67,44 +70,39 @@ func (setup *BaseSetup) SignAttestation(data map[string]interface{}) ([]byte, er
 }
 
 // UpdateStorage updates the storage.
-func (setup *BaseSetup) UpdateStorage() error {
+func (setup *BaseSetup) UpdateStorage(t *testing.T) error {
 	// get store
-	store, err := shared.BaseInmemStorage()
-	if err != nil {
-		return err
-	}
+	store, err := shared.BaseInmemStorage(t)
+	require.NoError(t, err)
 
 	// encode store
 	byts, err := json.Marshal(store)
-	if err != nil {
-		return nil
-	}
+	require.NoError(t, err)
+
 	encodedStore := hex.EncodeToString(byts)
 
 	// body
 	body, err := json.Marshal(map[string]string{
 		"data": encodedStore,
 	})
+	require.NoError(t, err)
 
 	// build req
 	targetURL := fmt.Sprintf("%s/v1/ethereum/storage", setup.baseURL)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
-	if err != nil {
-		return nil
-	}
+	require.NoError(t, err)
+
 	req.Header.Set("Authorization", "Bearer "+setup.RootKey)
 
 	// Do request
 	httpClient := http.Client{}
 	resp, err := httpClient.Do(req)
-	if err != nil {
-		return err
-	}
+	require.NoError(t, err)
+
 	// Read response body
 	respBodyByts, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
+	require.NoError(t, err)
+
 	respBody := string(respBodyByts)
 	defer resp.Body.Close()
 
