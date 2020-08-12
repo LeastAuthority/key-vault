@@ -45,7 +45,6 @@ Run application for testing:
     - $DOCKER_LOGIN_TO_INFRA_STAGE_REPO && docker push $DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF
     - docker images
     - printenv | grep DOCKER
-    - kubectl delete job vault-plugin-secrets-test -n validators || true
     - .k8/scripts/deploy-single-yaml.sh $DOCKER_REPO_INFRA_STAGE $CI_BUILD_REF validators $TESTS_YAML blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION
     - sleep 15
 
@@ -68,7 +67,8 @@ Run tests of the application:
     - kubectl -n validators logs  -c vault-plugin-secrets-test $POD_NAME
     - go get -t
     - go test -cover -race -p 1 ./...
-    - kubectl delete job vault-plugin-secrets-test -n validators
+  after_script:
+    - kubectl delete pod $POD_NAME -n validators || true
 
 Build stage Docker image:
   stage: build
