@@ -46,7 +46,7 @@ Run application for testing:
     - docker images
     - printenv | grep DOCKER
     - .k8/scripts/deploy-single-yaml.sh $DOCKER_REPO_INFRA_STAGE $CI_BUILD_REF validators $TESTS_YAML blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION
-    - sleep 15
+    - sleep 60
 
 Run tests of the application:
   stage: test
