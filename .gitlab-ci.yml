@@ -71,7 +71,7 @@ Run tests of the application:
   after_script:
     - source .variables
     - echo $POD_NAME
-    - kubectl -n validators delete pod $POD_NAME || true
+    - kubectl -n validators delete job $POD_NAME || true
 
 Build stage Docker image:
   stage: build

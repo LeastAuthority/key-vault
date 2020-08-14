@@ -69,6 +69,7 @@ fi
 
 if [[ -f .k8/${YAML_FILE} ]]; then
    sed -i -e "s|REPLACE_NAMESPACE|${NAMESPACE}|g" \
+          -e "s|REPLACE_JOB_POSTFIX|${RANDOM}|g" \
           -e "s|REPLACE_DOCKER_REPO|${DOCKERREPO}|g" \
           -e "s|REPLACE_DOMAIN_SUFFIX|${DOMAIN_SUFFIX}|g" \
           -e "s|REPLACE_API_VERSION|${K8S_API_VERSION}|g" \
