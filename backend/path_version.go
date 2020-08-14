@@ -2,14 +2,9 @@ package backend
 
 import (
 	"context"
-	"encoding/hex"
 
-	vault "github.com/bloxapp/KeyVault"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
-	"github.com/pkg/errors"
-
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
 )
 
 func versionPaths(b *backend) []*framework.Path {
