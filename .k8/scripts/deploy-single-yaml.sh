@@ -42,6 +42,11 @@ if [[ -z $8 ]]; then
   exit 1
 fi
 
+if [[ -z $9 ]]; then
+  echo "Please provide CI pipeline ID"
+  exit 1
+fi
+
 
 DOCKERREPO=$1
 IMAGETAG=$2
@@ -51,6 +56,7 @@ DEPL_TYPE=$5
 K8S_CONTEXT=$6
 DOMAIN_SUFFIX=$7
 K8S_API_VERSION=$8
+CI_PIPELINE_ID=$9
 
 echo $DOCKERREPO
 echo $IMAGETAG
@@ -60,9 +66,7 @@ echo $DEPL_TYPE
 echo $K8S_CONTEXT
 echo $DOMAIN_SUFFIX
 echo $K8S_API_VERSION
-
-export POD_POSTFIX=${RANDOM}
-echo $POD_POSTFIX
+echo $CI_PIPELINE_ID
 
 # create namespace if not exists
 if ! kubectl --context=$K8S_CONTEXT get ns | grep -q $NAMESPACE; then
@@ -72,7 +76,7 @@ fi
 
 if [[ -f .k8/${YAML_FILE} ]]; then
    sed -i -e "s|REPLACE_NAMESPACE|${NAMESPACE}|g" \
-          -e "s|REPLACE_JOB_POSTFIX|${POD_POSTFIX}|g" \
+          -e "s|REPLACE_JOB_POSTFIX|${CI_PIPELINE_ID}|g" \
           -e "s|REPLACE_DOCKER_REPO|${DOCKERREPO}|g" \
           -e "s|REPLACE_DOMAIN_SUFFIX|${DOMAIN_SUFFIX}|g" \
           -e "s|REPLACE_API_VERSION|${K8S_API_VERSION}|g" \
@@ -81,5 +85,5 @@ fi
 
 #deploy
 kubectl --context=$K8S_CONTEXT apply -f .k8/${YAML_FILE} --wait=true || exit 1
-export POD_NAME=$(kubectl get pods --selector=job-name=vault-plugin-secrets-test-$POD_POSTFIX  -o=jsonpath='{.items[0].metadata.name}' -n validators)
+export POD_NAME=$(kubectl get pods --selector=job-name=vault-plugin-secrets-test-$CI_PIPELINE_ID  -o=jsonpath='{.items[0].metadata.name}' -n validators)
 kubectl wait --timeout=3m --for=condition=ready -n validators pod $POD_NAME || exit 1
