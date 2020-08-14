@@ -68,7 +68,7 @@ Run tests of the application:
     - go get -t
     - go test -cover -race -p 1 ./...
   after_script:
-    - kubectl delete pod $POD_NAME -n validators || true
+    - kubectl -n validators delete pod $POD_NAME || true
 
 Build stage Docker image:
   stage: build
