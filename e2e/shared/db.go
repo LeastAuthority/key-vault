@@ -21,7 +21,7 @@ func BaseInmemStorage(t *testing.T) (*in_memory.InMemStore, error) {
 	entropy, err := core.GenerateNewEntropy()
 	require.NoError(t, err)
 
-	seed, err := core.SeedFromEntropy(entropy, "test_password")
+	seed, err := core.SeedFromEntropy(entropy, "")
 	require.NoError(t, err)
 
 	// wallet
