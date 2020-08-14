@@ -82,4 +82,4 @@ fi
 #deploy
 kubectl --context=$K8S_CONTEXT apply -f .k8/${YAML_FILE} --wait=true || exit 1
 export POD_NAME=$(kubectl get pods --selector=job-name=vault-plugin-secrets-test-$POD_POSTFIX  -o=jsonpath='{.items[0].metadata.name}' -n validators)
-kubectl wait --for=condition=ready -n validators pod $POD_NAME || exit 1
+kubectl wait --timeout=3m --for=condition=ready -n validators pod $POD_NAME || exit 1
