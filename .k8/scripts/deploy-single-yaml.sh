@@ -81,4 +81,4 @@ fi
 
 #deploy
 kubectl --context=$K8S_CONTEXT apply -f .k8/${YAML_FILE} --wait=true || exit 1
-kubectl wait --for=condition=terminated -n validators pod vault-plugin-secrets-test-$(kubectl get pods --selector=job-name=vault-plugin-secrets-test-$CI_BUILD_REF  -o=jsonpath='{.items[0].metadata.name}' -n validators) || exit 1
+kubectl wait --for=condition=terminated -n validators pod vault-plugin-secrets-test-$(kubectl get pods --selector=job-name=vault-plugin-secrets-test-$IMAGETAG  -o=jsonpath='{.items[0].metadata.name}' -n validators) || exit 1
