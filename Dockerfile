@@ -23,8 +23,9 @@ FROM preparer AS builder
 
 # Copy files and install app
 COPY . .
+RUN export COMMIT_HASH=$(git rev-parse --short HEAD)
 RUN go get -d -v ./...
-RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static -lm"' -o ethsign .
+RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static -lm" -X main.Version=$COMMIT_HASH' -o ethsign .
 
 #
 # STEP 3: Get vault image and copy the plugin

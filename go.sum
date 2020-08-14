@@ -92,6 +92,7 @@ github.com/bloxapp/KeyVault v0.1.11-0.20200802155454-064a7bf53382 h1:zh5bIBy/LhL
 github.com/bloxapp/KeyVault v0.1.11-0.20200802155454-064a7bf53382/go.mod h1:DBGa3AiaBhFyrYDkKzNO3Fg0u7zzeMs54QR07er/qoo=
 github.com/bloxapp/KeyVault v0.2.0 h1:Jra0gQvl1lZ707flsiV/C0VO0UHMK0Y/zcCK1AextlQ=
 github.com/bloxapp/KeyVault v0.2.0/go.mod h1:DBGa3AiaBhFyrYDkKzNO3Fg0u7zzeMs54QR07er/qoo=
+github.com/bloxapp/KeyVault v0.2.1 h1:MFBR8Lvwvl+0qvKSRL6GpK1VvO8o2p4GSiBlmMkbv04=
 github.com/bloxapp/KeyVault v0.2.1/go.mod h1:Y7dx8BJ52KQsCX0DpJ1ystz7BIs/o5+4eCzvEOVCKwM=
 github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40/go.mod h1:8rLXio+WjiTceGBHIoTvn60HIbs7Hm7bcHjyrSqYB9c=
 github.com/boltdb/bolt v1.3.1/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=

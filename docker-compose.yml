@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      #args:
+      #  - COMMIT_HASH: $(git rev-parse --short HEAD)
 #    image: bloxstaking/key-vault:latest
     ports:
       - 8200:8200
