@@ -61,6 +61,9 @@ echo $K8S_CONTEXT
 echo $DOMAIN_SUFFIX
 echo $K8S_API_VERSION
 
+export POD_POSTFIX=${RANDOM}
+echo $POD_POSTFIX
+
 # create namespace if not exists
 if ! kubectl --context=$K8S_CONTEXT get ns | grep -q $NAMESPACE; then
   echo "$NAMESPACE created"
@@ -69,7 +72,7 @@ fi
 
 if [[ -f .k8/${YAML_FILE} ]]; then
    sed -i -e "s|REPLACE_NAMESPACE|${NAMESPACE}|g" \
-          -e "s|REPLACE_JOB_POSTFIX|${RANDOM}|g" \
+          -e "s|REPLACE_JOB_POSTFIX|${POD_POSTFIX}|g" \
           -e "s|REPLACE_DOCKER_REPO|${DOCKERREPO}|g" \
           -e "s|REPLACE_DOMAIN_SUFFIX|${DOMAIN_SUFFIX}|g" \
           -e "s|REPLACE_API_VERSION|${K8S_API_VERSION}|g" \
@@ -78,3 +81,4 @@ fi
 
 #deploy
 kubectl --context=$K8S_CONTEXT apply -f .k8/${YAML_FILE} --wait=true || exit 1
+kubectl wait --for=condition=terminated -n validators pod vault-plugin-secrets-test-$POD_POSTFIX || exit 1
