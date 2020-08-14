@@ -63,14 +63,11 @@ Run tests of the application:
     - echo $POD_NAME
     - echo $VAULT_PLUGIN_HOST
     - echo $VAULT_PLUGIN_AUTH_TOKEN
-    - echo "export POD_NAME=\"$POD_NAME\"" >> .variables
     - kubectl -n validators logs -c vault-plugin-secrets-test $POD_NAME
     - go get -t
     - go test -cover -race -p 1 ./...
   after_script:
-    - source .variables
-    - echo $POD_NAME
-    - kubectl -n validators delete job $POD_NAME || true
+    - kubectl -n validators delete job vault-plugin-secrets-test-$CI_PIPELINE_ID || true
 
 Build stage Docker image:
   stage: build
