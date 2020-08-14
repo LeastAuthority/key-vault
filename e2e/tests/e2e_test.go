@@ -4,22 +4,22 @@ import (
 	"testing"
 )
 
-func TestAttestationSigning(t *testing.T) {
-	test := &AttestationSigning{}
-	test.Run(t)
+type E2E interface {
+	Name() string
+	Run(t *testing.T)
 }
 
-func TestAttestationSigningAccountNotFound(t *testing.T) {
-	test := &AttestationSigningAccountNotFound{}
-	test.Run(t)
-}
-
-func TestAttestationDoubleSigning(t *testing.T) {
-	test := &AttestationDoubleSigning{}
-	test.Run(t)
+var tests = []E2E{
+	&AttestationSigning{},
+	&AttestationSigningAccountNotFound{},
+	&AttestationDoubleSigning{},
+	&AttestationConcurrentSigning{},
 }
 
 func TestE2E(t *testing.T) {
-	test := &AttestationConcurrentSigning{}
-	test.Run(t)
+	for _, tst := range tests {
+		t.Run(tst.Name(), func(t *testing.T) {
+			tst.Run(t)
+		})
+	}
 }
