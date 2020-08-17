@@ -21,7 +21,7 @@ func getBackend(t *testing.T) (logical.Backend, logical.Storage) {
 		BackendUUID: "test",
 	}
 
-	b, err := Factory(context.Background(), config)
+	b, err := Factory("test")(context.Background(), config)
 	if err != nil {
 		t.Fatalf("unable to create backend: %v", err)
 	}
