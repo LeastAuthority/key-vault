@@ -36,6 +36,21 @@ func TestProposalSlashing(t *testing.T) {
 		require.NotNil(t, res.Data)
 	})
 
+	t.Run("Sign proposal with undefined account", func(t *testing.T) {
+		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-proposal")
+
+		// setup storage
+		err := setupStorageWithWalletAndAccounts(req.Storage)
+		require.NoError(t, err)
+
+		req.Data = basicProposalData()
+		req.Data["public_key"] = "undefinedpublickey"
+		res, err := b.HandleRequest(context.Background(), req)
+		require.NoError(t, err)
+		require.NotNil(t, res.Data)
+		require.Equal(t, 404, res.Data["http_status_code"], res.Data)
+	})
+
 	t.Run("Successfully Sign proposal (exactly same)", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-proposal")
 
