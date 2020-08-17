@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
@@ -54,4 +55,13 @@ func (b *backend) pathExistenceCheck(ctx context.Context, req *logical.Request, 
 	}
 
 	return out != nil, nil
+}
+
+func (b *backend) notFoundResponse() (*logical.Response, error) {
+	return logical.RespondWithStatusCode(&logical.Response{
+		Data: map[string]interface{}{
+			"message":     "account not found",
+			"status_code": http.StatusNotFound,
+		},
+	}, nil, http.StatusNotFound)
 }

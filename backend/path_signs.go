@@ -7,6 +7,7 @@ import (
 	vault "github.com/bloxapp/KeyVault"
 	"github.com/bloxapp/KeyVault/slashing_protection"
 	"github.com/bloxapp/KeyVault/validator_signer"
+	"github.com/bloxapp/KeyVault/wallet_hd"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
@@ -169,6 +170,18 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
+	// Parse request data
+	publicKey := data.Get("public_key").(string)
+	domain := data.Get("domain").(string)
+	slot := data.Get("slot").(int)
+	committeeIndex := data.Get("committeeIndex").(int)
+	beaconBlockRoot := data.Get("beaconBlockRoot").(string)
+	sourceEpoch := data.Get("sourceEpoch").(int)
+	sourceRoot := data.Get("sourceRoot").(string)
+	targetEpoch := data.Get("targetEpoch").(int)
+	targetRoot := data.Get("targetRoot").(string)
+
+	// Open wallet
 	kv, err := vault.OpenKeyVault(&options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open key vault")
@@ -179,28 +192,21 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 		return nil, errors.Wrap(err, "failed to retrieve wallet")
 	}
 
-	account, err := wallet.AccountByPublicKey(data.Get("public_key").(string))
+	account, err := wallet.AccountByPublicKey(publicKey)
 	if err != nil {
+		if err == wallet_hd.ErrAccountNotFound {
+			return b.notFoundResponse()
+		}
+
 		return nil, errors.Wrap(err, "failed to retrieve account")
 	}
 
 	// try to lock signature lock, if it fails return error
-	lock := DBLock{storage: req.Storage, id: account.ID()}
-	err = lock.Lock()
-	if err != nil {
+	lock := NewDBLock(account.ID(), req.Storage)
+	if err := lock.Lock(); err != nil {
 		return nil, err
 	}
 	defer lock.UnLock()
-
-	publicKey := data.Get("public_key").(string)
-	domain := data.Get("domain").(string)
-	slot := data.Get("slot").(int)
-	committeeIndex := data.Get("committeeIndex").(int)
-	beaconBlockRoot := data.Get("beaconBlockRoot").(string)
-	sourceEpoch := data.Get("sourceEpoch").(int)
-	sourceRoot := data.Get("sourceRoot").(string)
-	targetEpoch := data.Get("targetEpoch").(int)
-	targetRoot := data.Get("targetRoot").(string)
 
 	// Decode public key
 	publicKeyBytes, err := hex.DecodeString(publicKey)
@@ -269,6 +275,16 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
+	// Parse request data
+	publicKey := data.Get("public_key").(string)
+	domain := data.Get("domain").(string)
+	slot := data.Get("slot").(int)
+	proposerIndex := data.Get("proposerIndex").(int)
+	parentRoot := data.Get("parentRoot").(string)
+	stateRoot := data.Get("stateRoot").(string)
+	bodyRoot := data.Get("bodyRoot").(string)
+
+	// Open wallet
 	kv, err := vault.OpenKeyVault(&options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open key vault")
@@ -279,26 +295,21 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
-	account, err := wallet.AccountByPublicKey(data.Get("public_key").(string))
+	account, err := wallet.AccountByPublicKey(publicKey)
 	if err != nil {
+		if err == wallet_hd.ErrAccountNotFound {
+			return b.notFoundResponse()
+		}
+
 		return nil, errors.Wrap(err, "failed to retrieve account")
 	}
 
 	// try to lock signature lock, if it fails return error
-	lock := DBLock{storage: req.Storage, id: account.ID()}
-	err = lock.Lock()
-	if err != nil {
+	lock := NewDBLock(account.ID(), req.Storage)
+	if err := lock.Lock(); err != nil {
 		return nil, err
 	}
 	defer lock.UnLock()
-
-	publicKey := data.Get("public_key").(string)
-	domain := data.Get("domain").(string)
-	slot := data.Get("slot").(int)
-	proposerIndex := data.Get("proposerIndex").(int)
-	parentRoot := data.Get("parentRoot").(string)
-	stateRoot := data.Get("stateRoot").(string)
-	bodyRoot := data.Get("bodyRoot").(string)
 
 	// Decode public key
 	publicKeyBytes, err := hex.DecodeString(publicKey)
@@ -363,6 +374,12 @@ func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request,
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
+	// Parse request data
+	publicKey := data.Get("public_key").(string)
+	domain := data.Get("domain").(string)
+	dataToSign := data.Get("dataToSign").(string)
+
+	// Open wallet
 	kv, err := vault.OpenKeyVault(&options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open key vault")
@@ -373,17 +390,21 @@ func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request,
 		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
-	// try to lock signature lock, if it fails return error
-	lock := DBLock{storage: req.Storage, id: wallet.ID()}
-	err = lock.Lock()
+	account, err := wallet.AccountByPublicKey(publicKey)
 	if err != nil {
+		if err == wallet_hd.ErrAccountNotFound {
+			return b.notFoundResponse()
+		}
+
+		return nil, errors.Wrap(err, "failed to retrieve account")
+	}
+
+	// try to lock signature lock, if it fails return error
+	lock := NewDBLock(account.ID(), req.Storage)
+	if err := lock.Lock(); err != nil {
 		return nil, err
 	}
 	defer lock.UnLock()
-
-	publicKey := data.Get("public_key").(string)
-	domain := data.Get("domain").(string)
-	dataToSign := data.Get("dataToSign").(string)
 
 	// Decode public key
 	publicKeyBytes, err := hex.DecodeString(publicKey)
