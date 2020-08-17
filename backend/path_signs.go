@@ -169,7 +169,29 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
-	// Parse request data.
+	kv, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open key vault")
+	}
+
+	wallet, err := kv.Wallet()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve wallet")
+	}
+
+	account, err := wallet.AccountByPublicKey(data.Get("public_key").(string))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve account")
+	}
+
+	// try to lock signature lock, if it fails return error
+	lock := DBLock{storage: req.Storage, id: account.ID()}
+	err = lock.Lock()
+	if err != nil {
+		return nil, err
+	}
+	defer lock.UnLock()
+
 	publicKey := data.Get("public_key").(string)
 	domain := data.Get("domain").(string)
 	slot := data.Get("slot").(int)
@@ -209,25 +231,6 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to HEX decode target root")
 	}
-
-	kv, err := vault.OpenKeyVault(&options)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open key vault")
-	}
-
-	wallet, err := kv.Wallet()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to retrieve wallet")
-	}
-
-	wallet.AccountByPublicKey(publicKey)
-
-	// Try to lock signature lock, if it fails return error
-	lock := NewDBLock(wallet.ID(), req.Storage)
-	if err := lock.Lock(); err != nil {
-		return nil, err
-	}
-	defer lock.UnLock()
 
 	protector := slashing_protection.NewNormalProtection(storage)
 	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
@@ -276,8 +279,13 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 		return nil, errors.Wrap(err, "failed to retrieve wallet by name")
 	}
 
+	account, err := wallet.AccountByPublicKey(data.Get("public_key").(string))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve account")
+	}
+
 	// try to lock signature lock, if it fails return error
-	lock := DBLock{storage: req.Storage, id: wallet.ID()}
+	lock := DBLock{storage: req.Storage, id: account.ID()}
 	err = lock.Lock()
 	if err != nil {
 		return nil, err
