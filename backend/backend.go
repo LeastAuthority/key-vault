@@ -3,32 +3,35 @@ package backend
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
-// Factory returns the backend
-func Factory(ctx context.Context, conf *logical.BackendConfig) (logical.Backend, error) {
-	b, err := Backend()
-	if err != nil {
-		return nil, err
+// Factory returns the backend factory
+func Factory(version string) logical.Factory {
+	return func(ctx context.Context, conf *logical.BackendConfig) (logical.Backend, error) {
+		b := Backend(version)
+		if err := b.Setup(ctx, conf); err != nil {
+			return nil, err
+		}
+		return b, nil
 	}
-	if err := b.Setup(ctx, conf); err != nil {
-		return nil, err
-	}
-	return b, nil
 }
 
 // Backend returns the backend
-func Backend() (logical.Backend, error) {
-	var b backend
+func Backend(version string) *backend {
+	b := &backend{
+		Version: version,
+	}
 	b.Backend = &framework.Backend{
 		Help: "",
 		Paths: framework.PathAppend(
-			storagePaths(&b),
-			accountsPaths(&b),
-			signsPaths(&b),
+			versionPaths(b),
+			storagePaths(b),
+			accountsPaths(b),
+			signsPaths(b),
 		),
 		PathsSpecial: &logical.Paths{
 			SealWrapStorage: []string{
@@ -38,12 +41,14 @@ func Backend() (logical.Backend, error) {
 		Secrets:     []*framework.Secret{},
 		BackendType: logical.TypeLogical,
 	}
-	return &b, nil
+
+	return b
 }
 
 // backend implements the Backend for this plugin
 type backend struct {
 	*framework.Backend
+	Version string
 }
 
 func (b *backend) pathExistenceCheck(ctx context.Context, req *logical.Request, data *framework.FieldData) (bool, error) {
@@ -54,4 +59,13 @@ func (b *backend) pathExistenceCheck(ctx context.Context, req *logical.Request, 
 	}
 
 	return out != nil, nil
+}
+
+func (b *backend) notFoundResponse() (*logical.Response, error) {
+	return logical.RespondWithStatusCode(&logical.Response{
+		Data: map[string]interface{}{
+			"message":     "account not found",
+			"status_code": http.StatusNotFound,
+		},
+	}, nil, http.StatusNotFound)
 }

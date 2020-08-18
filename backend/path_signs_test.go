@@ -49,8 +49,9 @@ func TestSignAttestation(t *testing.T) {
 			"public_key": "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3270",
 		}
 		req.Data = data
-		_, err = b.HandleRequest(context.Background(), req)
-		require.EqualError(t, err, "failed to retrieve account: account not found")
+		resp, err := b.HandleRequest(context.Background(), req)
+		require.NoError(t, err)
+		require.EqualValues(t, 404, resp.Data["http_status_code"], resp.Data)
 	})
 }
 
@@ -90,8 +91,9 @@ func TestSignProposal(t *testing.T) {
 			"public_key": "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3270",
 		}
 		req.Data = data
-		_, err = b.HandleRequest(context.Background(), req)
-		require.EqualError(t, err, "failed to retrieve account: account not found")
+		resp, err := b.HandleRequest(context.Background(), req)
+		require.NoError(t, err)
+		require.EqualValues(t, 404, resp.Data["http_status_code"], resp.Data)
 	})
 }
 
@@ -130,7 +132,8 @@ func TestSignAggregation(t *testing.T) {
 			"public_key": "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3270",
 		}
 		req.Data = data
-		_, err = b.HandleRequest(context.Background(), req)
-		require.EqualError(t, err, "failed to sign data: account not found")
+		resp, err := b.HandleRequest(context.Background(), req)
+		require.NoError(t, err)
+		require.EqualValues(t, 404, resp.Data["http_status_code"], resp.Data)
 	})
 }

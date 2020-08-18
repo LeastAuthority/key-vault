@@ -190,6 +190,15 @@ func (store *HashicorpVaultStore) OpenAccount(accountID uuid.UUID) (core.Validat
 	return ret, nil
 }
 
+// DeleteAccount deletes the given account
+func (store *HashicorpVaultStore) DeleteAccount(accountId uuid.UUID) error {
+	path := fmt.Sprintf(AccountPath, accountId)
+	if err := store.storage.Delete(store.ctx, path); err != nil {
+		return errors.Wrapf(err, "failed to delete record with path '%s'", path)
+	}
+	return nil
+}
+
 // SetEncryptor sets the given encryptor. Could be nil value.
 func (store *HashicorpVaultStore) SetEncryptor(encryptor types.Encryptor, password []byte) {
 	store.encryptor = encryptor

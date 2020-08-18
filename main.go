@@ -10,6 +10,10 @@ import (
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend"
 )
 
+// Version contains the current version of app binary.
+// Basically, this is the commit hash
+var Version = "latest"
+
 func main() {
 	apiClientMeta := &api.PluginAPIClientMeta{}
 	flags := apiClientMeta.FlagSet()
@@ -19,7 +23,7 @@ func main() {
 	tlsProviderFunc := api.VaultPluginTLSProvider(tlsConfig)
 
 	err := plugin.Serve(&plugin.ServeOpts{
-		BackendFactoryFunc: backend.Factory,
+		BackendFactoryFunc: backend.Factory(Version),
 		TLSProviderFunc:    tlsProviderFunc,
 	})
 	if err != nil {

@@ -24,7 +24,7 @@ FROM preparer AS builder
 # Copy files and install app
 COPY . .
 RUN go get -d -v ./...
-RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static -lm"' -o ethsign .
+RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags "-linkmode external -extldflags \"-static -lm\" -X main.Version=$(git rev-parse --short HEAD)" -o ethsign .
 
 #
 # STEP 3: Get vault image and copy the plugin
@@ -53,4 +53,4 @@ WORKDIR /
 EXPOSE 8200
 
 # Run vault
-ENTRYPOINT ["bash", "/vault/config/entrypoint.sh"]
+CMD ["bash", "/vault/config/entrypoint.sh"]

@@ -14,6 +14,14 @@ type DBLock struct {
 	storage logical.Storage
 }
 
+// NewDBLock is the constructor of DBLock.
+func NewDBLock(id uuid.UUID, storage logical.Storage) *DBLock {
+	return &DBLock{
+		id:      id,
+		storage: storage,
+	}
+}
+
 // Lock locks the DB.
 func (lock *DBLock) Lock() error {
 	// if locked return error
