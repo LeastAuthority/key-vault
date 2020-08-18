@@ -81,8 +81,10 @@ func runSlashableAttestation(t *testing.T, setup *e2e.BaseSetup, pubKey string) 
 		},
 	)
 	require.Error(t, err, "did not slash")
+	require.IsType(t, &e2e.ServiceError{}, err)
 
-	protected := err.Error() == fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: slashable attestation (DoubleVote), not signing\n\n") ||
-		err.Error() == fmt.Sprintf("1 error occurred:\n\t* locked\n\n")
+	errValue := err.(*e2e.ServiceError).ErrorValue()
+	protected := errValue == fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: slashable attestation (DoubleVote), not signing\n\n") ||
+		errValue == fmt.Sprintf("1 error occurred:\n\t* locked\n\n")
 	require.True(t, protected, err.Error())
 }

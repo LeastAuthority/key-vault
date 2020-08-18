@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -40,6 +40,7 @@ func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
 		},
 	)
 	require.Error(t, err)
-	expectedErr := fmt.Sprintf("1 error occurred:\n\t* failed to retrieve account: account not found\n\n")
-	require.EqualError(t, err, expectedErr)
+	require.IsType(t, &e2e.ServiceError{}, err)
+	require.EqualValues(t, "account not found", err.(*e2e.ServiceError).DataValue("message"))
+	require.EqualValues(t, http.StatusNotFound, err.(*e2e.ServiceError).DataValue("status_code"))
 }

@@ -2,19 +2,49 @@ package e2e
 
 import (
 	"bytes"
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/bloxapp/KeyVault/core"
+	"github.com/pborman/uuid"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/launcher"
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 )
+
+// ServiceError represents service error type.
+type ServiceError struct {
+	Data map[string]interface{}
+}
+
+// NewServiceError is the constructor of ServiceError.
+func NewServiceError(data map[string]interface{}) *ServiceError {
+	return &ServiceError{
+		Data: data,
+	}
+}
+
+// Error implements error interface.
+func (e *ServiceError) Error() string {
+	return fmt.Sprintf("%#v", e.Data)
+}
+
+// ErrorValue returns error value from the data
+func (e *ServiceError) ErrorValue() string {
+	return e.Data["errors"].([]interface{})[0].(string)
+}
+
+// DataValue returns "field" value from data
+func (e *ServiceError) DataValue(field string) interface{} {
+	return e.Data["data"].(map[string]interface{})[field]
+}
 
 // BaseSetup implements mechanism, to setup base env for e2e tests.
 type BaseSetup struct {
@@ -25,15 +55,19 @@ type BaseSetup struct {
 
 // SetupE2EEnv sets up environment for e2e tests
 func SetupE2EEnv(t *testing.T) *BaseSetup {
-	authToken := os.Getenv("VAULT_PLUGIN_AUTH_TOKEN")
-	require.NotEmpty(t, authToken)
+	dockerLauncher, err := launcher.New(logrus.New(), "vault-plugin-secrets-eth20_vault:latest")
+	require.NoError(t, err)
 
-	host := os.Getenv("VAULT_PLUGIN_HOST")
-	require.NotEmpty(t, host)
+	conf, err := dockerLauncher.Launch(context.Background(), uuid.New())
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		err := dockerLauncher.Stop(context.Background(), conf.ID)
+		require.NoError(t, err)
+	})
 
 	return &BaseSetup{
-		RootKey: authToken,
-		baseURL: fmt.Sprintf("http://%s:8200", host),
+		RootKey: conf.Token,
+		baseURL: conf.URL,
 	}
 }
 
@@ -74,7 +108,7 @@ func (setup *BaseSetup) SignAttestation(data map[string]interface{}) ([]byte, er
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%s", retObj["errors"].([]interface{})[0])
+		return nil, NewServiceError(retObj)
 	}
 
 	sigStr := retObj["data"].(map[string]interface{})["signature"].(string)
