@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 
@@ -13,7 +14,12 @@ import (
 )
 
 func TestLaunch(t *testing.T) {
-	launcher, err := New(logrus.New(), "vault-plugin-secrets-eth20_vault:latest")
+	imageName := "vault-plugin-secrets-eth20_vault:latest"
+	if envImageName := os.Getenv("VAULT_PLUGIN_IMAGE"); len(envImageName) > 0 {
+		imageName = envImageName
+	}
+
+	launcher, err := New(logrus.New(), imageName)
 	require.NoError(t, err)
 
 	config, err := launcher.Launch(context.Background(), "")

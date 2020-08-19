@@ -82,7 +82,7 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 			CapAdd:       strslice.StrSlice{"IPC_LOCK"},
 		}, nil, name)
 	if err != nil {
-		panic(err)
+		return nil, errors.Wrap(err, "failed to create container")
 	}
 
 	// Start container
