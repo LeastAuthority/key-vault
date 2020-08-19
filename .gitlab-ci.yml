@@ -71,6 +71,7 @@ Run tests of the application:
   #  - kubectl -n validators logs -c vault-plugin-secrets-test $POD_NAME
   #  - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
     - export VAULT_PLUGIN_IMAGE="$IMAGE_NAME:$CI_BUILD_REF"
+    - echo $VAULT_PLUGIN_IMAGE
     - go get -t
     - go test -cover -race -p 1 ./...
   #after_script:
