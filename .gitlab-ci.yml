@@ -50,6 +50,8 @@ Run linter:
 Run tests of the application:
   stage: test
   image: golang:1.14-stretch
+  services:
+    - docker:dind
   tags:
     - blox-infra-stage
   #before_script:
