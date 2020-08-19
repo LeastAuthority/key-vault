@@ -51,7 +51,7 @@ func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (
 	if err != nil {
 		return nil, err
 	}
-	return store.FromInMemoryStore(inMem, logicalStorage, ctx)
+	return store.FromInMemoryStore(ctx, inMem, logicalStorage)
 }
 
 func TestStorage(t *testing.T) {
@@ -86,7 +86,7 @@ func TestStorage(t *testing.T) {
 		acc, err := wallet.AccountByPublicKey("ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279")
 		require.NoError(t, err)
 
-		vault := store.NewHashicorpVaultStore(logicalStorage, context.Background())
+		vault := store.NewHashicorpVaultStore(context.Background(), logicalStorage)
 		wallet2, err := vault.OpenWallet()
 		require.NoError(t, err)
 		require.Equal(t, wallet.ID().String(), wallet2.ID().String())

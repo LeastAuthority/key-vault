@@ -2,22 +2,83 @@ package e2e
 
 import (
 	"bytes"
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"testing"
 
+	"github.com/bloxapp/KeyVault/core"
+	"github.com/pborman/uuid"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/launcher"
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 )
 
-type E2EBaseSetup struct {
-	WorkingDir string
-	RootKey    string
-	baseUrl    string
+// ServiceError represents service error type.
+type ServiceError struct {
+	Data map[string]interface{}
 }
 
-func (setup *E2EBaseSetup) SignAttestation(data map[string]interface{}) ([]byte, error) {
+// NewServiceError is the constructor of ServiceError.
+func NewServiceError(data map[string]interface{}) *ServiceError {
+	return &ServiceError{
+		Data: data,
+	}
+}
+
+// Error implements error interface.
+func (e *ServiceError) Error() string {
+	return fmt.Sprintf("%#v", e.Data)
+}
+
+// ErrorValue returns error value from the data
+func (e *ServiceError) ErrorValue() string {
+	return e.Data["errors"].([]interface{})[0].(string)
+}
+
+// DataValue returns "field" value from data
+func (e *ServiceError) DataValue(field string) interface{} {
+	return e.Data["data"].(map[string]interface{})[field]
+}
+
+// BaseSetup implements mechanism, to setup base env for e2e tests.
+type BaseSetup struct {
+	WorkingDir string
+	RootKey    string
+	baseURL    string
+}
+
+// SetupE2EEnv sets up environment for e2e tests
+func SetupE2EEnv(t *testing.T) *BaseSetup {
+	imageName := "vault-plugin-secrets-eth20_vault:latest"
+	if envImageName := os.Getenv("VAULT_PLUGIN_IMAGE"); len(envImageName) > 0 {
+		imageName = envImageName
+	}
+
+	dockerLauncher, err := launcher.New(logrus.New(), imageName)
+	require.NoError(t, err)
+
+	conf, err := dockerLauncher.Launch(context.Background(), uuid.New())
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		err := dockerLauncher.Stop(context.Background(), conf.ID)
+		require.NoError(t, err)
+	})
+
+	return &BaseSetup{
+		RootKey: conf.Token,
+		baseURL: conf.URL,
+	}
+}
+
+// SignAttestation tests the sign attestation endpoint.
+func (setup *BaseSetup) SignAttestation(data map[string]interface{}) ([]byte, error) {
 	// body
 	body, err := json.Marshal(data)
 	if err != nil {
@@ -25,7 +86,7 @@ func (setup *E2EBaseSetup) SignAttestation(data map[string]interface{}) ([]byte,
 	}
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/accounts/sign-attestation", setup.baseUrl)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/accounts/sign-attestation", setup.baseURL)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, nil
@@ -53,63 +114,57 @@ func (setup *E2EBaseSetup) SignAttestation(data map[string]interface{}) ([]byte,
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%s", retObj["errors"].([]interface{})[0])
-	} else {
-		sigStr := retObj["data"].(map[string]interface{})["signature"].(string)
-		ret, err := hex.DecodeString(sigStr)
-		if err != nil {
-			return nil, err
-		}
-		return ret, nil
+		return nil, NewServiceError(retObj)
 	}
+
+	sigStr := retObj["data"].(map[string]interface{})["signature"].(string)
+	ret, err := hex.DecodeString(sigStr)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
 }
 
-func (setup *E2EBaseSetup) UpdateStorage() error {
+// UpdateStorage updates the storage.
+func (setup *BaseSetup) UpdateStorage(t *testing.T) core.Storage {
 	// get store
-	store, err := shared.BaseInmemStorage()
-	if err != nil {
-		return err
-	}
+	store, err := shared.BaseInmemStorage(t)
+	require.NoError(t, err)
 
 	// encode store
 	byts, err := json.Marshal(store)
-	if err != nil {
-		return nil
-	}
+	require.NoError(t, err)
+
 	encodedStore := hex.EncodeToString(byts)
 
 	// body
 	body, err := json.Marshal(map[string]string{
 		"data": encodedStore,
 	})
+	require.NoError(t, err)
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/storage", setup.baseUrl)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/storage", setup.baseURL)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
-	if err != nil {
-		return nil
-	}
+	require.NoError(t, err)
+
 	req.Header.Set("Authorization", "Bearer "+setup.RootKey)
 
 	// Do request
 	httpClient := http.Client{}
 	resp, err := httpClient.Do(req)
-	if err != nil {
-		return err
-	}
+	require.NoError(t, err)
+
 	// Read response body
 	respBodyByts, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
+	require.NoError(t, err)
+
 	respBody := string(respBodyByts)
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error: could not update vault: respose: %s", respBody)
-	}
+	require.Equal(t, http.StatusOK, resp.StatusCode, respBody)
 
 	fmt.Printf("e2e: setup hashicorp vault db\n")
 
-	return nil
+	return store
 }

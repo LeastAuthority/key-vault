@@ -1,47 +1,100 @@
 package tests
 
 import (
+	"encoding/hex"
 	"testing"
+
+	"github.com/bloxapp/KeyVault/stores/in_memory"
+
+	"github.com/bloxapp/KeyVault/slashing_protection"
+	"github.com/bloxapp/KeyVault/validator_signer"
+	"github.com/stretchr/testify/require"
+	v1 "github.com/wealdtech/eth2-signer-api/pb/v1"
 
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
-	"github.com/stretchr/testify/require"
 )
 
+// AttestationSigning tests sign attestation endpoint.
 type AttestationSigning struct {
 }
 
+// Name returns the name of the test.
 func (test *AttestationSigning) Name() string {
 	return "Test attestation signing"
 }
 
+// Run run the test.
 func (test *AttestationSigning) Run(t *testing.T) {
-	setup, err := e2e.SetupE2EEnv()
-	require.NoError(t, err)
+	setup := e2e.SetupE2EEnv(t)
 
 	// setup vault with db
-	err = setup.UpdateStorage()
+	storage := setup.UpdateStorage(t)
+	account := shared.RetrieveAccount(t, storage)
+	pubKeyBytes := account.ValidatorPublicKey().Marshal()
+
+	// Get wallet
+	wallet, err := storage.OpenWallet()
 	require.NoError(t, err)
 
-	// sign
-	sig, err := setup.SignAttestation(
-		map[string]interface{}{
-			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
-			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
-			"slot":            284115,
-			"committeeIndex":  2,
-			"beaconBlockRoot": "7b5679277ca45ea74e1deebc9d3e8c0e7d6c570b3cfaf6884be144a81dac9a0e",
-			"sourceEpoch":     8877,
-			"sourceRoot":      "7402fdc1ce16d449d637c34a172b349a12b2bae8d6d77e401006594d8057c33d",
-			"targetEpoch":     8878,
-			"targetRoot":      "17959acc370274756fa5e9fdd7e7adf17204f49cc8457e49438c42c4883cbfb0",
+	dataToSign := map[string]interface{}{
+		"public_key":      hex.EncodeToString(pubKeyBytes),
+		"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
+		"slot":            284115,
+		"committeeIndex":  2,
+		"beaconBlockRoot": "7b5679277ca45ea74e1deebc9d3e8c0e7d6c570b3cfaf6884be144a81dac9a0e",
+		"sourceEpoch":     8877,
+		"sourceRoot":      "7402fdc1ce16d449d637c34a172b349a12b2bae8d6d77e401006594d8057c33d",
+		"targetEpoch":     8878,
+		"targetRoot":      "17959acc370274756fa5e9fdd7e7adf17204f49cc8457e49438c42c4883cbfb0",
+	}
+
+	// Sign data
+	protector := slashing_protection.NewNormalProtection(in_memory.NewInMemStore())
+	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
+
+	res, err := signer.SignBeaconAttestation(test.dataToAttestationRequest(t, pubKeyBytes, dataToSign))
+	require.NoError(t, err)
+
+	// Send sign attestation request
+	sig, err := setup.SignAttestation(dataToSign)
+	require.NoError(t, err)
+
+	require.Equal(t, res.GetSignature(), sig)
+}
+
+func (test *AttestationSigning) dataToAttestationRequest(t *testing.T, pubKey []byte, data map[string]interface{}) *v1.SignBeaconAttestationRequest {
+	// Decode domain
+	domainBytes, err := hex.DecodeString(data["domain"].(string))
+	require.NoError(t, err)
+
+	// Decode block root
+	beaconBlockRoot, err := hex.DecodeString(data["beaconBlockRoot"].(string))
+	require.NoError(t, err)
+
+	// Decode source root
+	sourceRootBytes, err := hex.DecodeString(data["sourceRoot"].(string))
+	require.NoError(t, err)
+
+	// Decode target root
+	targetRootBytes, err := hex.DecodeString(data["targetRoot"].(string))
+	require.NoError(t, err)
+
+	return &v1.SignBeaconAttestationRequest{
+		Id:     &v1.SignBeaconAttestationRequest_PublicKey{PublicKey: pubKey},
+		Domain: domainBytes,
+		Data: &v1.AttestationData{
+			Slot:            uint64(data["slot"].(int)),
+			CommitteeIndex:  uint64(data["committeeIndex"].(int)),
+			BeaconBlockRoot: beaconBlockRoot,
+			Source: &v1.Checkpoint{
+				Epoch: uint64(data["sourceEpoch"].(int)),
+				Root:  sourceRootBytes,
+			},
+			Target: &v1.Checkpoint{
+				Epoch: uint64(data["targetEpoch"].(int)),
+				Root:  targetRootBytes,
+			},
 		},
-	)
-	require.NoError(t, err)
-
-	expecetd := shared.HexToBytes("a53b6728fc2cc52abb0059da9b2e7cb01f33cd95fd6c9db7f2b821fa58a58d5ef2bc5dda058d570a7f240bf24b335eee066b2ab8dbf5a989157dd51b647733665f7c1be0d1c285b02efdbb37cd4e0ace0529b8e02c944386e3b110c32b019c63")
-	require.Equal(t, expecetd, sig)
-
-	// cleanup
-	require.NoError(t, setup.Cleanup())
+	}
 }

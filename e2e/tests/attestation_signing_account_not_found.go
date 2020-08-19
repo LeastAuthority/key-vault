@@ -1,30 +1,32 @@
 package tests
 
 import (
-	"fmt"
+	"net/http"
 	"testing"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 )
 
+// AttestationSigningAccountNotFound tests sign attestation when account not found
 type AttestationSigningAccountNotFound struct {
 }
 
+// Name returns the name of the test
 func (test *AttestationSigningAccountNotFound) Name() string {
 	return "Test attestation signing account not found"
 }
 
+// Run runs the test.
 func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
-	setup, err := e2e.SetupE2EEnv()
-	require.NoError(t, err)
+	setup := e2e.SetupE2EEnv(t)
 
 	// setup vault with db
-	err = setup.UpdateStorage()
-	require.NoError(t, err)
+	setup.UpdateStorage(t)
 
 	// sign
-	_, err = setup.SignAttestation(
+	_, err := setup.SignAttestation(
 		map[string]interface{}{
 			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3278", // this account is not found
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
@@ -38,9 +40,7 @@ func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
 		},
 	)
 	require.Error(t, err)
-	expectedErr := fmt.Sprintf("1 error occurred:\n\t* failed to retrieve account: account not found\n\n")
-	require.EqualError(t, err, expectedErr)
-
-	// cleanup
-	require.NoError(t, setup.Cleanup())
+	require.IsType(t, &e2e.ServiceError{}, err)
+	require.EqualValues(t, "account not found", err.(*e2e.ServiceError).DataValue("message"))
+	require.EqualValues(t, http.StatusNotFound, err.(*e2e.ServiceError).DataValue("status_code"))
 }

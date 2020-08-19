@@ -1,33 +1,40 @@
 package tests
 
 import (
+	"encoding/hex"
 	"fmt"
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
-	"github.com/stretchr/testify/require"
 	"math/rand"
-	"sync"
+	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 )
 
+// AttestationConcurrentSigning tests signing method concurrently.
 type AttestationConcurrentSigning struct {
 }
 
+// Name returns the name of the test.
 func (test *AttestationConcurrentSigning) Name() string {
 	return "Test attestation concurrent signing"
 }
 
+// Run runs the test.
 func (test *AttestationConcurrentSigning) Run(t *testing.T) {
-	setup, err := e2e.SetupE2EEnv()
-	require.NoError(t, err)
+	setup := e2e.SetupE2EEnv(t)
 
 	// setup vault with db
-	err = setup.UpdateStorage()
-	require.NoError(t, err)
+	store := setup.UpdateStorage(t)
+	account := shared.RetrieveAccount(t, store)
+	pubKey := hex.EncodeToString(account.ValidatorPublicKey().Marshal())
 
 	// sign and save the valid attestation
-	_, err = setup.SignAttestation(
+	_, err := setup.SignAttestation(
 		map[string]interface{}{
-			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
+			"public_key":      pubKey,
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284115,
 			"committeeIndex":  1,
@@ -40,22 +47,20 @@ func (test *AttestationConcurrentSigning) Run(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	var wg sync.WaitGroup
-	for i := 0; i < 5; i++ {
-		go func() {
-			wg.Add(1)
-			require.NoError(t, test.runSlashableAttestation(setup))
-			wg.Done()
-		}()
-	}
-	wg.Wait()
-
-	// cleanup
-	require.NoError(t, setup.Cleanup())
+	// Send requests in parallel
+	t.Run("concurrent signing", func(t *testing.T) {
+		t.Parallel()
+		for i := 0; i < 5; i++ {
+			t.Run("concurrent signing "+strconv.Itoa(i), func(t *testing.T) {
+				t.Parallel()
+				runSlashableAttestation(t, setup, pubKey)
+			})
+		}
+	})
 }
 
 // will return no error if trying to sign a slashable attestation will not work
-func (test *AttestationConcurrentSigning) runSlashableAttestation(setup *e2e.E2EBaseSetup) error {
+func runSlashableAttestation(t *testing.T, setup *e2e.BaseSetup, pubKey string) {
 	randomCommittee := func() int {
 		max := 1000
 		min := 2
@@ -64,7 +69,7 @@ func (test *AttestationConcurrentSigning) runSlashableAttestation(setup *e2e.E2E
 
 	_, err := setup.SignAttestation(
 		map[string]interface{}{
-			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
+			"public_key":      pubKey,
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284115,
 			"committeeIndex":  randomCommittee(),
@@ -75,12 +80,11 @@ func (test *AttestationConcurrentSigning) runSlashableAttestation(setup *e2e.E2E
 			"targetRoot":      "17959acc370274756fa5e9fdd7e7adf17204f49cc8457e49438c42c4883cbfb0",
 		},
 	)
-	if err == nil {
-		return fmt.Errorf("did not slash")
-	} else if err.Error() == fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: slashable attestation (DoubleVote), not signing\n\n") {
-		return nil
-	} else if err.Error() == fmt.Sprintf("1 error occurred:\n\t* locked\n\n") {
-		return nil
-	}
-	return err
+	require.Error(t, err, "did not slash")
+	require.IsType(t, &e2e.ServiceError{}, err)
+
+	errValue := err.(*e2e.ServiceError).ErrorValue()
+	protected := errValue == fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: slashable attestation (DoubleVote), not signing\n\n") ||
+		errValue == fmt.Sprintf("1 error occurred:\n\t* locked\n\n")
+	require.True(t, protected, err.Error())
 }

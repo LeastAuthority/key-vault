@@ -1,32 +1,38 @@
 package tests
 
 import (
+	"encoding/hex"
 	"fmt"
 	"testing"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
+	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 )
 
+// AttestationDoubleSigning tests double signing case
 type AttestationDoubleSigning struct {
 }
 
+// Name returns the name of the test.
 func (test *AttestationDoubleSigning) Name() string {
 	return "Test double attestation signing, different block root"
 }
 
+// Run runs the test.
 func (test *AttestationDoubleSigning) Run(t *testing.T) {
-	setup, err := e2e.SetupE2EEnv()
-	require.NoError(t, err)
+	setup := e2e.SetupE2EEnv(t)
 
 	// setup vault with db
-	err = setup.UpdateStorage()
-	require.NoError(t, err)
+	storage := setup.UpdateStorage(t)
+	account := shared.RetrieveAccount(t, storage)
+	pubKey := hex.EncodeToString(account.ValidatorPublicKey().Marshal())
 
 	// first sig
-	_, err = setup.SignAttestation(
+	_, err := setup.SignAttestation(
 		map[string]interface{}{
-			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
+			"public_key":      pubKey,
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284115,
 			"committeeIndex":  2,
@@ -42,7 +48,7 @@ func (test *AttestationDoubleSigning) Run(t *testing.T) {
 	// second sig, different block root
 	_, err = setup.SignAttestation(
 		map[string]interface{}{
-			"public_key":      "ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279",
+			"public_key":      pubKey,
 			"domain":          "01000000f071c66c6561d0b939feb15f513a019d99a84bd85635221e3ad42dac",
 			"slot":            284115,
 			"committeeIndex":  2,
@@ -55,8 +61,6 @@ func (test *AttestationDoubleSigning) Run(t *testing.T) {
 	)
 	expectedErr := fmt.Sprintf("1 error occurred:\n\t* failed to sign attestation: slashable attestation (DoubleVote), not signing\n\n")
 	require.Error(t, err)
-	require.EqualError(t, err, expectedErr)
-
-	// cleanup
-	require.NoError(t, setup.Cleanup())
+	require.IsType(t, &e2e.ServiceError{}, err)
+	require.EqualValues(t, expectedErr, err.(*e2e.ServiceError).ErrorValue())
 }

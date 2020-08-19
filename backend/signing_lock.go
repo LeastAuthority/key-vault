@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
+// DBLock implements DB slocking mechanism.
 type DBLock struct {
 	id      uuid.UUID
 	storage logical.Storage
@@ -21,6 +22,7 @@ func NewDBLock(id uuid.UUID, storage logical.Storage) *DBLock {
 	}
 }
 
+// Lock locks the DB.
 func (lock *DBLock) Lock() error {
 	// if locked return error
 	locked, err := lock.IsLocked()
@@ -40,6 +42,7 @@ func (lock *DBLock) Lock() error {
 	return lock.storage.Put(context.Background(), entry)
 }
 
+// UnLock unlocks the DB.
 func (lock *DBLock) UnLock() error {
 	// check if locked
 	locked, err := lock.IsLocked()
@@ -54,6 +57,7 @@ func (lock *DBLock) UnLock() error {
 	return lock.storage.Delete(context.Background(), lock.key())
 }
 
+// IsLocked returns true if the DB is locked.
 func (lock *DBLock) IsLocked() (bool, error) {
 	entry, err := lock.storage.Get(context.Background(), lock.key())
 	if err != nil {

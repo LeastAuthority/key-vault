@@ -1,6 +1,12 @@
 stages:
+  - lint
+  - pre-test
+  - test
   - build
   - deploy
+
+services:
+  - docker:dind
 
 variables:
 
@@ -15,9 +21,38 @@ variables:
   APP_REPLICAS_INFRA_STAGE: "1"
   ECRLOGIN_INFRA_STAGE: "aws ecr get-login --registry-ids $ACCOUNT_ID_INFRA_STAGE --region $AWS_REGION_INFRA_STAGE --no-include-email"
 
-
-
 #blox-infra-stage
+Run linter:
+  stage: lint
+  image: golang:1.14-stretch
+  tags:
+    - blox-infra-stage
+  script:
+    - go get -u golang.org/x/lint/golint
+    - go get -u golang.org/x/tools/cmd/goimports
+    - ./scripts/lint.sh .
+
+Run application for testing:
+  stage: pre-test
+  tags:
+    - blox-infra-stage
+  script:
+    - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
+    - docker images
+    - printenv | grep DOCKER
+
+Run tests of the application:
+  stage: test
+  image: golang:1.14-stretch
+  services:
+    - docker:dind
+  tags:
+    - blox-infra-stage
+  script:
+    - export VAULT_PLUGIN_IMAGE="$IMAGE_NAME:$CI_BUILD_REF"
+    - go get -t
+    - go test -cover -race -p 1 ./...
+
 Build stage Docker image:
   stage: build
   tags:

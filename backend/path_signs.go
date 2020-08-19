@@ -166,7 +166,7 @@ func signsPaths(b *backend) []*framework.Path {
 
 func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	// bring up KeyVault and wallet
-	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
@@ -271,7 +271,7 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 
 func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	// bring up KeyVault and wallet
-	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
@@ -370,7 +370,7 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 
 func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	// bring up KeyVault and wallet
-	storage := store.NewHashicorpVaultStore(req.Storage, ctx)
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 

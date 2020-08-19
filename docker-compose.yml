@@ -2,6 +2,9 @@ version: '3.7'
 
 services:
 
+  # IMPORTANT: Don't expose /data directory.
+  # If you need to get token, just run the following command after the service is up:
+  #   $ docker-compose exec -T vault cat /data/keys/vault.root.token
   vault:
     build:
       context: .
@@ -9,9 +12,6 @@ services:
 #    image: bloxstaking/key-vault:latest
     ports:
       - 8200:8200
-    volumes:
-      - ./data:/data
-      - ./policies:/policies
     environment:
       VAULT_ADDR: http://127.0.0.1:8200
       VAULT_API_ADDR: http://127.0.0.1:8200

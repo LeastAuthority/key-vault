@@ -58,7 +58,7 @@ func TestImportAndDeleteFromInMem(t *testing.T) {
 	hashiStorage := &logical.InmemStorage{}
 
 	// import to hashicorp
-	oldHashi, err := store.FromInMemoryStore(oldInMemStore, hashiStorage, context.Background())
+	oldHashi, err := store.FromInMemoryStore(context.Background(), oldInMemStore, hashiStorage)
 	require.NoError(t, err)
 
 	// create another in mem base keyvault to override (different seed and account names)
@@ -70,7 +70,7 @@ func TestImportAndDeleteFromInMem(t *testing.T) {
 	)
 
 	// import to hashicorp, should override
-	hashi, err := store.FromInMemoryStore(inMemStore, hashiStorage, context.Background())
+	hashi, err := store.FromInMemoryStore(context.Background(), inMemStore, hashiStorage)
 	require.NoError(t, err)
 
 	// verify deletion
@@ -108,7 +108,7 @@ func TestImportFromInMem(t *testing.T) {
 	)
 
 	// import to hashicorp
-	hashi, err := store.FromInMemoryStore(inMemStore, &logical.InmemStorage{}, context.Background())
+	hashi, err := store.FromInMemoryStore(context.Background(), inMemStore, &logical.InmemStorage{})
 	require.NoError(t, err)
 
 	// get hasicorp's wallet and accounts

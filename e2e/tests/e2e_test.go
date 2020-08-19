@@ -4,12 +4,12 @@ import (
 	"testing"
 )
 
-type E2ETest interface {
+type E2E interface {
 	Name() string
 	Run(t *testing.T)
 }
 
-var tests = []E2ETest{
+var tests = []E2E{
 	&AttestationSigning{},
 	&AttestationSigningAccountNotFound{},
 	&AttestationDoubleSigning{},
@@ -22,5 +22,4 @@ func TestE2E(t *testing.T) {
 			tst.Run(t)
 		})
 	}
-
 }
