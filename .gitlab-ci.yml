@@ -1,6 +1,6 @@
 stages:
   - lint
-#  - pre-test
+  - pre-test
   - test
   - build
   - deploy
@@ -33,21 +33,21 @@ Run linter:
     - go get -u golang.org/x/tools/cmd/goimports
     - ./scripts/lint.sh .
 
-#Run application for testing:
-#  stage: pre-test
-#  tags:
-#    - blox-infra-stage
+Run application for testing:
+  stage: pre-test
+  tags:
+    - blox-infra-stage
 #  before_script:
 #    - apk update
 #    - apk add bash
-#  script:
+  script:
 #    - export K8S_API_VERSION=$INFRA_STAGE_K8_API_VERSION
-#    - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
-#    - DOCKER_LOGIN_TO_INFRA_STAGE_REPO=`$ECRLOGIN_INFRA_STAGE`
-#    - docker tag $IMAGE_NAME:$CI_BUILD_REF $DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF
-#    - $DOCKER_LOGIN_TO_INFRA_STAGE_REPO && docker push $DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF
-#    - docker images
-#    - printenv | grep DOCKER
+    - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
+    - DOCKER_LOGIN_TO_INFRA_STAGE_REPO=`$ECRLOGIN_INFRA_STAGE`
+    - docker tag $IMAGE_NAME:$CI_BUILD_REF $DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF
+    - $DOCKER_LOGIN_TO_INFRA_STAGE_REPO && docker push $DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF
+    - docker images
+    - printenv | grep DOCKER
 #    - .k8/scripts/deploy-single-yaml.sh $DOCKER_REPO_INFRA_STAGE $CI_BUILD_REF validators $TESTS_YAML blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION $CI_PIPELINE_ID
 
 Run tests of the application:
