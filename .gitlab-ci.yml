@@ -73,7 +73,7 @@ Run tests of the application:
     - export VAULT_PLUGIN_IMAGE="$DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF"
     - echo $VAULT_PLUGIN_IMAGE
     - go get -t
-    - go test -cover -race -p 1 ./...
+    - VAULT_PLUGIN_IMAGE="$DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF" go test -cover -race -p 1 ./...
   #after_script:
   #  - kubectl -n validators delete job vault-plugin-secrets-test-$CI_PIPELINE_ID || true
 
