@@ -191,8 +191,8 @@ func (store *HashicorpVaultStore) OpenAccount(accountID uuid.UUID) (core.Validat
 }
 
 // DeleteAccount deletes the given account
-func (store *HashicorpVaultStore) DeleteAccount(accountId uuid.UUID) error {
-	path := fmt.Sprintf(AccountPath, accountId)
+func (store *HashicorpVaultStore) DeleteAccount(accountID uuid.UUID) error {
+	path := fmt.Sprintf(AccountPath, accountID)
 	if err := store.storage.Delete(store.ctx, path); err != nil {
 		return errors.Wrapf(err, "failed to delete record with path '%s'", path)
 	}
