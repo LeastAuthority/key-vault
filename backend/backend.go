@@ -12,7 +12,7 @@ import (
 // Factory returns the backend factory
 func Factory(version string) logical.Factory {
 	return func(ctx context.Context, conf *logical.BackendConfig) (logical.Backend, error) {
-		b := newBacend(version)
+		b := newBackend(version)
 		if err := b.Setup(ctx, conf); err != nil {
 			return nil, err
 		}
@@ -20,8 +20,8 @@ func Factory(version string) logical.Factory {
 	}
 }
 
-// newBacend returns the backend
-func newBacend(version string) *backend {
+// newBackend returns the backend
+func newBackend(version string) *backend {
 	b := &backend{
 		Version: version,
 	}
