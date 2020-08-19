@@ -37,18 +37,10 @@ Run application for testing:
   stage: pre-test
   tags:
     - blox-infra-stage
-#  before_script:
-#    - apk update
-#    - apk add bash
   script:
-#    - export K8S_API_VERSION=$INFRA_STAGE_K8_API_VERSION
     - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
-    - DOCKER_LOGIN_TO_INFRA_STAGE_REPO=`$ECRLOGIN_INFRA_STAGE`
-    - docker tag $IMAGE_NAME:$CI_BUILD_REF $DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF
-    - $DOCKER_LOGIN_TO_INFRA_STAGE_REPO && docker push $DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF
     - docker images
     - printenv | grep DOCKER
-#    - .k8/scripts/deploy-single-yaml.sh $DOCKER_REPO_INFRA_STAGE $CI_BUILD_REF validators $TESTS_YAML blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION $CI_PIPELINE_ID
 
 Run tests of the application:
   stage: test
@@ -57,25 +49,11 @@ Run tests of the application:
     - docker:dind
   tags:
     - blox-infra-stage
-  #before_script:
-  #  - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl
-  #  - chmod +x ./kubectl
-  #  - mv ./kubectl /usr/bin/kubectl
   script:
-  #  - export POD_NAME=$(kubectl get pods --selector=job-name=vault-plugin-secrets-test-$CI_PIPELINE_ID  -o=jsonpath='{.items[0].metadata.name}' -n validators)
-  #  - export VAULT_PLUGIN_HOST=$(kubectl get pods -n validators --selector=job-name=vault-plugin-secrets-test-$CI_PIPELINE_ID --output=jsonpath='{.items[*].status.podIPs[0].ip}')
-  #  - export VAULT_PLUGIN_AUTH_TOKEN=$(kubectl exec -n validators --stdin $POD_NAME -- cat /data/keys/vault.root.token)
-  #  - echo $POD_NAME
-  #  - echo $VAULT_PLUGIN_HOST
-  #  - echo $VAULT_PLUGIN_AUTH_TOKEN
-  #  - kubectl -n validators logs -c vault-plugin-secrets-test $POD_NAME
-  #  - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
-    - export VAULT_PLUGIN_IMAGE="$DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF"
+    - export VAULT_PLUGIN_IMAGE="$IMAGE_NAME:$CI_BUILD_REF"
     - echo $VAULT_PLUGIN_IMAGE
     - go get -t
-    - VAULT_PLUGIN_IMAGE="$DOCKER_REPO_INFRA_STAGE:$CI_BUILD_REF" go test -cover -race -p 1 ./...
-  #after_script:
-  #  - kubectl -n validators delete job vault-plugin-secrets-test-$CI_PIPELINE_ID || true
+    - go test -cover -race -p 1 ./...
 
 Build stage Docker image:
   stage: build
