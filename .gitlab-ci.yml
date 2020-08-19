@@ -20,7 +20,6 @@ variables:
   DOCKER_REPO_INFRA_STAGE: $ACCOUNT_ID_INFRA_STAGE.dkr.ecr.$AWS_REGION_INFRA_STAGE.amazonaws.com/$IMAGE_NAME
   APP_REPLICAS_INFRA_STAGE: "1"
   ECRLOGIN_INFRA_STAGE: "aws ecr get-login --registry-ids $ACCOUNT_ID_INFRA_STAGE --region $AWS_REGION_INFRA_STAGE --no-include-email"
-  TESTS_YAML: "jobs/vault-plugin-secrets-tests-job.yml"
 
 #blox-infra-stage
 Run linter:
@@ -51,7 +50,6 @@ Run tests of the application:
     - blox-infra-stage
   script:
     - export VAULT_PLUGIN_IMAGE="$IMAGE_NAME:$CI_BUILD_REF"
-    - echo $VAULT_PLUGIN_IMAGE
     - go get -t
     - go test -cover -race -p 1 ./...
 
