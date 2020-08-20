@@ -7,13 +7,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"testing"
 
 	"github.com/bloxapp/KeyVault/core"
 	"github.com/pborman/uuid"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/launcher"
@@ -54,10 +54,9 @@ func (e *ServiceError) DataValue(field string) interface{} {
 
 func init() {
 	var err error
-	logger := logrus.New()
 	imageName := "vault-plugin-secrets-eth20:" + uuid.New()
-	if dockerLauncher, err = launcher.New(logger, imageName, basePath); err != nil {
-		logger.Fatal(err)
+	if dockerLauncher, err = launcher.New(imageName, basePath); err != nil {
+		log.Fatal(err)
 	}
 }
 

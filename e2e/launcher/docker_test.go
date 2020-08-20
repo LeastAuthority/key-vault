@@ -9,17 +9,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sirupsen/logrus"
+	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLaunch(t *testing.T) {
-	imageName := "vault-plugin-secrets-eth20_vault:latest"
-	if envImageName := os.Getenv("VAULT_PLUGIN_IMAGE"); len(envImageName) > 0 {
-		imageName = envImageName
-	}
-
-	launcher, err := New(logrus.New(), imageName)
+	imageName := "vault-plugin-secrets-eth20_vault:" + uuid.New()
+	launcher, err := New(imageName, os.Getenv("GOPATH")+"/src/github.com/bloxapp/vault-plugin-secrets-eth2.0")
 	require.NoError(t, err)
 
 	config, err := launcher.Launch(context.Background(), "")

@@ -18,7 +18,6 @@ import (
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/go-connections/nat"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 // Config contains configuration of validator service instance.
@@ -33,11 +32,10 @@ type Docker struct {
 	client    *client.Client
 	imageName string
 	basePath  string
-	logger    *logrus.Logger
 }
 
 // New is the constructor of dockerLauncher
-func New(logger *logrus.Logger, imageName, basePath string) (*Docker, error) {
+func New(imageName, basePath string) (*Docker, error) {
 	// Create a new client
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -48,7 +46,6 @@ func New(logger *logrus.Logger, imageName, basePath string) (*Docker, error) {
 		client:    cli,
 		imageName: imageName,
 		basePath:  basePath,
-		logger:    logger,
 	}, nil
 }
 
@@ -98,7 +95,6 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 	if err := l.client.ContainerStart(ctx, cont.ID, types.ContainerStartOptions{}); err != nil {
 		return nil, errors.Wrap(err, "failed to start container")
 	}
-	l.logger.WithField("container_id", cont.ID).Info("Container is started")
 
 	// Retrieve container config
 	containerConfig, err := l.client.ContainerInspect(ctx, cont.ID)
@@ -149,14 +145,12 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 				l.Stop(ctx, cont.ID)
 				return nil, errors.Wrap(err, "failed to read from logs stream")
 			}
-			l.logger.Info(string(dat))
 
 			dta := strings.ToLower(string(dat))
 			if strings.Contains(dta, "connection refused") {
 				l.Stop(ctx, cont.ID)
 				return nil, errors.Errorf("failed to launch instance: %s", string(dat))
 			} else if strings.Contains(dta, "core: successfully reloaded plugin: plugin=ethsign path=ethereum") {
-				l.logger.Info("plugin successfully loaded")
 				loaded = true
 				break
 			}
