@@ -15,7 +15,7 @@ import (
 
 func TestLaunch(t *testing.T) {
 	imageName := "vault-plugin-secrets-eth20_vault:" + uuid.New()
-	launcher, err := New(imageName, os.Getenv("GOPATH")+"/src/github.com/bloxapp/vault-plugin-secrets-eth2.0")
+	launcher, err := New(imageName, os.Getenv("PWD")+"/../../")
 	require.NoError(t, err)
 
 	config, err := launcher.Launch(context.Background(), "")
