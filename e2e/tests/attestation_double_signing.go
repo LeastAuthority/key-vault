@@ -22,7 +22,7 @@ func (test *AttestationDoubleSigning) Name() string {
 
 // Run runs the test.
 func (test *AttestationDoubleSigning) Run(t *testing.T) {
-	setup := e2e.SetupE2EEnv(t)
+	setup := e2e.Setup(t)
 
 	// setup vault with db
 	storage := setup.UpdateStorage(t)

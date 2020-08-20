@@ -56,8 +56,8 @@ type BaseSetup struct {
 	baseURL    string
 }
 
-// SetupE2EEnv sets up environment for e2e tests
-func SetupE2EEnv(t *testing.T) *BaseSetup {
+// Setup sets up environment for e2e tests
+func Setup(t *testing.T) *BaseSetup {
 	imageName := "vault-plugin-secrets-eth20_vault:latest"
 	if envImageName := os.Getenv("VAULT_PLUGIN_IMAGE"); len(envImageName) > 0 {
 		imageName = envImageName

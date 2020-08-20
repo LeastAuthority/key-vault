@@ -20,7 +20,7 @@ func (test *AttestationSigningAccountNotFound) Name() string {
 
 // Run runs the test.
 func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
-	setup := e2e.SetupE2EEnv(t)
+	setup := e2e.Setup(t)
 
 	// setup vault with db
 	setup.UpdateStorage(t)

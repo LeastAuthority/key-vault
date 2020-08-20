@@ -24,7 +24,7 @@ func (test *AttestationConcurrentSigning) Name() string {
 
 // Run runs the test.
 func (test *AttestationConcurrentSigning) Run(t *testing.T) {
-	setup := e2e.SetupE2EEnv(t)
+	setup := e2e.Setup(t)
 
 	// setup vault with db
 	store := setup.UpdateStorage(t)
