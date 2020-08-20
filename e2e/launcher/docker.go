@@ -32,11 +32,12 @@ type Config struct {
 type Docker struct {
 	client    *client.Client
 	imageName string
+	basePath  string
 	logger    *logrus.Logger
 }
 
 // New is the constructor of dockerLauncher
-func New(logger *logrus.Logger, imageName string) (*Docker, error) {
+func New(logger *logrus.Logger, imageName, basePath string) (*Docker, error) {
 	// Create a new client
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -46,6 +47,7 @@ func New(logger *logrus.Logger, imageName string) (*Docker, error) {
 	return &Docker{
 		client:    cli,
 		imageName: imageName,
+		basePath:  basePath,
 		logger:    logger,
 	}, nil
 }
@@ -194,9 +196,7 @@ func (l *Docker) Stop(ctx context.Context, id string) error {
 
 // buildImage builds the test image
 func (l *Docker) buildImage(ctx context.Context) error {
-	var basePath = os.Getenv("GOPATH") + "/src/github.com/bloxapp/vault-plugin-secrets-eth2.0"
-	fmt.Println("basePath", basePath)
-	buildCtx, err := archive.TarWithOptions(basePath, &archive.TarOptions{})
+	buildCtx, err := archive.TarWithOptions(l.basePath, &archive.TarOptions{})
 	if err != nil {
 		return err
 	}
@@ -209,7 +209,7 @@ func (l *Docker) buildImage(ctx context.Context) error {
 			Context:    buildCtx,
 			Dockerfile: "Dockerfile",
 			Remove:     true,
-			Tags:       []string{"vault-plugin-secrets-eth2.0-from-code"},
+			Tags:       []string{l.imageName},
 		})
 	if err != nil {
 		return err
