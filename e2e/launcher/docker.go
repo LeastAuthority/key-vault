@@ -190,23 +190,17 @@ func (l *Docker) Stop(ctx context.Context, id string) error {
 
 // buildImage builds the test image
 func (l *Docker) buildImage(ctx context.Context) error {
-	fmt.Println("l.basePath", l.basePath)
-	fmt.Println("PWD", os.Getenv("PWD"))
 	buildCtx, err := archive.TarWithOptions(l.basePath, &archive.TarOptions{})
 	if err != nil {
 		return err
 	}
 
-	imageBuildResponse, err := l.client.ImageBuild(
-		ctx,
-		// dockerFileTarReader,
-		buildCtx,
-		types.ImageBuildOptions{
-			Context:    buildCtx,
-			Dockerfile: "Dockerfile",
-			Remove:     true,
-			Tags:       []string{l.imageName},
-		})
+	imageBuildResponse, err := l.client.ImageBuild(ctx, buildCtx, types.ImageBuildOptions{
+		Context:    buildCtx,
+		Dockerfile: "Dockerfile",
+		Remove:     true,
+		Tags:       []string{l.imageName},
+	})
 	if err != nil {
 		return err
 	}
