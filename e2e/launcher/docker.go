@@ -190,6 +190,7 @@ func (l *Docker) Stop(ctx context.Context, id string) error {
 
 // buildImage builds the test image
 func (l *Docker) buildImage(ctx context.Context) error {
+	fmt.Println("l.basePath", l.basePath)
 	buildCtx, err := archive.TarWithOptions(l.basePath, &archive.TarOptions{})
 	if err != nil {
 		return err
