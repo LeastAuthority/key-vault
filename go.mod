@@ -3,6 +3,7 @@ module github.com/bloxapp/vault-plugin-secrets-eth2.0
 go 1.14
 
 require (
+	github.com/Sirupsen/logrus v0.0.0-00010101000000-000000000000 // indirect
 	github.com/bloxapp/KeyVault v0.2.5
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1
@@ -13,6 +14,7 @@ require (
 	github.com/hashicorp/vault/api v1.0.4
 	github.com/hashicorp/vault/sdk v0.1.13
 	github.com/opencontainers/go-digest v1.0.0 // indirect
+	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/pborman/uuid v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/prysmaticlabs/prysm v0.3.10
@@ -31,3 +33,7 @@ replace github.com/ethereum/go-ethereum => github.com/prysmaticlabs/bazel-go-eth
 replace github.com/herumi/bls-eth-go-binary => github.com/herumi/bls-eth-go-binary v0.0.0-20200605082007-3a76b4c6c599
 
 replace github.com/prysmaticlabs/prysm => github.com/prysmaticlabs/prysm v1.0.0-alpha.10
+
+replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.6.0
+
+replace github.com/sirupsen/logrus => github.com/sirupsen/logrus v1.6.0

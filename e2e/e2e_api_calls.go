@@ -20,6 +20,8 @@ import (
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
 )
 
+var basePath = os.Getenv("GOPATH") + "/src/github.com/bloxapp/vault-plugin-secrets-eth2.0"
+
 // ServiceError represents service error type.
 type ServiceError struct {
 	Data map[string]interface{}

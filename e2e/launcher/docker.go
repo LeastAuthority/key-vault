@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -13,6 +15,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/go-connections/nat"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -49,6 +52,10 @@ func New(logger *logrus.Logger, imageName string) (*Docker, error) {
 
 // Launch implements launcher.Launcher interface by starting image using installed Docker service.
 func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
+	if err := l.buildImage(ctx); err != nil {
+		return nil, errors.Wrap(err, "failed to build image")
+	}
+
 	// Get available port
 	hostPort, err := getFreePort()
 	if err != nil {
@@ -180,6 +187,38 @@ func (l *Docker) Stop(ctx context.Context, id string) error {
 	// Stop container
 	if err := l.client.ContainerStop(ctx, id, nil); err != nil {
 		return errors.Wrap(err, "failed to stop container")
+	}
+
+	return nil
+}
+
+// buildImage builds the test image
+func (l *Docker) buildImage(ctx context.Context) error {
+	var basePath = os.Getenv("GOPATH") + "/src/github.com/bloxapp/vault-plugin-secrets-eth2.0"
+	fmt.Println("basePath", basePath)
+	buildCtx, err := archive.TarWithOptions(basePath, &archive.TarOptions{})
+	if err != nil {
+		return err
+	}
+
+	imageBuildResponse, err := l.client.ImageBuild(
+		ctx,
+		// dockerFileTarReader,
+		buildCtx,
+		types.ImageBuildOptions{
+			Context:    buildCtx,
+			Dockerfile: "Dockerfile",
+			Remove:     true,
+			Tags:       []string{"vault-plugin-secrets-eth2.0-from-code"},
+		})
+	if err != nil {
+		return err
+	}
+	defer imageBuildResponse.Body.Close()
+
+	_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
+	if err != nil {
+		return err
 	}
 
 	return nil
