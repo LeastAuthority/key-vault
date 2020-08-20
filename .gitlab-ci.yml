@@ -37,7 +37,7 @@ Run application for testing:
   tags:
     - blox-infra-stage
   script:
-    - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
+    - docker build --no-cache -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
     - docker images
     - printenv | grep DOCKER
 
