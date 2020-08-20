@@ -23,7 +23,7 @@ import (
 var (
 	dockerLauncher *launcher.Docker
 	// basePath       = os.Getenv("GOPATH") + "/src/github.com/bloxapp/vault-plugin-secrets-eth2.0"
-	basePath = os.Getenv("PWD") + "../"
+	basePath = os.Getenv("PWD") + "/../../"
 )
 
 // ServiceError represents service error type.
