@@ -3,7 +3,6 @@ module github.com/bloxapp/vault-plugin-secrets-eth2.0
 go 1.14
 
 require (
-	github.com/Sirupsen/logrus v0.0.0-00010101000000-000000000000 // indirect
 	github.com/bloxapp/KeyVault v0.2.5
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1
