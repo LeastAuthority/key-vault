@@ -26,7 +26,7 @@ func (l *Docker) inspectExecResp(ctx context.Context, containerID string, comman
 		return nil, errors.Wrap(err, "failed to create exec command")
 	}
 
-	resp, err := l.client.ContainerExecAttach(ctx, execData.ID, types.ExecConfig{})
+	resp, err := l.client.ContainerExecAttach(ctx, execData.ID, types.ExecStartCheck{})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to attach exec command")
 	}
