@@ -12,10 +12,16 @@ import (
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
 )
 
+// Endpoints patterns
+const (
+	// AccountsPattern is the path pattern for list accounts endpoint
+	AccountsPattern = "accounts/"
+)
+
 func accountsPaths(b *backend) []*framework.Path {
 	return []*framework.Path{
 		&framework.Path{
-			Pattern:         "accounts/",
+			Pattern:         AccountsPattern,
 			HelpSynopsis:    "List wallet accounts",
 			HelpDescription: ``,
 			Fields:          map[string]*framework.FieldSchema{},

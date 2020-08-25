@@ -16,10 +16,22 @@ import (
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
 )
 
+// Endpoints patterns
+const (
+	// SignAttestationPattern is the path pattern for sign attestation endpoint
+	SignAttestationPattern = "accounts/sign-attestation"
+
+	// SignProposalPattern is the path pattern for sign proposal endpoint
+	SignProposalPattern = "accounts/sign-proposal"
+
+	// SignAggregationPattern is the path pattern for sign aggregation endpoint
+	SignAggregationPattern = "accounts/sign-aggregation"
+)
+
 func signsPaths(b *backend) []*framework.Path {
 	return []*framework.Path{
 		&framework.Path{
-			Pattern:         "accounts/sign-attestation",
+			Pattern:         SignAttestationPattern,
 			HelpSynopsis:    "Sign attestation",
 			HelpDescription: `Sign attestation`,
 			Fields: map[string]*framework.FieldSchema{
@@ -80,7 +92,7 @@ func signsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:         "accounts/sign-proposal",
+			Pattern:         SignProposalPattern,
 			HelpSynopsis:    "Sign proposal",
 			HelpDescription: `Sign proposal`,
 			Fields: map[string]*framework.FieldSchema{
@@ -131,7 +143,7 @@ func signsPaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:         "accounts/sign-aggregation",
+			Pattern:         SignAggregationPattern,
 			HelpSynopsis:    "Sign aggregation",
 			HelpDescription: `Sign aggregation`,
 			Fields: map[string]*framework.FieldSchema{
