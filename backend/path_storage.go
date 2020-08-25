@@ -14,10 +14,16 @@ import (
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
 )
 
+// Endpoints patterns
+const (
+	// StoragePattern is the path pattern for storage endpoint
+	StoragePattern = "storage"
+)
+
 func storagePaths(b *backend) []*framework.Path {
 	return []*framework.Path{
 		&framework.Path{
-			Pattern:         "storage",
+			Pattern:         StoragePattern,
 			HelpSynopsis:    "Update storage",
 			HelpDescription: `Manage KeyVault storage`,
 			Fields: map[string]*framework.FieldSchema{

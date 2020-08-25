@@ -15,10 +15,11 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pborman/uuid v1.2.0
 	github.com/pkg/errors v0.9.1
+	github.com/prysmaticlabs/ethereumapis v0.0.0-20200608211251-7dafd77461b5
 	github.com/prysmaticlabs/prysm v0.3.10
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1
-	github.com/wealdtech/eth2-signer-api v1.3.0
+	github.com/wealdtech/eth2-signer-api v1.5.2
 	github.com/wealdtech/go-eth2-types/v2 v2.5.0
 	github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4 v1.1.0
 	github.com/wealdtech/go-eth2-wallet-types/v2 v2.6.0

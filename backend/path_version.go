@@ -7,10 +7,16 @@ import (
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
+// Endpoints patterns
+const (
+	// VersionPattern is the path pattern for version endpoint
+	VersionPattern = "version"
+)
+
 func versionPaths(b *backend) []*framework.Path {
 	return []*framework.Path{
 		&framework.Path{
-			Pattern:         "version",
+			Pattern:         VersionPattern,
 			HelpSynopsis:    "Shows app version",
 			HelpDescription: ``,
 			Fields:          map[string]*framework.FieldSchema{},
