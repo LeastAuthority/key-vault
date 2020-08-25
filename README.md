@@ -106,7 +106,6 @@ In order to run all tests including e2e ones you will need to do the following c
 ```bash
 $ make test
 ``` 
-It will build the image based on the current codebase and will run tests.
 
 New e2e tests should be placed in `./e2e/tests` directory and implement `E2E` interface.
 Use the current format to add new tests. 

@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -13,9 +15,9 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/go-connections/nat"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 // Config contains configuration of validator service instance.
@@ -29,11 +31,11 @@ type Config struct {
 type Docker struct {
 	client    *client.Client
 	imageName string
-	logger    *logrus.Logger
+	basePath  string
 }
 
 // New is the constructor of dockerLauncher
-func New(logger *logrus.Logger, imageName string) (*Docker, error) {
+func New(imageName, basePath string) (*Docker, error) {
 	// Create a new client
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -43,12 +45,16 @@ func New(logger *logrus.Logger, imageName string) (*Docker, error) {
 	return &Docker{
 		client:    cli,
 		imageName: imageName,
-		logger:    logger,
+		basePath:  basePath,
 	}, nil
 }
 
 // Launch implements launcher.Launcher interface by starting image using installed Docker service.
 func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
+	if err := l.buildImage(ctx); err != nil {
+		return nil, errors.Wrap(err, "failed to build image")
+	}
+
 	// Get available port
 	hostPort, err := getFreePort()
 	if err != nil {
@@ -89,7 +95,6 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 	if err := l.client.ContainerStart(ctx, cont.ID, types.ContainerStartOptions{}); err != nil {
 		return nil, errors.Wrap(err, "failed to start container")
 	}
-	l.logger.WithField("container_id", cont.ID).Info("Container is started")
 
 	// Retrieve container config
 	containerConfig, err := l.client.ContainerInspect(ctx, cont.ID)
@@ -140,14 +145,12 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 				l.Stop(ctx, cont.ID)
 				return nil, errors.Wrap(err, "failed to read from logs stream")
 			}
-			l.logger.Info(string(dat))
 
 			dta := strings.ToLower(string(dat))
 			if strings.Contains(dta, "connection refused") {
 				l.Stop(ctx, cont.ID)
 				return nil, errors.Errorf("failed to launch instance: %s", string(dat))
 			} else if strings.Contains(dta, "core: successfully reloaded plugin: plugin=ethsign path=ethereum") {
-				l.logger.Info("plugin successfully loaded")
 				loaded = true
 				break
 			}
@@ -180,6 +183,32 @@ func (l *Docker) Stop(ctx context.Context, id string) error {
 	// Stop container
 	if err := l.client.ContainerStop(ctx, id, nil); err != nil {
 		return errors.Wrap(err, "failed to stop container")
+	}
+
+	return nil
+}
+
+// buildImage builds the test image
+func (l *Docker) buildImage(ctx context.Context) error {
+	buildCtx, err := archive.TarWithOptions(l.basePath, &archive.TarOptions{})
+	if err != nil {
+		return err
+	}
+
+	imageBuildResponse, err := l.client.ImageBuild(ctx, buildCtx, types.ImageBuildOptions{
+		Context:    buildCtx,
+		Dockerfile: "Dockerfile",
+		Remove:     true,
+		Tags:       []string{l.imageName},
+	})
+	if err != nil {
+		return err
+	}
+	defer imageBuildResponse.Body.Close()
+
+	_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
+	if err != nil {
+		return err
 	}
 
 	return nil

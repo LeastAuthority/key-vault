@@ -45,20 +45,20 @@ func (e *HTTPRequestError) String() string {
 
 // GenericError represents the generic error of keymanager.
 type GenericError struct {
-	Err error `json:"err"`
+	ErrorMsg string `json:"error"`
 }
 
 // NewGenericError is the constructor of GenericError.
 func NewGenericError(err error, desc string, args ...interface{}) *GenericError {
 	return &GenericError{
-		Err: errors.Wrapf(err, desc, args...),
+		ErrorMsg: errors.Wrapf(err, desc, args...).Error(),
 	}
 }
 
 // NewGenericErrorWithMessage is the constructor of GenericError.
 func NewGenericErrorWithMessage(msg string) *GenericError {
 	return &GenericError{
-		Err: errors.New(msg),
+		ErrorMsg: msg,
 	}
 }
 

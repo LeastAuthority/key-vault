@@ -1,6 +1,5 @@
 stages:
   - lint
-  - pre-test
   - test
   - build
   - deploy
@@ -32,15 +31,6 @@ Run linter:
     - go get -u golang.org/x/tools/cmd/goimports
     - ./scripts/lint.sh .
 
-Run application for testing:
-  stage: pre-test
-  tags:
-    - blox-infra-stage
-  script:
-    - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
-    - docker images
-    - printenv | grep DOCKER
-
 Run tests of the application:
   stage: test
   image: golang:1.14-stretch
@@ -49,9 +39,7 @@ Run tests of the application:
   tags:
     - blox-infra-stage
   script:
-    - export VAULT_PLUGIN_IMAGE="$IMAGE_NAME:$CI_BUILD_REF"
-    - go get -t
-    - go test -cover -race -p 1 ./...
+    - DOCKER_API_VERSION=1.39 go test -cover -race -p 1 ./...
 
 Build stage Docker image:
   stage: build

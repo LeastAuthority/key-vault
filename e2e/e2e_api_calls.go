@@ -7,17 +7,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"testing"
 
 	"github.com/bloxapp/KeyVault/core"
 	"github.com/pborman/uuid"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/launcher"
 	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
+)
+
+var (
+	dockerLauncher *launcher.Docker
+	// basePath       = os.Getenv("GOPATH") + "/src/github.com/bloxapp/vault-plugin-secrets-eth2.0"
+	basePath = os.Getenv("PWD") + "/../../"
 )
 
 // ServiceError represents service error type.
@@ -47,6 +53,14 @@ func (e *ServiceError) DataValue(field string) interface{} {
 	return e.Data["data"].(map[string]interface{})[field]
 }
 
+func init() {
+	var err error
+	imageName := "vault-plugin-secrets-eth20:" + uuid.New()
+	if dockerLauncher, err = launcher.New(imageName, basePath); err != nil {
+		log.Fatal(err)
+	}
+}
+
 // BaseSetup implements mechanism, to setup base env for e2e tests.
 type BaseSetup struct {
 	WorkingDir string
@@ -54,16 +68,8 @@ type BaseSetup struct {
 	baseURL    string
 }
 
-// SetupE2EEnv sets up environment for e2e tests
-func SetupE2EEnv(t *testing.T) *BaseSetup {
-	imageName := "vault-plugin-secrets-eth20_vault:latest"
-	if envImageName := os.Getenv("VAULT_PLUGIN_IMAGE"); len(envImageName) > 0 {
-		imageName = envImageName
-	}
-
-	dockerLauncher, err := launcher.New(logrus.New(), imageName)
-	require.NoError(t, err)
-
+// Setup sets up environment for e2e tests
+func Setup(t *testing.T) *BaseSetup {
 	conf, err := dockerLauncher.Launch(context.Background(), uuid.New())
 	require.NoError(t, err)
 	t.Cleanup(func() {
