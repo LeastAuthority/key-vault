@@ -1,29 +1,29 @@
 package httpex
 
 import (
-	"net"
 	"net/http"
 	"time"
+
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 // Default configuration of HTTP client.
 const (
-	dealTimeout         = time.Minute
-	tlsHandshakeTimeout = time.Minute
-	clientTimeout       = time.Minute
+	attempts        = 3
+	attemptsWaitMin = time.Second / 3
+	attemptsWaitMax = time.Second
+	clientTimeout   = time.Minute
 )
 
 // CreateClient creates a new HTTP client.
 func CreateClient() *http.Client {
-	netTransport := &http.Transport{
-		Dial: (&net.Dialer{
-			Timeout: dealTimeout,
-		}).Dial,
-		TLSHandshakeTimeout: tlsHandshakeTimeout,
-	}
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = attempts
+	retryClient.RetryWaitMin = attemptsWaitMin
+	retryClient.RetryWaitMax = attemptsWaitMax
 
-	return &http.Client{
-		Timeout:   clientTimeout,
-		Transport: netTransport,
-	}
+	client := retryClient.StandardClient()
+	client.Timeout = clientTimeout
+
+	return client
 }
