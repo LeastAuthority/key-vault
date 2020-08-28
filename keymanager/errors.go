@@ -2,6 +2,7 @@ package keymanager
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/pkg/errors"
@@ -52,6 +53,13 @@ type GenericError struct {
 func NewGenericError(err error, desc string, args ...interface{}) *GenericError {
 	return &GenericError{
 		ErrorMsg: errors.Wrapf(err, desc, args...).Error(),
+	}
+}
+
+// NewGenericErrorMessage is the constructor of GenericError.
+func NewGenericErrorMessage(desc string, args ...interface{}) *GenericError {
+	return &GenericError{
+		ErrorMsg: fmt.Sprintf(desc, args...),
 	}
 }
 
