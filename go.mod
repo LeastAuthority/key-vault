@@ -1,4 +1,4 @@
-module github.com/bloxapp/vault-plugin-secrets-eth2.0
+module github.com/bloxapp/key-vault
 
 go 1.14
 

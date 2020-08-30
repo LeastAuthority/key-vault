@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
+	"github.com/bloxapp/key-vault/backend/store"
 )
 
 func _byteArray(input string) []byte {

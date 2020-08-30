@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 	v1 "github.com/wealdtech/eth2-signer-api/pb/v1"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
+	"github.com/bloxapp/key-vault/backend/store"
 )
 
 // Endpoints patterns

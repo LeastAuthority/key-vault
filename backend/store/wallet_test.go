@@ -8,7 +8,7 @@ import (
 	"github.com/bloxapp/KeyVault/stores"
 	"github.com/hashicorp/vault/sdk/logical"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
+	"github.com/bloxapp/key-vault/backend/store"
 )
 
 func getStorage() logical.Storage {

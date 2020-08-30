@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
+	"github.com/bloxapp/key-vault/backend/store"
 )
 
 // Endpoints patterns

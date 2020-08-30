@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 	v1 "github.com/wealdtech/eth2-signer-api/pb/v1"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
+	"github.com/bloxapp/key-vault/e2e"
+	"github.com/bloxapp/key-vault/e2e/shared"
 )
 
 // AttestationSigning tests sign attestation endpoint.

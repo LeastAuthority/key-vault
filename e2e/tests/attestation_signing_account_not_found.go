@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
+	"github.com/bloxapp/key-vault/e2e"
 )
 
 // AttestationSigningAccountNotFound tests sign attestation when account not found
