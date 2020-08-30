@@ -12,17 +12,17 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bloxapp/KeyVault/core"
+	"github.com/bloxapp/eth-key-manager/core"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/launcher"
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
+	"github.com/bloxapp/key-vault/e2e/launcher"
+	"github.com/bloxapp/key-vault/e2e/shared"
 )
 
 var (
 	dockerLauncher *launcher.Docker
-	// basePath       = os.Getenv("GOPATH") + "/src/github.com/bloxapp/vault-plugin-secrets-eth2.0"
+	// basePath       = os.Getenv("GOPATH") + "/src/github.com/bloxapp/key-vault"
 	basePath = os.Getenv("PWD") + "/../../"
 )
 

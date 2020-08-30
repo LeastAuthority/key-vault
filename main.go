@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/vault/api"
 	"github.com/hashicorp/vault/sdk/plugin"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend"
+	"github.com/bloxapp/key-vault/backend"
 )
 
 // Version contains the current version of app binary.

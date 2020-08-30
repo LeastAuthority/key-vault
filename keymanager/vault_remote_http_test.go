@@ -18,8 +18,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/keymanager"
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/utils/endpoint"
+	"github.com/bloxapp/key-vault/keymanager"
+	"github.com/bloxapp/key-vault/utils/endpoint"
 )
 
 const (

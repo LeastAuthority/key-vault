@@ -12,9 +12,9 @@ import (
 	"github.com/prysmaticlabs/prysm/shared/bytesutil"
 	"github.com/sirupsen/logrus"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend"
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/utils/endpoint"
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/utils/httpex"
+	"github.com/bloxapp/key-vault/backend"
+	"github.com/bloxapp/key-vault/utils/endpoint"
+	"github.com/bloxapp/key-vault/utils/httpex"
 )
 
 // Signing endpoints

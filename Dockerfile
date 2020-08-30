@@ -11,7 +11,7 @@ RUN apt-get update                                                        && \
 RUN go version
 RUN python --version
 
-WORKDIR /go/src/github.com/bloxapp/vault-plugin-secrets-eth2.0/
+WORKDIR /go/src/github.com/bloxapp/key-vault/
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
@@ -37,7 +37,7 @@ RUN apk -v --update --no-cache add \
 
 WORKDIR /vault/plugins/
 
-COPY --from=builder /go/src/github.com/bloxapp/vault-plugin-secrets-eth2.0/ethsign ./ethsign
+COPY --from=builder /go/src/github.com/bloxapp/key-vault/ethsign ./ethsign
 COPY ./config/vault-config.json /vault/config/vault-config.json
 COPY ./config/entrypoint.sh /vault/config/entrypoint.sh
 COPY ./config/vault-init.sh /vault/config/vault-init.sh

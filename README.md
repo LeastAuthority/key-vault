@@ -1,4 +1,4 @@
-# vault-plugin-secrets-eth2.0
+# key-vault
 
 ## How to use this project?
 

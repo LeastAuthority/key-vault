@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e"
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/e2e/shared"
+	"github.com/bloxapp/key-vault/e2e"
+	"github.com/bloxapp/key-vault/e2e/shared"
 )
 
 // AttestationDoubleSigning tests double signing case

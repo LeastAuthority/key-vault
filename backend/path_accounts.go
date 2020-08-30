@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/hex"
 
-	vault "github.com/bloxapp/KeyVault"
+	vault "github.com/bloxapp/eth-key-manager"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
 
-	"github.com/bloxapp/vault-plugin-secrets-eth2.0/backend/store"
+	"github.com/bloxapp/key-vault/backend/store"
 )
 
 // Endpoints patterns

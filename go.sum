@@ -104,6 +104,8 @@ github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6r
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
 github.com/bloxapp/KeyVault v0.2.5 h1:6fEVGQGB/kJHH+QQ6jmorS8VbC9AZ4Osca45tnZZjdM=
 github.com/bloxapp/KeyVault v0.2.5/go.mod h1:Y7dx8BJ52KQsCX0DpJ1ystz7BIs/o5+4eCzvEOVCKwM=
+github.com/bloxapp/eth-key-manager v0.2.6 h1:x6WZERSwdTOvZQrmagSg34Bnh8kDpik885DBGi48E2w=
+github.com/bloxapp/eth-key-manager v0.2.6/go.mod h1:mog6Peh4Qcm2tLikLJp+BSTKNi54dMPDWRlbwqqN5Mg=
 github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40/go.mod h1:8rLXio+WjiTceGBHIoTvn60HIbs7Hm7bcHjyrSqYB9c=
 github.com/boltdb/bolt v1.3.1/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=
 github.com/bradfitz/go-smtpd v0.0.0-20170404230938-deb6d6237625/go.mod h1:HYsPBTaaSFSlLx/70C2HPIMNZpVV8+vt/A+FMnYP11g=
