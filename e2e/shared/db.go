@@ -3,9 +3,9 @@ package shared
 import (
 	"testing"
 
-	"github.com/bloxapp/KeyVault/core"
-	"github.com/bloxapp/KeyVault/stores/in_memory"
-	"github.com/bloxapp/KeyVault/wallet_hd"
+	"github.com/bloxapp/eth-key-manager/core"
+	"github.com/bloxapp/eth-key-manager/stores/in_memory"
+	"github.com/bloxapp/eth-key-manager/wallet_hd"
 	"github.com/stretchr/testify/require"
 	types "github.com/wealdtech/go-eth2-types/v2"
 )

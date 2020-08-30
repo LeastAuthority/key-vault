@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/bloxapp/KeyVault/core"
-	"github.com/bloxapp/KeyVault/stores"
+	"github.com/bloxapp/eth-key-manager/core"
+	"github.com/bloxapp/eth-key-manager/stores"
 	"github.com/hashicorp/vault/sdk/logical"
 
 	"github.com/bloxapp/key-vault/backend/store"

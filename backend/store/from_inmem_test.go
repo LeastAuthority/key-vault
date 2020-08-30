@@ -5,9 +5,9 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/bloxapp/KeyVault"
-	"github.com/bloxapp/KeyVault/core"
-	"github.com/bloxapp/KeyVault/stores/in_memory"
+	ethkeymanager "github.com/bloxapp/eth-key-manager"
+	"github.com/bloxapp/eth-key-manager/core"
+	"github.com/bloxapp/eth-key-manager/stores/in_memory"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/stretchr/testify/require"
 	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
@@ -25,12 +25,12 @@ func baseKeyVault(seed []byte, acc1Name string, acc2Name string, t *testing.T) (
 	inMemStore := in_memory.NewInMemStore()
 	// seed
 	// create keyvault in a normal in mem store
-	options := &KeyVault.KeyVaultOptions{}
+	options := &ethkeymanager.KeyVaultOptions{}
 	options.SetStorage(inMemStore)
 	options.SetSeed(seed)
 	options.SetEncryptor(keystorev4.New())
 	options.SetPassword("password")
-	kv, err := KeyVault.NewKeyVault(options)
+	kv, err := ethkeymanager.NewKeyVault(options)
 	require.NoError(t, err)
 	require.NotNil(t, kv)
 	// get wallet and accounts to compare

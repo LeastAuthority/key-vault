@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/bloxapp/KeyVault/core"
+	"github.com/bloxapp/eth-key-manager/core"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
 	e2types "github.com/wealdtech/go-eth2-types/v2"

@@ -5,10 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/bloxapp/KeyVault/stores/in_memory"
-
-	"github.com/bloxapp/KeyVault/core"
-	"github.com/bloxapp/KeyVault/wallet_hd"
+	"github.com/bloxapp/eth-key-manager/core"
+	"github.com/bloxapp/eth-key-manager/stores/in_memory"
+	"github.com/bloxapp/eth-key-manager/wallet_hd"
 	"github.com/google/uuid"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"

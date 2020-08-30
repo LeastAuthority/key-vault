@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
-	"github.com/bloxapp/KeyVault"
-	"github.com/bloxapp/KeyVault/stores/in_memory"
+	vault "github.com/bloxapp/eth-key-manager"
+	"github.com/bloxapp/eth-key-manager/stores/in_memory"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
@@ -41,7 +41,7 @@ func storagePaths(b *backend) []*framework.Path {
 }
 
 func (b *backend) pathStorageUpdate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
-	KeyVault.InitCrypto()
+	vault.InitCrypto()
 
 	storage := data.Get("data").(string)
 	storageBytes, err := hex.DecodeString(storage)
