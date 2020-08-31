@@ -20,6 +20,13 @@ variables:
   APP_REPLICAS_INFRA_STAGE: "1"
   ECRLOGIN_INFRA_STAGE: "aws ecr get-login --registry-ids $ACCOUNT_ID_INFRA_STAGE --region $AWS_REGION_INFRA_STAGE --no-include-email"
 
+  #PRODUCTION
+  ACCOUNT_ID_INFRA_PROD: 764289642555
+  AWS_REGION_INFRA_PROD: "us-west-2"
+  DOCKER_REPO_INFRA_PROD: $ACCOUNT_ID_INFRA_PROD.dkr.ecr.$AWS_REGION_INFRA_PROD.amazonaws.com/$IMAGE_NAME
+  APP_REPLICAS_INFRA_PROD: "1"
+  ECRLOGIN_INFRA_PROD: "aws ecr get-login --registry-ids $ACCOUNT_ID_INFRA_PROD --region $AWS_REGION_INFRA_PROD --no-include-email"
+
 #blox-infra-stage
 Run linter:
   stage: lint
@@ -63,3 +70,48 @@ Deploy to blox-infra-stage cluster:
     - .k8/scripts/deploy-yamls-on-k8s.sh $DOCKER_REPO_INFRA_STAGE $CI_BUILD_REF validators $APP_REPLICAS_INFRA_STAGE blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION
   only:
     - stage
+
+
+#blox-infra-prod
+Run linter:
+  stage: lint
+  image: golang:1.14-stretch
+  tags:
+    - blox-infra-prod
+  script:
+    - go get -u golang.org/x/lint/golint
+    - go get -u golang.org/x/tools/cmd/goimports
+    - ./scripts/lint.sh .
+
+Run tests of the application:
+  stage: test
+  image: golang:1.14-stretch
+  services:
+    - docker:dind
+  tags:
+    - blox-infra-prod
+  script:
+    - DOCKER_API_VERSION=1.39 go test -cover -race -p 1 ./...
+
+Build stage Docker image:
+  stage: build
+  tags:
+    - blox-infra-prod
+  script:
+    - docker build -t $IMAGE_NAME:$CI_BUILD_REF -f Dockerfile .
+    - DOCKER_LOGIN_TO_INFRA_PROD_REPO=`$ECRLOGIN_INFRA_PROD`
+    - docker tag $IMAGE_NAME:$CI_BUILD_REF $DOCKER_REPO_INFRA_PROD:$CI_BUILD_REF
+    - $DOCKER_LOGIN_TO_INFRA_PROD_REPO && docker push $DOCKER_REPO_INFRA_PROD:$CI_BUILD_REF
+  only:
+    - master 
+
+Deploy to blox-infra-prod cluster:
+  stage: deploy
+  tags:
+    - blox-infra-prod
+  script:
+    - apk add bash
+    - export K8S_API_VERSION=$INFRA_PROD_K8_API_VERSION
+    - .k8/scripts/deploy-yamls-on-k8s.sh $DOCKER_REPO_INFRA_PROD $CI_BUILD_REF validators $APP_REPLICAS_INFRA_PROD blox-infra-prod kubernetes-admin@blox-infra-prod k8.prod.bloxinternal.com $K8S_API_VERSION
+  only:
+    - master
