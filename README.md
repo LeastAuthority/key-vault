@@ -272,3 +272,9 @@ $ make test
 
 New e2e tests should be placed in `./e2e/tests` directory and implement `E2E` interface.
 Use the current format to add new tests. 
+
+
+## Release Version
+
+versions are published to dockerhub based on tags.
+before publishing a tag update docker compose image to the to be pushed tag 
