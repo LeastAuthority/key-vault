@@ -123,7 +123,7 @@ func (b *backend) pathSlashingStorageUpdate(ctx context.Context, req *logical.Re
 	// HEX decode slashing history
 	slashingHistoryBytes, err := hex.DecodeString(slashingData)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to HEX decode slashing storage")
+		return b.badRequestResponse(errors.Wrap(err, "failed to HEX decode slashing storage").Error())
 	}
 
 	// JSON unmarshal slashing history
@@ -132,7 +132,7 @@ func (b *backend) pathSlashingStorageUpdate(ctx context.Context, req *logical.Re
 		Proposals    []*core.BeaconBlockHeader `json:"proposals"`
 	}
 	if err := json.Unmarshal(slashingHistoryBytes, &slashingHistory); err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal slashing history")
+		return b.badRequestResponse(errors.Wrap(err, "failed to unmarshal slashing history").Error())
 	}
 
 	// Store attestation history

@@ -69,3 +69,12 @@ func (b *backend) notFoundResponse() (*logical.Response, error) {
 		},
 	}, nil, http.StatusNotFound)
 }
+
+func (b *backend) badRequestResponse(msg string) (*logical.Response, error) {
+	return logical.RespondWithStatusCode(&logical.Response{
+		Data: map[string]interface{}{
+			"message":     msg,
+			"status_code": http.StatusBadRequest,
+		},
+	}, nil, http.StatusBadRequest)
+}
