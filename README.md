@@ -20,21 +20,6 @@
         $ docker-compose exec -T vault cat /data/keys/vault.root.token
         ```
 
-  4. Initialize the server
- 
-        ```sh
-        $ vault operator init
-        ```
-
-  5. Now we need to unseal the server. A sealed server can't accept any requests. Since vault was initialized with 5 key
-  shares and requires a minimum of 3 keys to reconstruct master key, we need to send 3 unseal requests with these
-  3 keys. After 3 unseal keys are provided, Sealed in the server status turns to false, and the server is ready to be
-  further configured.
- 
-        ```sh
-        $ vault operator unseal
-        ```
-
 ## Access Policies
 The plugin's endpoint paths are designed such that admin-level access policies vs. signer-level access policies can be easily separated.
 
