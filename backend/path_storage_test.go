@@ -11,7 +11,6 @@ import (
 	"github.com/bloxapp/eth-key-manager/wallet_hd"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/stretchr/testify/require"
-	types "github.com/wealdtech/go-eth2-types/v2"
 
 	"github.com/bloxapp/key-vault/backend/store"
 )
@@ -22,8 +21,6 @@ func _byteArray(input string) []byte {
 }
 
 func baseInmemStorage() (*in_memory.InMemStore, error) {
-	types.InitBLS()
-
 	inMemStore := in_memory.NewInMemStore()
 
 	// wallet
@@ -55,8 +52,6 @@ func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (
 }
 
 func TestStorage(t *testing.T) {
-	require.NoError(t, types.InitBLS())
-
 	b, _ := getBackend(t)
 	inMemStore, err := baseInmemStorage()
 	require.NoError(t, err)

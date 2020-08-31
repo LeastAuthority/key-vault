@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	vault "github.com/bloxapp/eth-key-manager"
 	"github.com/hashicorp/vault/api"
 	"github.com/hashicorp/vault/sdk/plugin"
 
@@ -13,6 +14,11 @@ import (
 // Version contains the current version of app binary.
 // Basically, this is the commit hash
 var Version = "latest"
+
+func init() {
+	// This is needed for signing methods
+	vault.InitCrypto()
+}
 
 func main() {
 	apiClientMeta := &api.PluginAPIClientMeta{}
