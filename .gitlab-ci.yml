@@ -77,7 +77,7 @@ Deploy to blox-infra-stage cluster:
 
 
 #blox-infra-prod
-Run linter:
+Run prod linter:
   stage: lint
   image: golang:1.14-stretch
   tags:
@@ -89,7 +89,7 @@ Run linter:
   only:
     - master
 
-Run tests of the application:
+Run prod tests of the application:
   stage: test
   image: golang:1.14-stretch
   services:
@@ -101,7 +101,7 @@ Run tests of the application:
   only:
     - master
 
-Build stage Docker image:
+Build prod Docker image:
   stage: build
   tags:
     - blox-infra-prod
