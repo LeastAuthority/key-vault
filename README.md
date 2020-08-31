@@ -20,6 +20,184 @@
         $ docker-compose exec -T vault cat /data/keys/vault.root.token
         ```
 
+## Endpoints 
+
+
+### LIST ACCOUNTS
+
+This endpoint will list all accounts of key-vault.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `LIST`  | `:mount-path/accounts`  | `200 application/json` |
+
+
+#### Sample Response
+
+The example below shows output for a query path of `/ethereum/accounts` when there is 1 account.
+
+```
+{
+    "request_id": "489790dc-b4bd-54e5-be6e-95a894ffc48c",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "accounts": [
+            {
+                "id": "9676ef06-d238-49f3-ab50-b3fe9930db0f",
+                "name": "account-0",
+                "validationPubKey": "8a5df36be5f89f9fe19cabadcbb17babc8c518bcd7fe0095c89f83915ea943343fa7dd3c26d8fb6096bce11fbc1ec7d3",
+                "withdrawalPubKey": "887abb059075160ce2556a8bfef745898ee3a11b2b6521b09077d422c164929dea277ac8afcacd5b6d729198238f8f6c"
+            }
+        ]
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}
+```
+
+### UPDATE STORAGE
+
+This endpoint will update the storage.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `POST`  | `:mount-path/storage`  | `200 application/json` |
+
+
+#### Sample Response
+
+The example below shows output for a query path of `/ethereum/storage`.
+
+```
+{
+    {
+        "request_id": "d53d5075-6a3b-2642-ffde-0714beb595f5",
+        "lease_id": "",
+        "renewable": false,
+        "lease_duration": 0,
+        "data": {
+            "status": true
+        },
+        "wrap_info": null,
+        "warnings": null,
+        "auth": null
+    }
+}
+```
+
+
+### SIGN ATTESTATION
+
+This endpoint will sign attestation for specific account at a path.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `POST`  | `:mount-path/accounts/sign-attestation`  | `200 application/json` |
+
+#### Parameters
+
+* `public_key` (`string: <required>`) - Specifies the public key of the account to sign.
+* `domain` (`string: <required>`) - Specifies the domain.
+* `slot` (`int: <required>`) - Specifies the slot.
+* `committeeIndex` (`int: <required>`) - Specifies the committeeIndex.
+* `beaconBlockRoot` (`string: <required>`) - Specifies the beaconBlockRoot.
+* `sourceEpoch` (`int: <required>`) - Specifies the sourceEpoch.
+* `sourceRoot` (`string: <required>`) - Specifies the sourceRoot.
+* `targetEpoch` (`int: <required>`) - Specifies the targetEpoch.
+* `targetRoot` (`string: <required>`) - Specifies the targetRoot.
+
+#### Sample Response
+
+The example below shows output for the successful sign of `/ethereum/accounts/account1/sign-attestation`.
+
+```
+{
+    "request_id": "b767dcca-5b10-4a52-1d9a-0a9b81b378ae",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "signature": "kEEOMxNkouz7EOSULfrG6hXzZbIOvRCVVK+lfBofj3U49/PHm7YHji8ac9Gf9vgEFVEmbPp+lhO3OpAElt3yaBajTKaJBWocgXuv64Ojq44tfxLJo6jrzMU5yoP78dYW"
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}
+```
+
+### SIGN PROPOSAL
+
+This endpoint will sign attestation for specific account at a path.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `POST`  | `:mount-path/accounts/sign-proposal`  | `200 application/json` |
+
+#### Parameters
+
+* `public_key` (`string: <required>`) - Specifies the public key of the account to sign.
+* `domain` (`string: <required>`) - Specifies the domain.
+* `slot` (`int: <required>`) - Specifies the slot.
+* `proposerIndex` (`int: <required>`) - Specifies the proposerIndex.
+* `parentRoot` (`string: <required>`) - Specifies the parentRoot.
+* `stateRoot` (`string: <required>`) - Specifies the stateRoot.
+* `bodyRoot` (`string: <required>`) - Specifies the bodyRoot.
+
+#### Sample Response
+
+The example below shows output for the successful sign of `/ethereum/accounts/account1/sign-proposal`.
+
+```
+{
+    "request_id": "b767dcca-5b10-4a52-1d9a-0a9b81b378ae",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "signature": "kPyCp8ID44ceUB3KSp+7QsxqTlGSP2u6/cytr04qJyxkkIKIO/FW57qwH9E7/c48D1PgHsyb8hgoT8/jOLMD7Y/Jt06Qiw80ZRtoS78CzMFYRut/OQot+FzAJcW7Jk0U"
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}
+```
+
+### SIGN AGGREGATION
+
+This endpoint will sign attestation for specific account at a path.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `POST`  | `:mount-path/accounts/sign-aggregation`  | `200 application/json` |
+
+#### Parameters
+
+* `public_key` (`string: <required>`) - Specifies the public key of the account to sign.
+* `domain` (`string: <required>`) - Specifies the domain.
+* `dataToSign` (`string: <required>`) - Specifies the slot.
+
+#### Sample Response
+
+The example below shows output for the successful creation of `/ethereum/accounts/account1/sign-aggregation`.
+
+```
+{
+    "request_id": "b767dcca-5b10-4a52-1d9a-0a9b81b378ae",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "signature": "kPyCp8ID44ceUB3KSp+7QsxqTlGSP2u6/cytr04qJyxkkIKIO/FW57qwH9E7/c48D1PgHsyb8hgoT8/jOLMD7Y/Jt06Qiw80ZRtoS78CzMFYRut/OQot+FzAJcW7Jk0U"
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}
+```
+
 ## Access Policies
 The plugin's endpoint paths are designed such that admin-level access policies vs. signer-level access policies can be easily separated.
 
