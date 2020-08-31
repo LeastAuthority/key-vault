@@ -10,7 +10,7 @@ services:
 variables:
 
   #GLOBAL
-  IMAGE_NAME: vault-plugin-secrets
+  IMAGE_NAME: key-vault
   REPLICAS: "1"
 
   #STAGE

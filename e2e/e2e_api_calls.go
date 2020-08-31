@@ -55,7 +55,7 @@ func (e *ServiceError) DataValue(field string) interface{} {
 
 func init() {
 	var err error
-	imageName := "vault-plugin-secrets-eth20:" + uuid.New()
+	imageName := "key-vault:" + uuid.New()
 	if dockerLauncher, err = launcher.New(imageName, basePath); err != nil {
 		log.Fatal(err)
 	}
