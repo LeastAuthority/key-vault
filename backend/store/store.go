@@ -66,7 +66,7 @@ func FromInMemoryStore(ctx context.Context, inMem *in_memory.InMemStore, storage
 	// get new store
 	newStore := NewHashicorpVaultStore(ctx, storage)
 
-	// save wallet
+	// Save wallet
 	wallet, err := inMem.OpenWallet()
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func FromInMemoryStore(ctx context.Context, inMem *in_memory.InMemStore, storage
 		return nil, err
 	}
 
-	// save accounts
+	// Save accounts
 	for acc := range wallet.Accounts() {
 		err = newStore.SaveAccount(acc)
 		if err != nil {

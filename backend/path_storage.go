@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 
 	vault "github.com/bloxapp/eth-key-manager"
 	"github.com/bloxapp/eth-key-manager/core"
@@ -22,8 +23,14 @@ const (
 	StoragePattern = "storage"
 
 	// SlashingStoragePattern is the path pattern for slashing storage endpoint
-	SlashingStoragePattern = "storage/slashing"
+	SlashingStoragePattern = "storage/%s/slashing"
 )
+
+// SlashingHistory contains slashing history data.
+type SlashingHistory struct {
+	Attestations []*core.BeaconAttestation `json:"attestations"`
+	Proposals    []*core.BeaconBlockHeader `json:"proposals"`
+}
 
 func storagePaths(b *backend) []*framework.Path {
 	return []*framework.Path{
@@ -43,7 +50,7 @@ func storagePaths(b *backend) []*framework.Path {
 			},
 		},
 		&framework.Path{
-			Pattern:         SlashingStoragePattern,
+			Pattern:         fmt.Sprintf(SlashingStoragePattern, framework.GenericNameRegex("public_key")),
 			HelpSynopsis:    "Update slashing storage",
 			HelpDescription: `Manage KeyVault slashing storage`,
 			Fields: map[string]*framework.FieldSchema{
@@ -60,6 +67,7 @@ func storagePaths(b *backend) []*framework.Path {
 			ExistenceCheck: b.pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
 				logical.CreateOperation: b.pathSlashingStorageUpdate,
+				logical.ReadOperation:   b.pathSlashingStorageRead,
 			},
 		},
 	}
@@ -127,10 +135,7 @@ func (b *backend) pathSlashingStorageUpdate(ctx context.Context, req *logical.Re
 	}
 
 	// JSON unmarshal slashing history
-	var slashingHistory struct {
-		Attestations []*core.BeaconAttestation `json:"attestations"`
-		Proposals    []*core.BeaconBlockHeader `json:"proposals"`
-	}
+	var slashingHistory SlashingHistory
 	if err := json.Unmarshal(slashingHistoryBytes, &slashingHistory); err != nil {
 		return b.badRequestResponse(errors.Wrap(err, "failed to unmarshal slashing history").Error())
 	}
@@ -154,6 +159,59 @@ func (b *backend) pathSlashingStorageUpdate(ctx context.Context, req *logical.Re
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"status": true,
+		},
+	}, nil
+}
+
+func (b *backend) pathSlashingStorageRead(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	// bring up KeyVault and wallet
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
+	options := vault.KeyVaultOptions{}
+	options.SetStorage(storage)
+
+	// Get request payload
+	publicKey := data.Get("public_key").(string)
+
+	// Open wallet
+	kv, err := vault.OpenKeyVault(&options)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open key vault")
+	}
+
+	wallet, err := kv.Wallet()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve wallet")
+	}
+
+	account, err := wallet.AccountByPublicKey(publicKey)
+	if err != nil {
+		if err == wallet_hd.ErrAccountNotFound {
+			return b.notFoundResponse()
+		}
+
+		return nil, errors.Wrap(err, "failed to retrieve account")
+	}
+
+	var slashingHistory SlashingHistory
+
+	// Fetch attestations
+	if slashingHistory.Attestations, err = storage.ListAllAttestations(account.ValidatorPublicKey()); err != nil {
+		return nil, errors.Wrap(err, "failed to list attestations data")
+	}
+
+	// Fetch proposals
+	if slashingHistory.Proposals, err = storage.ListAllProposals(account.ValidatorPublicKey()); err != nil {
+		return nil, errors.Wrap(err, "failed to list proposals data")
+	}
+
+	slashingHistoryEncoded, err := json.Marshal(slashingHistory)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal slashing history")
+	}
+
+	return &logical.Response{
+		Data: map[string]interface{}{
+			"data": hex.EncodeToString(slashingHistoryEncoded),
 		},
 	}, nil
 }
