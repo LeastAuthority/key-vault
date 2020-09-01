@@ -6,10 +6,10 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/bloxapp/eth-key-manager/core"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bloxapp/eth-key-manager/core"
 	"github.com/bloxapp/key-vault/backend/store"
 )
 
