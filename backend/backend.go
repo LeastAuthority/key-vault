@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bloxapp/key-vault/utils/errorex"
+	"github.com/pkg/errors"
+
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 )
@@ -30,6 +33,7 @@ func newBackend(version string) *backend {
 		Paths: framework.PathAppend(
 			versionPaths(b),
 			storagePaths(b),
+			storageSlashingPaths(b),
 			accountsPaths(b),
 			signsPaths(b),
 		),
@@ -70,11 +74,13 @@ func (b *backend) notFoundResponse() (*logical.Response, error) {
 	}, nil, http.StatusNotFound)
 }
 
-func (b *backend) badRequestResponse(msg string) (*logical.Response, error) {
-	return logical.RespondWithStatusCode(&logical.Response{
-		Data: map[string]interface{}{
-			"message":     msg,
-			"status_code": http.StatusBadRequest,
-		},
-	}, nil, http.StatusBadRequest)
+func (b *backend) prepareErrorResponse(originError error) (*logical.Response, error) {
+	switch err := errors.Cause(originError).(type) {
+	case *errorex.ErrBadRequest:
+		return err.ToLogicalResponse()
+	case nil:
+		return nil, nil
+	default:
+		return logical.ErrorResponse(originError.Error()), nil
+	}
 }

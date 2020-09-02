@@ -57,8 +57,7 @@ func TestSlashingStorage_Update(t *testing.T) {
 		ctx := context.Background()
 		req := logical.TestRequest(t, logical.CreateOperation, "storage/slashing")
 		req.Data = map[string]interface{}{
-			"public_key": publicKey,
-			"data":       hex.EncodeToString(slashingHistory),
+			publicKey: hex.EncodeToString(slashingHistory),
 		}
 		_, err = store.FromInMemoryStore(ctx, inMemStore, req.Storage)
 		require.NoError(t, err)
@@ -72,8 +71,7 @@ func TestSlashingStorage_Update(t *testing.T) {
 		ctx := context.Background()
 		req := logical.TestRequest(t, logical.CreateOperation, "storage/slashing")
 		req.Data = map[string]interface{}{
-			"public_key": publicKey,
-			"data":       hex.EncodeToString([]byte("slashinghistory")),
+			publicKey: hex.EncodeToString([]byte("slashinghistory")),
 		}
 		_, err := store.FromInMemoryStore(ctx, inMemStore, req.Storage)
 		require.NoError(t, err)
@@ -87,8 +85,7 @@ func TestSlashingStorage_Update(t *testing.T) {
 		ctx := context.Background()
 		req := logical.TestRequest(t, logical.CreateOperation, "storage/slashing")
 		req.Data = map[string]interface{}{
-			"public_key": publicKey,
-			"data":       "slashinghistory",
+			publicKey: "slashinghistory",
 		}
 		_, err := store.FromInMemoryStore(ctx, inMemStore, req.Storage)
 		require.NoError(t, err)
@@ -99,6 +96,7 @@ func TestSlashingStorage_Update(t *testing.T) {
 	})
 
 	t.Run("rejects setup slashing history for unknown public key", func(t *testing.T) {
+		fakePublicKey := "ab0cb36c4ce5ddabdc38a1d6868c871328539ebde5fea89686b2cd6332bf4cc5f9c48a501d1d6d87bf916d0e1b01ead963e1b6ce52075e26dc65bad535ecfad0"
 		slashingHistory, err := json.Marshal(struct {
 			Attestations []*core.BeaconAttestation `json:"attestations"`
 			Proposals    []*core.BeaconBlockHeader `json:"proposals"`
@@ -111,8 +109,7 @@ func TestSlashingStorage_Update(t *testing.T) {
 		ctx := context.Background()
 		req := logical.TestRequest(t, logical.CreateOperation, "storage/slashing")
 		req.Data = map[string]interface{}{
-			"public_key": "ab0cb36c4ce5ddabdc38a1d6868c871328539ebde5fea89686b2cd6332bf4cc5f9c48a501d1d6d87bf916d0e1b01ead963e1b6ce52075e26dc65bad535ecfad0",
-			"data":       hex.EncodeToString(slashingHistory),
+			fakePublicKey: hex.EncodeToString(slashingHistory),
 		}
 		_, err = store.FromInMemoryStore(ctx, inMemStore, req.Storage)
 		require.NoError(t, err)
@@ -156,9 +153,6 @@ func TestSlashingStorage_Read(t *testing.T) {
 	t.Run("successfully read slashing history", func(t *testing.T) {
 		ctx := context.Background()
 		req := logical.TestRequest(t, logical.ReadOperation, "storage/slashing")
-		req.Data = map[string]interface{}{
-			"public_key": publicKey,
-		}
 		newStore, err := store.FromInMemoryStore(ctx, inMemStore, req.Storage)
 		require.NoError(t, err)
 		err = newStore.SaveAttestation(account.ValidatorPublicKey(), attestation)
@@ -168,9 +162,9 @@ func TestSlashingStorage_Read(t *testing.T) {
 
 		res, err := b.HandleRequest(ctx, req)
 		require.NoError(t, err)
-		require.NotEmpty(t, res.Data["data"].(string))
+		require.NotEmpty(t, res.Data[publicKey].(string))
 
-		data, err := hex.DecodeString(res.Data["data"].(string))
+		data, err := hex.DecodeString(res.Data[publicKey].(string))
 		require.NoError(t, err)
 		var slashingHistory SlashingHistory
 		err = json.Unmarshal(data, &slashingHistory)
@@ -179,19 +173,5 @@ func TestSlashingStorage_Read(t *testing.T) {
 		require.Len(t, slashingHistory.Proposals, 1)
 		require.EqualValues(t, attestation, slashingHistory.Attestations[0])
 		require.EqualValues(t, proposal, slashingHistory.Proposals[0])
-	})
-
-	t.Run("rejects read slashing history for unknown public key", func(t *testing.T) {
-		ctx := context.Background()
-		req := logical.TestRequest(t, logical.CreateOperation, "storage/slashing")
-		req.Data = map[string]interface{}{
-			"public_key": "ab0cb36c4ce5ddabdc38a1d6868c871328539ebde5fea89686b2cd6332bf4cc5f9c48a501d1d6d87bf916d0e1b01ead963e1b6ce52075e26dc65bad535ecfad0",
-		}
-		_, err = store.FromInMemoryStore(ctx, inMemStore, req.Storage)
-		require.NoError(t, err)
-
-		res, err := b.HandleRequest(ctx, req)
-		require.NoError(t, err)
-		require.EqualValues(t, 404, res.Data["http_status_code"])
 	})
 }
