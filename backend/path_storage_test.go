@@ -9,9 +9,9 @@ import (
 	"github.com/bloxapp/eth-key-manager/core"
 	"github.com/bloxapp/eth-key-manager/stores/in_memory"
 	"github.com/bloxapp/eth-key-manager/wallet_hd"
+	uuid "github.com/google/uuid"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/stretchr/testify/require"
-	types "github.com/wealdtech/go-eth2-types/v2"
 
 	"github.com/bloxapp/key-vault/backend/store"
 )
@@ -21,33 +21,35 @@ func _byteArray(input string) []byte {
 	return res
 }
 
-func baseInmemStorage() (*in_memory.InMemStore, error) {
-	types.InitBLS()
-
+func baseInmemStorage() (*in_memory.InMemStore, uuid.UUID, error) {
 	inMemStore := in_memory.NewInMemStore()
 
 	// wallet
 	wallet := wallet_hd.NewHDWallet(&core.WalletContext{Storage: inMemStore})
 	err := inMemStore.SaveWallet(wallet)
 	if err != nil {
-		return nil, err
+		return nil, uuid.UUID{}, err
 	}
 
 	// account
-	acc, err := wallet.CreateValidatorAccount(_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"), "test_account")
+	acc, err := wallet.CreateValidatorAccount(
+		_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"),
+		"test_name",
+	)
 	if err != nil {
-		return nil, err
+		return nil, uuid.UUID{}, err
 	}
+	acc.ID()
 
 	if err := inMemStore.SaveAccount(acc); err != nil {
-		return nil, err
+		return nil, uuid.UUID{}, err
 	}
 
-	return inMemStore, nil
+	return inMemStore, acc.ID(), nil
 }
 
 func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (*store.HashicorpVaultStore, error) {
-	inMem, err := baseInmemStorage()
+	inMem, _, err := baseInmemStorage()
 	if err != nil {
 		return nil, err
 	}
@@ -55,10 +57,8 @@ func baseHashicorpStorage(logicalStorage logical.Storage, ctx context.Context) (
 }
 
 func TestStorage(t *testing.T) {
-	require.NoError(t, types.InitBLS())
-
 	b, _ := getBackend(t)
-	inMemStore, err := baseInmemStorage()
+	inMemStore, _, err := baseInmemStorage()
 	require.NoError(t, err)
 	var logicalStorage logical.Storage
 

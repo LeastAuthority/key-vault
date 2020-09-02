@@ -88,6 +88,74 @@ The example below shows output for a query path of `/ethereum/storage`.
 }
 ```
 
+### UPDATE SLASHING STORAGE
+
+This endpoint will update the storage.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `POST`  | `:mount-path/storage/slashing`  | `200 application/json` |
+
+
+#### Sample Request
+
+The example below shows input for a query path of `/ethereum/storage/slashing`.
+
+```
+{
+    "<public_key>": "<hex_encoded_slashing_storage>"
+}
+```
+
+
+#### Sample Response
+
+The example below shows output for a query path of `/ethereum/storage/slashing`.
+
+```
+{
+    "request_id": "d53d5075-6a3b-2642-ffde-0714beb595f5",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "status": true
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}
+```
+
+### READ SLASHING STORAGE
+
+This endpoint will update the storage.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `GET`  | `:mount-path/storage/slashing`  | `200 application/json` |
+
+
+#### Sample Response
+
+The example below shows output for a query path of `/ethereum/storage/slashing`.
+
+```
+{
+    {
+        "request_id": "d53d5075-6a3b-2642-ffde-0714beb595f5",
+        "lease_id": "",
+        "renewable": false,
+        "lease_duration": 0,
+        "data": {
+            "<public_key>": "<hex_encoded_slashing_storage>"
+        },
+        "wrap_info": null,
+        "warnings": null,
+        "auth": null
+    }
+}
+```
 
 ### SIGN ATTESTATION
 
