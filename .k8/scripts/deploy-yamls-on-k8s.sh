@@ -23,7 +23,7 @@ if [[ -z $4 ]]; then
 fi
 
 if [[ -z $5 ]]; then
-  echo "Please provide deployment type: prod|stage|blox-infra-stage|blox-infra-prod"
+  echo "Please provide deployment type: blox-infra-stage|blox-infra-prod"
   exit 1
 fi
 

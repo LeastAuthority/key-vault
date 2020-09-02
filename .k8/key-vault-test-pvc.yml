@@ -2,7 +2,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: vault-plugin-secrets-test
+  name: key-vault-test
   namespace: validators
 spec:
   accessModes:

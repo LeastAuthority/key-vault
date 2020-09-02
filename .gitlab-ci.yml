@@ -71,7 +71,7 @@ Deploy to blox-infra-stage cluster:
   script:
     - apk add bash
     - export K8S_API_VERSION=$INFRA_STAGE_K8_API_VERSION
-    - .k8/scripts/deploy-yamls-on-k8s.sh $DOCKER_REPO_INFRA_STAGE $CI_BUILD_REF validators $APP_REPLICAS_INFRA_STAGE blox-infra-stage kubernetes-admin@blox-infra k8.stage.bloxinternal.com $K8S_API_VERSION
+    - .k8/scripts/deploy-yamls-on-k8s.sh $DOCKER_REPO_INFRA_STAGE $CI_BUILD_REF validators $APP_REPLICAS_INFRA_STAGE blox-infra-stage kubernetes-admin@blox-infra stage.bloxinfra.com $K8S_API_VERSION
   only:
     - stage
 
@@ -120,6 +120,6 @@ Deploy to blox-infra-prod cluster:
   script:
     - apk add bash
     - export K8S_API_VERSION=$INFRA_PROD_K8_API_VERSION
-    - .k8/scripts/deploy-yamls-on-k8s.sh $DOCKER_REPO_INFRA_PROD $CI_BUILD_REF validators $APP_REPLICAS_INFRA_PROD blox-infra-prod kubernetes-admin@blox-infra-prod k8.prod.bloxinternal.com $K8S_API_VERSION
+    - .k8/scripts/deploy-yamls-on-k8s.sh $DOCKER_REPO_INFRA_PROD $CI_BUILD_REF validators $APP_REPLICAS_INFRA_PROD blox-infra-prod kubernetes-admin@blox-infra-prod bloxinfra.com $K8S_API_VERSION
   only:
     - master
