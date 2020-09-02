@@ -23,7 +23,7 @@ func (e *ErrBadRequest) Error() string {
 	return e.ErrorMsg
 }
 
-// Error implements error interface
+// ToLogicalResponse converts error to logical response model
 func (e *ErrBadRequest) ToLogicalResponse() (*logical.Response, error) {
 	return logical.RespondWithStatusCode(&logical.Response{
 		Data: map[string]interface{}{
