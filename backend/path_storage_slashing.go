@@ -5,8 +5,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
-	"github.com/bloxapp/key-vault/utils/errorex"
-
 	vault "github.com/bloxapp/eth-key-manager"
 	"github.com/bloxapp/eth-key-manager/core"
 	"github.com/bloxapp/eth-key-manager/wallet_hd"
@@ -15,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/bloxapp/key-vault/backend/store"
+	"github.com/bloxapp/key-vault/utils/errorex"
 )
 
 // Endpoints patterns
