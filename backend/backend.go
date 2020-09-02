@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bloxapp/key-vault/utils/errorex"
-	"github.com/pkg/errors"
-
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
+	"github.com/pkg/errors"
+
+	"github.com/bloxapp/key-vault/utils/errorex"
 )
 
 // Factory returns the backend factory
