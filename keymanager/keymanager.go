@@ -10,12 +10,16 @@ import (
 	ethpb "github.com/prysmaticlabs/ethereumapis/eth/v1alpha1"
 	"github.com/prysmaticlabs/prysm/shared/bls"
 	"github.com/prysmaticlabs/prysm/shared/bytesutil"
+	v1keymanager "github.com/prysmaticlabs/prysm/validator/keymanager/v1"
 	"github.com/sirupsen/logrus"
 
 	"github.com/bloxapp/key-vault/backend"
 	"github.com/bloxapp/key-vault/utils/endpoint"
 	"github.com/bloxapp/key-vault/utils/httpex"
 )
+
+// To make sure VaultRemoteHTTPWallet implements v1keymanager.ProtectingKeyManager interface
+var _ v1keymanager.ProtectingKeyManager = &VaultRemoteHTTPWallet{}
 
 // Signing endpoints
 var (
@@ -26,7 +30,7 @@ var (
 
 // Predefined errors
 var (
-	ErrUnprotectedSigning = NewGenericErrorWithMessage("remote HTTP key manager does not support unprotected signing")
+	ErrUnsupportedSigning = NewGenericErrorWithMessage("remote HTTP key manager does not support such signing method")
 	ErrNoSuchKey          = NewGenericErrorWithMessage("no such key")
 )
 
@@ -95,11 +99,6 @@ func NewVaultRemoteHTTPWallet(log *logrus.Entry, remoteAddress, accessToken, pub
 		httpClient:    httpex.CreateClient(),
 		log:           log,
 	}, nil
-}
-
-// Sign implements KeyManager interface.
-func (km *VaultRemoteHTTPWallet) Sign(pubKey [48]byte, root [32]byte) (bls.Signature, error) {
-	return nil, ErrUnprotectedSigning
 }
 
 // SignGeneric implements ProtectingKeyManager interface.
@@ -233,11 +232,6 @@ func (km *VaultRemoteHTTPWallet) SignAttestation(pubKey [48]byte, domain [32]byt
 	}
 
 	return sig, nil
-}
-
-// FetchValidatingKeys implements KeyManager interface.
-func (km *VaultRemoteHTTPWallet) FetchValidatingKeys() ([][48]byte, error) {
-	return [][48]byte{km.pubKey}, nil
 }
 
 // sendRequest implements the logic to work with HTTP requests.
