@@ -10,23 +10,23 @@ import (
 	v2keymanager "github.com/prysmaticlabs/prysm/validator/keymanager/v2"
 )
 
-// To make sure KeyManagerV2 implements v2keymanager.IKeymanager interface
-var _ v2keymanager.IKeymanager = &KeyManagerV2{}
+// To make sure V2 implements v2keymanager.IKeymanager interface
+var _ v2keymanager.IKeymanager = &V2{}
 
-// KeyManagerV2 implements prysm keymanager-v2 interface.
-type KeyManagerV2 struct {
+// V2 implements prysm keymanager-v2 interface.
+type V2 struct {
 	km *KeyManager
 }
 
-// NewKeyManagerV2 is the constructor of NewKeyManagerV2.
-func NewKeyManagerV2(km *KeyManager) *KeyManagerV2 {
-	return &KeyManagerV2{
+// NewKeyManagerV2 is the constructor of V2.
+func NewKeyManagerV2(km *KeyManager) *V2 {
+	return &V2{
 		km: km,
 	}
 }
 
 // Sign implements KeyManager-v2 interface.
-func (km *KeyManagerV2) Sign(ctx context.Context, req *validatorpb.SignRequest) (bls.Signature, error) {
+func (km *V2) Sign(ctx context.Context, req *validatorpb.SignRequest) (bls.Signature, error) {
 	if bytesutil.ToBytes48(req.GetPublicKey()) != km.km.pubKey {
 		return nil, ErrNoSuchKey
 	}
@@ -53,6 +53,6 @@ func (km *KeyManagerV2) Sign(ctx context.Context, req *validatorpb.SignRequest) 
 }
 
 // FetchValidatingPublicKeys implements KeyManager-v2 interface.
-func (km *KeyManagerV2) FetchValidatingPublicKeys(_ context.Context) ([][48]byte, error) {
+func (km *V2) FetchValidatingPublicKeys(_ context.Context) ([][48]byte, error) {
 	return [][48]byte{km.km.pubKey}, nil
 }
