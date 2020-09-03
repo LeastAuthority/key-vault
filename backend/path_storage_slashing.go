@@ -103,7 +103,7 @@ func (b *backend) pathSlashingStorageBatchRead(ctx context.Context, req *logical
 
 	// Load accounts slashing history
 	responseData := make(map[string]interface{})
-	for account := range wallet.Accounts() {
+	for _, account := range wallet.Accounts() {
 		// Load slashing history
 		slashingHistory, err := loadAccountSlashingHistory(storage, account)
 		if err != nil {

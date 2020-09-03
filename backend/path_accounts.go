@@ -49,7 +49,7 @@ func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Reque
 	}
 
 	var accounts []map[string]string
-	for a := range wallet.Accounts() {
+	for _, a := range wallet.Accounts() {
 		accObj := map[string]string{
 			"id":               a.ID().String(),
 			"name":             a.Name(),
