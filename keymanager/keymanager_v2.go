@@ -13,6 +13,7 @@ import (
 // To make sure KeyManagerV2 implements v2keymanager.IKeymanager interface
 var _ v2keymanager.IKeymanager = &KeyManagerV2{}
 
+// KeyManagerV2 implements prysm keymanager-v2 interface.
 type KeyManagerV2 struct {
 	km *KeyManager
 }
