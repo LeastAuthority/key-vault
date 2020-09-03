@@ -53,7 +53,7 @@ func TestSignGeneric(t *testing.T) {
 	})
 	defer s.Close()
 
-	wallet, _, err := keymanager.NewKeyManager(logrus.NewEntry(logrus.New()), &keymanager.Config{
+	wallet, err := keymanager.NewKeyManager(logrus.NewEntry(logrus.New()), &keymanager.Config{
 		Location:    s.URL,
 		AccessToken: defaultAccessToken,
 		PubKey:      defaultAccountPublicKey,
@@ -156,7 +156,7 @@ func TestSignProposal(t *testing.T) {
 	})
 	defer s.Close()
 
-	wallet, _, err := keymanager.NewKeyManager(logrus.NewEntry(logrus.New()), &keymanager.Config{
+	wallet, err := keymanager.NewKeyManager(logrus.NewEntry(logrus.New()), &keymanager.Config{
 		Location:    s.URL,
 		AccessToken: defaultAccessToken,
 		PubKey:      defaultAccountPublicKey,
@@ -269,7 +269,7 @@ func TestSignAttestation(t *testing.T) {
 	})
 	defer s.Close()
 
-	wallet, _, err := keymanager.NewKeyManager(logrus.NewEntry(logrus.New()), &keymanager.Config{
+	wallet, err := keymanager.NewKeyManager(logrus.NewEntry(logrus.New()), &keymanager.Config{
 		Location:    s.URL,
 		AccessToken: defaultAccessToken,
 		PubKey:      defaultAccountPublicKey,
