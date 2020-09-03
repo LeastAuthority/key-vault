@@ -31,6 +31,8 @@ func (km *KeyManager) Sign(ctx context.Context, req *validatorpb.SignRequest) (b
 		})
 	case *validatorpb.SignRequest_AttestationData:
 		return km.SignAttestation(km.pubKey, domain, data.AttestationData)
+	case *validatorpb.SignRequest_AggregateAttestationAndProof:
+		return km.SignGeneric(km.pubKey, bytesutil.ToBytes32(req.GetSigningRoot()), domain)
 	case *validatorpb.SignRequest_Slot:
 		return km.SignGeneric(km.pubKey, bytesutil.ToBytes32(req.GetSigningRoot()), domain)
 	default:
