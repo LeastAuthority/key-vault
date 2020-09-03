@@ -50,7 +50,7 @@ func RetrieveAccount(t *testing.T, store core.Storage) core.ValidatorAccount {
 	require.NoError(t, err)
 
 	for _, acc := range accounts {
-		if acc.BasePath() == fmt.Sprintf("account-%d", AccountIndex) {
+		if acc.BasePath() == fmt.Sprintf("/%d", AccountIndex) {
 			return acc
 		}
 	}
