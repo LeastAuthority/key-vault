@@ -45,14 +45,8 @@ type VaultRemoteHTTPWallet struct {
 	log *logrus.Entry
 }
 
-// NewVaultRemoteHTTPWalletFromOpts is the constructor of VaultRemoteHTTPWallet.
-// This constructor handles the given options and creates a wallet.
-func NewVaultRemoteHTTPWalletFromOpts(input string) (*VaultRemoteHTTPWallet, string, error) {
-	opts := &remoteOpts{}
-	if err := json.Unmarshal([]byte(input), opts); err != nil {
-		return nil, remoteOptsHelp, NewGenericError(err, "failed to unmarshal options")
-	}
-
+// NewVaultRemoteHTTPWallet is the constructor of VaultRemoteHTTPWallet.
+func NewVaultRemoteHTTPWallet(log *logrus.Entry, opts *Config) (*VaultRemoteHTTPWallet, string, error) {
 	if len(opts.Location) == 0 {
 		return nil, remoteOptsHelp, NewGenericErrorMessage("wallet location is required")
 	}
@@ -63,11 +57,7 @@ func NewVaultRemoteHTTPWalletFromOpts(input string) (*VaultRemoteHTTPWallet, str
 		return nil, remoteOptsHelp, NewGenericErrorMessage("wallet public key is required")
 	}
 
-	logger := logrus.New().WithFields(logrus.Fields{
-		"location":   opts.Location,
-		"public_key": opts.PubKey,
-	})
-
+	// Decode public key
 	decodedPubKey, err := hex.DecodeString(opts.PubKey)
 	if err != nil {
 		return nil, remoteOptsHelp, NewGenericError(err, "failed to hex decode public key '%s'", opts.PubKey)
@@ -79,26 +69,8 @@ func NewVaultRemoteHTTPWalletFromOpts(input string) (*VaultRemoteHTTPWallet, str
 		originPubKey:  opts.PubKey,
 		pubKey:        bytesutil.ToBytes48(decodedPubKey),
 		httpClient:    httpex.CreateClient(),
-		log:           logger,
-	}, remoteOptsHelp, nil
-}
-
-// NewVaultRemoteHTTPWallet is the constructor of VaultRemoteHTTPWallet.
-func NewVaultRemoteHTTPWallet(log *logrus.Entry, remoteAddress, accessToken, pubKey string) (*VaultRemoteHTTPWallet, error) {
-	// Decode public key
-	decodedPubKey, err := hex.DecodeString(pubKey)
-	if err != nil {
-		return nil, NewGenericError(err, "failed to hex decode public key '%s'", pubKey)
-	}
-
-	return &VaultRemoteHTTPWallet{
-		remoteAddress: remoteAddress,
-		accessToken:   accessToken,
-		originPubKey:  pubKey,
-		pubKey:        bytesutil.ToBytes48(decodedPubKey),
-		httpClient:    httpex.CreateClient(),
 		log:           log,
-	}, nil
+	}, remoteOptsHelp, nil
 }
 
 // SignGeneric implements ProtectingKeyManager interface.

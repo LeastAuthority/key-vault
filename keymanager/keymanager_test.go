@@ -53,7 +53,11 @@ func TestSignGeneric(t *testing.T) {
 	})
 	defer s.Close()
 
-	wallet, err := keymanager.NewVaultRemoteHTTPWallet(logrus.NewEntry(logrus.New()), s.URL, defaultAccessToken, defaultAccountPublicKey)
+	wallet, _, err := keymanager.NewVaultRemoteHTTPWallet(logrus.NewEntry(logrus.New()), &keymanager.Config{
+		Location:    s.URL,
+		AccessToken: defaultAccessToken,
+		PubKey:      defaultAccountPublicKey,
+	})
 	require.NoError(t, err)
 
 	runTest := func(t *testing.T, statusCode int, signature []byte, f func(wallet *keymanager.VaultRemoteHTTPWallet)) {
@@ -152,7 +156,11 @@ func TestSignProposal(t *testing.T) {
 	})
 	defer s.Close()
 
-	wallet, err := keymanager.NewVaultRemoteHTTPWallet(logrus.NewEntry(logrus.New()), s.URL, defaultAccessToken, defaultAccountPublicKey)
+	wallet, _, err := keymanager.NewVaultRemoteHTTPWallet(logrus.NewEntry(logrus.New()), &keymanager.Config{
+		Location:    s.URL,
+		AccessToken: defaultAccessToken,
+		PubKey:      defaultAccountPublicKey,
+	})
 	require.NoError(t, err)
 
 	runTest := func(t *testing.T, statusCode int, signature []byte, f func(wallet *keymanager.VaultRemoteHTTPWallet)) {
@@ -261,7 +269,11 @@ func TestSignAttestation(t *testing.T) {
 	})
 	defer s.Close()
 
-	wallet, err := keymanager.NewVaultRemoteHTTPWallet(logrus.NewEntry(logrus.New()), s.URL, defaultAccessToken, defaultAccountPublicKey)
+	wallet, _, err := keymanager.NewVaultRemoteHTTPWallet(logrus.NewEntry(logrus.New()), &keymanager.Config{
+		Location:    s.URL,
+		AccessToken: defaultAccessToken,
+		PubKey:      defaultAccountPublicKey,
+	})
 	require.NoError(t, err)
 
 	runTest := func(t *testing.T, statusCode int, signature []byte, f func(wallet *keymanager.VaultRemoteHTTPWallet)) {
