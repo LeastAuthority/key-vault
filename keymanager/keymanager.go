@@ -19,6 +19,7 @@ import (
 )
 
 // To make sure KeyManager implements v1keymanager.ProtectingKeyManager interface
+var _ v1keymanager.KeyManager = &KeyManager{}
 var _ v1keymanager.ProtectingKeyManager = &KeyManager{}
 
 // Signing endpoints
@@ -30,6 +31,7 @@ var (
 
 // Predefined errors
 var (
+	ErrUnprotectedSigning = NewGenericErrorWithMessage("remote HTTP key manager does not support unprotected signing method")
 	ErrUnsupportedSigning = NewGenericErrorWithMessage("remote HTTP key manager does not support such signing method")
 	ErrNoSuchKey          = NewGenericErrorWithMessage("no such key")
 )
@@ -71,6 +73,16 @@ func NewKeyManager(log *logrus.Entry, opts *Config) (*KeyManager, error) {
 		httpClient:    httpex.CreateClient(),
 		log:           log,
 	}, nil
+}
+
+// FetchValidatingKeys implements KeyManager interface.
+func (km *KeyManager) FetchValidatingKeys() ([][48]byte, error) {
+	return [][48]byte{km.pubKey}, nil
+}
+
+// Sign implements KeyManager interface.
+func (km *KeyManager) Sign(pubKey [48]byte, root [32]byte) (bls.Signature, error) {
+	return nil, ErrUnprotectedSigning
 }
 
 // SignGeneric implements ProtectingKeyManager interface.
