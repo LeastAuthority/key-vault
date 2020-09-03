@@ -141,12 +141,7 @@ func (store *HashicorpVaultStore) ListAccounts() ([]core.ValidatorAccount, error
 		return nil, errors.Wrapf(err, "failed to get wallet")
 	}
 
-	ret := make([]core.ValidatorAccount, 0)
-	for _, a := range w.Accounts() {
-		ret = append(ret, a)
-	}
-
-	return ret, nil
+	return w.Accounts(), nil
 }
 
 // SaveAccount stores the given account in DB.

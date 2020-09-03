@@ -30,6 +30,7 @@ func (test *AttestationSigning) Run(t *testing.T) {
 	// setup vault with db
 	storage := setup.UpdateStorage(t)
 	account := shared.RetrieveAccount(t, storage)
+	require.NotNil(t, account)
 	pubKeyBytes := account.ValidatorPublicKey().Marshal()
 
 	// Get wallet
