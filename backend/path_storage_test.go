@@ -32,9 +32,10 @@ func baseInmemStorage() (*in_memory.InMemStore, uuid.UUID, error) {
 	}
 
 	// account
+	accIndex := 8
 	acc, err := wallet.CreateValidatorAccount(
 		_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"),
-		"test_name",
+		&accIndex,
 	)
 	if err != nil {
 		return nil, uuid.UUID{}, err

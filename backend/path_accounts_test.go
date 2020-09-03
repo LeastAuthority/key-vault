@@ -46,7 +46,7 @@ func TestAccountsList(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, res.Data["accounts"])
 		require.Len(t, res.Data["accounts"], 1)
-		require.Equal(t, res.Data["accounts"].([]map[string]string)[0]["name"], "test_account")
+		require.Contains(t, res.Data["accounts"].([]map[string]string)[0]["name"], "account-")
 
 		// make sure only the following fields are present to prevent accidental secret sharing
 		keys := make([]string, 0)

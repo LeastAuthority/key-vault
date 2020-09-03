@@ -20,7 +20,7 @@ func _byteArray(input string) []byte {
 	return res
 }
 
-func baseKeyVault(seed []byte, acc1Name string, acc2Name string, t *testing.T) (*in_memory.InMemStore, core.Wallet, []core.ValidatorAccount) {
+func baseKeyVault(seed []byte, acc1Name, acc2Name int, t *testing.T) (*in_memory.InMemStore, core.Wallet, []core.ValidatorAccount) {
 	// store
 	inMemStore := in_memory.NewInMemStore()
 	// seed
@@ -37,10 +37,10 @@ func baseKeyVault(seed []byte, acc1Name string, acc2Name string, t *testing.T) (
 	inMemWallet, err := kv.Wallet()
 	require.NoError(t, err)
 	require.NotNil(t, inMemWallet)
-	inMemAcc1, err := inMemWallet.CreateValidatorAccount(seed, acc1Name)
+	inMemAcc1, err := inMemWallet.CreateValidatorAccount(seed, &acc1Name)
 	require.NoError(t, err)
 	require.NotNil(t, inMemAcc1)
-	inMemAcc2, err := inMemWallet.CreateValidatorAccount(seed, acc2Name)
+	inMemAcc2, err := inMemWallet.CreateValidatorAccount(seed, &acc2Name)
 	require.NoError(t, err)
 	require.NotNil(t, inMemAcc2)
 
@@ -50,8 +50,8 @@ func baseKeyVault(seed []byte, acc1Name string, acc2Name string, t *testing.T) (
 func TestImportAndDeleteFromInMem(t *testing.T) {
 	oldInMemStore, _, oldInMemAccounts := baseKeyVault(
 		_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"),
-		"acc1",
-		"acc2",
+		1,
+		2,
 		t,
 	)
 
@@ -64,8 +64,8 @@ func TestImportAndDeleteFromInMem(t *testing.T) {
 	// create another in mem base keyvault to override (different seed and account names)
 	inMemStore, inMemWallet, inMemAccounts := baseKeyVault(
 		_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fdf"),
-		"acc3",
-		"acc4",
+		3,
+		4,
 		t,
 	)
 
@@ -102,8 +102,8 @@ func TestImportAndDeleteFromInMem(t *testing.T) {
 func TestImportFromInMem(t *testing.T) {
 	inMemStore, inMemWallet, inMemAccounts := baseKeyVault(
 		_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"),
-		"acc1",
-		"acc2",
+		5,
+		6,
 		t,
 	)
 
