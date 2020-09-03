@@ -46,21 +46,21 @@ type KeyManager struct {
 }
 
 // NewKeyManager is the constructor of KeyManager.
-func NewKeyManager(log *logrus.Entry, opts *Config) (*KeyManager, string, error) {
+func NewKeyManager(log *logrus.Entry, opts *Config) (*KeyManager, error) {
 	if len(opts.Location) == 0 {
-		return nil, remoteOptsHelp, NewGenericErrorMessage("wallet location is required")
+		return nil, NewGenericErrorMessage("wallet location is required")
 	}
 	if len(opts.AccessToken) == 0 {
-		return nil, remoteOptsHelp, NewGenericErrorMessage("wallet access token is required")
+		return nil, NewGenericErrorMessage("wallet access token is required")
 	}
 	if len(opts.PubKey) == 0 {
-		return nil, remoteOptsHelp, NewGenericErrorMessage("wallet public key is required")
+		return nil, NewGenericErrorMessage("wallet public key is required")
 	}
 
 	// Decode public key
 	decodedPubKey, err := hex.DecodeString(opts.PubKey)
 	if err != nil {
-		return nil, remoteOptsHelp, NewGenericError(err, "failed to hex decode public key '%s'", opts.PubKey)
+		return nil, NewGenericError(err, "failed to hex decode public key '%s'", opts.PubKey)
 	}
 
 	return &KeyManager{
@@ -70,7 +70,7 @@ func NewKeyManager(log *logrus.Entry, opts *Config) (*KeyManager, string, error)
 		pubKey:        bytesutil.ToBytes48(decodedPubKey),
 		httpClient:    httpex.CreateClient(),
 		log:           log,
-	}, remoteOptsHelp, nil
+	}, nil
 }
 
 // SignGeneric implements ProtectingKeyManager interface.
