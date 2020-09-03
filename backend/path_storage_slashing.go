@@ -5,9 +5,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
-	vault "github.com/bloxapp/eth-key-manager"
-	"github.com/bloxapp/eth-key-manager/core"
-	"github.com/bloxapp/eth-key-manager/wallet_hd"
+	vault "github.com/bloxapp/eth2-key-manager"
+	"github.com/bloxapp/eth2-key-manager/core"
+	"github.com/bloxapp/eth2-key-manager/wallet_hd"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
@@ -103,7 +103,7 @@ func (b *backend) pathSlashingStorageBatchRead(ctx context.Context, req *logical
 
 	// Load accounts slashing history
 	responseData := make(map[string]interface{})
-	for account := range wallet.Accounts() {
+	for _, account := range wallet.Accounts() {
 		// Load slashing history
 		slashingHistory, err := loadAccountSlashingHistory(storage, account)
 		if err != nil {

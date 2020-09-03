@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	vault "github.com/bloxapp/eth-key-manager"
+	vault "github.com/bloxapp/eth2-key-manager"
 	"github.com/hashicorp/vault/api"
 	"github.com/hashicorp/vault/sdk/plugin"
 

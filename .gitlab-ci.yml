@@ -37,8 +37,6 @@ Run linter:
     - go get -u golang.org/x/lint/golint
     - go get -u golang.org/x/tools/cmd/goimports
     - ./scripts/lint.sh .
-  only:
-    - stage
 
 Run tests of the application:
   stage: test
@@ -49,8 +47,6 @@ Run tests of the application:
     - blox-infra-stage
   script:
     - DOCKER_API_VERSION=1.39 go test -cover -race -p 1 ./...
-  only:
-    - stage
 
 Build stage Docker image:
   stage: build

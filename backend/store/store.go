@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/bloxapp/eth-key-manager/core"
-	"github.com/bloxapp/eth-key-manager/stores/in_memory"
-	"github.com/bloxapp/eth-key-manager/wallet_hd"
+	"github.com/bloxapp/eth2-key-manager/core"
+	"github.com/bloxapp/eth2-key-manager/stores/in_memory"
+	"github.com/bloxapp/eth2-key-manager/wallet_hd"
 	"github.com/google/uuid"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
@@ -77,7 +77,7 @@ func FromInMemoryStore(ctx context.Context, inMem *in_memory.InMemStore, storage
 	}
 
 	// Save accounts
-	for acc := range wallet.Accounts() {
+	for _, acc := range wallet.Accounts() {
 		err = newStore.SaveAccount(acc)
 		if err != nil {
 			return nil, err
@@ -142,7 +142,7 @@ func (store *HashicorpVaultStore) ListAccounts() ([]core.ValidatorAccount, error
 	}
 
 	ret := make([]core.ValidatorAccount, 0)
-	for a := range w.Accounts() {
+	for _, a := range w.Accounts() {
 		ret = append(ret, a)
 	}
 
