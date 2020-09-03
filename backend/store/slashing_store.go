@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/bloxapp/eth-key-manager/core"
+	"github.com/bloxapp/eth2-key-manager/core"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
 	e2types "github.com/wealdtech/go-eth2-types/v2"

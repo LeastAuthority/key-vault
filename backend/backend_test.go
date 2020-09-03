@@ -3,7 +3,7 @@ package backend
 import (
 	"testing"
 
-	vault "github.com/bloxapp/eth-key-manager"
+	vault "github.com/bloxapp/eth2-key-manager"
 )
 
 func TestMain(t *testing.M) {

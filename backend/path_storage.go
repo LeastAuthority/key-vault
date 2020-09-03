@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
-	"github.com/bloxapp/eth-key-manager/stores/in_memory"
+	"github.com/bloxapp/eth2-key-manager/stores/in_memory"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"

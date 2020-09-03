@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 
-	vault "github.com/bloxapp/eth-key-manager"
+	vault "github.com/bloxapp/eth2-key-manager"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"

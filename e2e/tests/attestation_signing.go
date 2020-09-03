@@ -4,9 +4,9 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/bloxapp/eth-key-manager/slashing_protection"
-	"github.com/bloxapp/eth-key-manager/stores/in_memory"
-	"github.com/bloxapp/eth-key-manager/validator_signer"
+	"github.com/bloxapp/eth2-key-manager/slashing_protection"
+	"github.com/bloxapp/eth2-key-manager/stores/in_memory"
+	"github.com/bloxapp/eth2-key-manager/validator_signer"
 	"github.com/stretchr/testify/require"
 	v1 "github.com/wealdtech/eth2-signer-api/pb/v1"
 
