@@ -1,7 +1,7 @@
 package keymanager
 
-// VaultSignAttestationRequest is the request body of vault sign attestation endpoint.
-type VaultSignAttestationRequest struct {
+// SignAttestationRequest is the request body of vault sign attestation endpoint.
+type SignAttestationRequest struct {
 	PubKey          string `json:"public_key"`
 	Domain          string `json:"domain"`
 	Slot            uint64 `json:"slot"`
@@ -13,8 +13,8 @@ type VaultSignAttestationRequest struct {
 	TargetRoot      string `json:"targetRoot"`
 }
 
-// VaultSignProposalRequest is the request body of vault sign proposal endpoint.
-type VaultSignProposalRequest struct {
+// SignProposalRequest is the request body of vault sign proposal endpoint.
+type SignProposalRequest struct {
 	PubKey        string `json:"public_key"`
 	Domain        string `json:"domain"`
 	Slot          uint64 `json:"slot"`
@@ -24,19 +24,19 @@ type VaultSignProposalRequest struct {
 	BodyRoot      string `json:"bodyRoot"`
 }
 
-// VaultSignAggregationRequest is the request body of vault sign aggregation endpoint.
-type VaultSignAggregationRequest struct {
+// SignAggregationRequest is the request body of vault sign aggregation endpoint.
+type SignAggregationRequest struct {
 	PubKey     string `json:"public_key"`
 	Domain     string `json:"domain"`
 	DataToSign string `json:"dataToSign"`
 }
 
-// VaultSignResponse is the vault sign response model.
-type VaultSignResponse struct {
-	Data VaultSignatureModel `json:"data"`
+// SignResponse is the vault sign response model.
+type SignResponse struct {
+	Data SignatureModel `json:"data"`
 }
 
-// VaultSignatureModel represents vault signature model.
-type VaultSignatureModel struct {
+// SignatureModel represents vault signature model.
+type SignatureModel struct {
 	Signature string `json:"signature"`
 }

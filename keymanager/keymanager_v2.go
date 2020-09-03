@@ -11,10 +11,10 @@ import (
 )
 
 // To make sure VaultRemoteHTTPWallet implements v2keymanager.IKeymanager interface
-var _ v2keymanager.IKeymanager = &VaultRemoteHTTPWallet{}
+var _ v2keymanager.IKeymanager = &KeyManager{}
 
 // Sign implements KeyManager-v2 interface.
-func (km *VaultRemoteHTTPWallet) Sign(ctx context.Context, req *validatorpb.SignRequest) (bls.Signature, error) {
+func (km *KeyManager) Sign(ctx context.Context, req *validatorpb.SignRequest) (bls.Signature, error) {
 	if bytesutil.ToBytes48(req.GetPublicKey()) != km.pubKey {
 		return nil, ErrNoSuchKey
 	}
@@ -39,6 +39,6 @@ func (km *VaultRemoteHTTPWallet) Sign(ctx context.Context, req *validatorpb.Sign
 }
 
 // FetchValidatingPublicKeys implements KeyManager-v2 interface.
-func (km *VaultRemoteHTTPWallet) FetchValidatingPublicKeys(_ context.Context) ([][48]byte, error) {
+func (km *KeyManager) FetchValidatingPublicKeys(_ context.Context) ([][48]byte, error) {
 	return [][48]byte{km.pubKey}, nil
 }
