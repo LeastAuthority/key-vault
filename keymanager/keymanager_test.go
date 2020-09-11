@@ -19,7 +19,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bloxapp/key-vault/keymanager"
-	"github.com/bloxapp/key-vault/utils/endpoint"
 )
 
 const (
@@ -48,7 +47,7 @@ func TestSignGeneric(t *testing.T) {
 
 	var protect sync.Mutex
 	var currentMethod http.HandlerFunc
-	s := newTestRemoteWallet(t, func(writer http.ResponseWriter, request *http.Request) {
+	s := newTestRemoteWallet(func(writer http.ResponseWriter, request *http.Request) {
 		currentMethod(writer, request)
 	})
 	defer s.Close()
@@ -57,6 +56,7 @@ func TestSignGeneric(t *testing.T) {
 		Location:    s.URL,
 		AccessToken: defaultAccessToken,
 		PubKey:      defaultAccountPublicKey,
+		Network:     "test",
 	})
 	require.NoError(t, err)
 
@@ -64,7 +64,7 @@ func TestSignGeneric(t *testing.T) {
 		protect.Lock()
 		currentMethod = func(writer http.ResponseWriter, request *http.Request) {
 			require.Equal(t, http.MethodPost, request.Method)
-			require.Equal(t, endpoint.Build("accounts/sign-aggregation"), request.URL.Path)
+			require.Equal(t, "/v1/ethereum/test/accounts/sign-aggregation", request.URL.Path)
 
 			var req keymanager.SignAggregationRequest
 			require.NoError(t, json.NewDecoder(request.Body).Decode(&req))
@@ -151,7 +151,7 @@ func TestSignProposal(t *testing.T) {
 
 	var protect sync.Mutex
 	var currentMethod http.HandlerFunc
-	s := newTestRemoteWallet(t, func(writer http.ResponseWriter, request *http.Request) {
+	s := newTestRemoteWallet(func(writer http.ResponseWriter, request *http.Request) {
 		currentMethod(writer, request)
 	})
 	defer s.Close()
@@ -160,6 +160,7 @@ func TestSignProposal(t *testing.T) {
 		Location:    s.URL,
 		AccessToken: defaultAccessToken,
 		PubKey:      defaultAccountPublicKey,
+		Network:     "test",
 	})
 	require.NoError(t, err)
 
@@ -167,7 +168,7 @@ func TestSignProposal(t *testing.T) {
 		protect.Lock()
 		currentMethod = func(writer http.ResponseWriter, request *http.Request) {
 			require.Equal(t, http.MethodPost, request.Method)
-			require.Equal(t, endpoint.Build("accounts/sign-proposal"), request.URL.Path)
+			require.Equal(t, "/v1/ethereum/test/accounts/sign-proposal", request.URL.Path)
 
 			var req keymanager.SignProposalRequest
 			require.NoError(t, json.NewDecoder(request.Body).Decode(&req))
@@ -264,7 +265,7 @@ func TestSignAttestation(t *testing.T) {
 
 	var protect sync.Mutex
 	var currentMethod http.HandlerFunc
-	s := newTestRemoteWallet(t, func(writer http.ResponseWriter, request *http.Request) {
+	s := newTestRemoteWallet(func(writer http.ResponseWriter, request *http.Request) {
 		currentMethod(writer, request)
 	})
 	defer s.Close()
@@ -273,6 +274,7 @@ func TestSignAttestation(t *testing.T) {
 		Location:    s.URL,
 		AccessToken: defaultAccessToken,
 		PubKey:      defaultAccountPublicKey,
+		Network:     "test",
 	})
 	require.NoError(t, err)
 
@@ -280,7 +282,7 @@ func TestSignAttestation(t *testing.T) {
 		protect.Lock()
 		currentMethod = func(writer http.ResponseWriter, request *http.Request) {
 			require.Equal(t, http.MethodPost, request.Method)
-			require.Equal(t, endpoint.Build("accounts/sign-attestation"), request.URL.Path)
+			require.Equal(t, "/v1/ethereum/test/accounts/sign-attestation", request.URL.Path)
 
 			var req keymanager.SignAttestationRequest
 			require.NoError(t, json.NewDecoder(request.Body).Decode(&req))
@@ -348,7 +350,7 @@ func TestSignAttestation(t *testing.T) {
 	})
 }
 
-func newTestRemoteWallet(t *testing.T, handler http.HandlerFunc) *httptest.Server {
+func newTestRemoteWallet(handler http.HandlerFunc) *httptest.Server {
 	s := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		handler(writer, request)
 	}))

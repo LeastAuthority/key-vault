@@ -22,13 +22,6 @@ import (
 var _ v1keymanager.KeyManager = &KeyManager{}
 var _ v1keymanager.ProtectingKeyManager = &KeyManager{}
 
-// Signing endpoints
-var (
-	signAggregationPath = endpoint.Build(backend.SignAggregationPattern)
-	signProposalPath    = endpoint.Build(backend.SignProposalPattern)
-	signAttestationPath = endpoint.Build(backend.SignAttestationPattern)
-)
-
 // Predefined errors
 var (
 	ErrUnprotectedSigning = NewGenericErrorWithMessage("remote HTTP key manager does not support unprotected signing method")
@@ -42,6 +35,7 @@ type KeyManager struct {
 	accessToken   string
 	originPubKey  string
 	pubKey        [48]byte
+	network       string
 	httpClient    *http.Client
 
 	log *logrus.Entry
@@ -70,6 +64,7 @@ func NewKeyManager(log *logrus.Entry, opts *Config) (*KeyManager, error) {
 		accessToken:   opts.AccessToken,
 		originPubKey:  opts.PubKey,
 		pubKey:        bytesutil.ToBytes48(decodedPubKey),
+		network:       opts.Network,
 		httpClient:    httpex.CreateClient(),
 		log:           log,
 	}, nil
@@ -106,7 +101,7 @@ func (km *KeyManager) SignGeneric(pubKey [48]byte, root [32]byte, domain [32]byt
 
 	// Send request.
 	var resp SignResponse
-	if err := km.sendRequest(http.MethodPost, signAggregationPath, reqBody, &resp); err != nil {
+	if err := km.sendRequest(http.MethodPost, backend.SignAggregationPattern, reqBody, &resp); err != nil {
 		km.log.WithError(err).Error("failed to send sign aggregation request")
 		return nil, NewGenericError(err, "failed to send SignGeneric request to remote vault wallet")
 	}
@@ -151,7 +146,7 @@ func (km *KeyManager) SignProposal(pubKey [48]byte, domain [32]byte, data *ethpb
 
 	// Send request.
 	var resp SignResponse
-	if err := km.sendRequest(http.MethodPost, signProposalPath, reqBody, &resp); err != nil {
+	if err := km.sendRequest(http.MethodPost, backend.SignProposalPattern, reqBody, &resp); err != nil {
 		km.log.WithError(err).Error("failed to send sign proposal request")
 		return nil, NewGenericError(err, "failed to send SignAttestation request to remote vault wallet")
 	}
@@ -198,7 +193,7 @@ func (km *KeyManager) SignAttestation(pubKey [48]byte, domain [32]byte, data *et
 
 	// Send request.
 	var resp SignResponse
-	if err := km.sendRequest(http.MethodPost, signAttestationPath, reqBody, &resp); err != nil {
+	if err := km.sendRequest(http.MethodPost, backend.SignAttestationPattern, reqBody, &resp); err != nil {
 		km.log.WithError(err).Error("failed to send sign attestation request")
 		return nil, NewGenericError(err, "failed to send SignAttestation request to remote vault wallet")
 	}
@@ -220,7 +215,7 @@ func (km *KeyManager) SignAttestation(pubKey [48]byte, domain [32]byte, data *et
 
 // sendRequest implements the logic to work with HTTP requests.
 func (km *KeyManager) sendRequest(method, path string, reqBody []byte, respBody interface{}) error {
-	endpoint := km.remoteAddress + path
+	endpoint := km.remoteAddress + endpoint.Build(km.network, path)
 
 	// Prepare a new request
 	req, err := http.NewRequest(method, endpoint, bytes.NewBuffer(reqBody))

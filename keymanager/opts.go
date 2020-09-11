@@ -8,11 +8,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Config contains cccconfiguration of the remote HTTP keymanager
+// Config contains configuration of the remote HTTP keymanager
 type Config struct {
 	Location    string `json:"location"`
 	AccessToken string `json:"access_token"`
 	PubKey      string `json:"public_key"`
+	Network     string `json:"network"`
 }
 
 // UnmarshalConfigFile attempts to JSON unmarshal a keymanager
