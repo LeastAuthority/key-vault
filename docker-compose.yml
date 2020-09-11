@@ -12,9 +12,6 @@ services:
 #    image: bloxstaking/key-vault:latest
     ports:
       - 8200:8200
-    volumes:
-      - ./data:/data
-      - ./policies:/policies
     environment:
       VAULT_ADDR: http://127.0.0.1:8200
       VAULT_API_ADDR: http://127.0.0.1:8200

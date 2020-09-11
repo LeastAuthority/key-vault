@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bloxapp/key-vault/backend/store"
+
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
@@ -30,13 +32,13 @@ func newBackend(version string) *backend {
 	}
 	b.Backend = &framework.Backend{
 		Help: "",
-		Paths: framework.PathAppend(
+		Paths: prepareStoreMiddleware(framework.PathAppend(
 			versionPaths(b),
 			storagePaths(b),
 			storageSlashingPaths(b),
 			accountsPaths(b),
 			signsPaths(b),
-		),
+		)),
 		PathsSpecial: &logical.Paths{
 			SealWrapStorage: []string{
 				"wallet/",
@@ -83,4 +85,39 @@ func (b *backend) prepareErrorResponse(originError error) (*logical.Response, er
 	default:
 		return logical.ErrorResponse(originError.Error()), nil
 	}
+}
+
+func prepareStoreMiddleware(paths []*framework.Path) []*framework.Path {
+	wrapperFunc := func(callback framework.OperationFunc) framework.OperationFunc {
+		return framework.OperationFunc(func(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+			network := data.Get("network").(string)
+			switch network {
+			case "testnet":
+				req.Storage = store.NewLogical(req.Storage, "testnet")
+				break
+			case "launchtestnet":
+				req.Storage = store.NewLogical(req.Storage, "launchtestnet")
+				break
+			default:
+				return nil, errors.New("unsupported network")
+			}
+			return callback(ctx, req, data)
+		})
+	}
+
+	for i := range paths {
+		paths[i].Pattern = framework.GenericNameRegex("network") + "/" + paths[i].Pattern
+		if paths[i].Fields == nil {
+			paths[i].Fields = make(map[string]*framework.FieldSchema)
+		}
+		paths[i].Fields["network"] = &framework.FieldSchema{
+			Type:        framework.TypeString,
+			Description: "Blockchain network",
+			Default:     "",
+		}
+		for j, callback := range paths[i].Callbacks {
+			paths[i].Callbacks[j] = wrapperFunc(callback)
+		}
+	}
+	return paths
 }
