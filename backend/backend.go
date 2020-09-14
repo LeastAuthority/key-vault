@@ -97,8 +97,6 @@ func prepareStoreMiddleware(paths []*framework.Path) []*framework.Path {
 			case "launchtest":
 				req.Storage = store.NewLogical(req.Storage, "launchtest")
 				break
-			default:
-				return nil, errors.New("unsupported network")
 			}
 			return callback(ctx, req, data)
 		})
