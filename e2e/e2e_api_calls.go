@@ -92,7 +92,7 @@ func (setup *BaseSetup) SignAttestation(data map[string]interface{}) ([]byte, er
 	}
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/testnet/accounts/sign-attestation", setup.baseURL)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/test/accounts/sign-attestation", setup.baseURL)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, nil
@@ -150,7 +150,7 @@ func (setup *BaseSetup) UpdateStorage(t *testing.T) core.Storage {
 	require.NoError(t, err)
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/testnet/storage", setup.baseURL)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/test/storage", setup.baseURL)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
 	require.NoError(t, err)
 

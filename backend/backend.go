@@ -91,11 +91,11 @@ func prepareStoreMiddleware(paths []*framework.Path) []*framework.Path {
 		return framework.OperationFunc(func(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 			network := data.Get("network").(string)
 			switch network {
-			case "testnet":
-				req.Storage = store.NewLogical(req.Storage, "testnet")
+			case "test":
+				req.Storage = store.NewLogical(req.Storage, "test")
 				break
-			case "launchtestnet":
-				req.Storage = store.NewLogical(req.Storage, "launchtestnet")
+			case "launchtest":
+				req.Storage = store.NewLogical(req.Storage, "launchtest")
 				break
 			default:
 				return nil, errors.New("unsupported network")
