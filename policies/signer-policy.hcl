@@ -1,9 +1,15 @@
 # Ability to list existing wallet accounts ("list")
-path "ethereum/accounts" {
+path "ethereum/test/accounts" {
+  capabilities = ["list"]
+}
+path "ethereum/launchtest/accounts" {
   capabilities = ["list"]
 }
 
 # Ability to sign data ("create")
-path "ethereum/accounts/sign-*" {
+path "ethereum/test/accounts/sign-*" {
+  capabilities = ["create"]
+}
+path "ethereum/launchtest/accounts/sign-*" {
   capabilities = ["create"]
 }
