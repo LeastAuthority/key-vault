@@ -346,3 +346,19 @@ Use the current format to add new tests.
 
 versions are published to dockerhub based on tags.
 before publishing a tag update docker compose image to the to be pushed tag 
+
+## Multinetworks
+
+The plugin supports multiple Ethereum networks. All available networks are defined in `./config/vault-plugin.sh`.
+New networks could be defined by the following steps:
+
+1. Enable secrets for a new network in `./config/vault-plugin.sh`. 
+    Example
+    ```bash
+    $ vault secrets enable \
+        -path=ethereum/test \
+        -description="Eth Signing Wallet - Test Network" \
+        -plugin-name=ethsign plugin > /dev/null 2>&1
+    ```
+
+2. Update policies `./policies/admin-policy.hcl` and `./policies/signer-policy.hcl` by adding a definition with a new network in the path. 
