@@ -9,5 +9,9 @@ const (
 
 // Build builds full path.
 func Build(network, pattern string) string {
-	return fmt.Sprintf("%s/%s/%s", BasePath, network, pattern)
+	if len(network) > 0 {
+		return fmt.Sprintf("%s/%s/%s", BasePath, network, pattern)
+	}
+
+	return fmt.Sprintf("%s/%s", BasePath, pattern)
 }
