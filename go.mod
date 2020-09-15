@@ -23,8 +23,8 @@ require (
 	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/pborman/uuid v1.2.0
 	github.com/pkg/errors v0.9.1
-	github.com/prysmaticlabs/ethereumapis v0.0.0-20200709024211-e8095222f77b
-	github.com/prysmaticlabs/prysm v1.0.0-alpha.23
+	github.com/prysmaticlabs/ethereumapis v0.0.0-20200827165051-58ccb36e36b9
+	github.com/prysmaticlabs/prysm v1.0.0-alpha.25
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1
 	github.com/wealdtech/eth2-signer-api v1.5.2
@@ -39,6 +39,6 @@ replace github.com/ethereum/go-ethereum => github.com/prysmaticlabs/bazel-go-eth
 
 replace github.com/herumi/bls-eth-go-binary => github.com/herumi/bls-eth-go-binary v0.0.0-20200605082007-3a76b4c6c599
 
-replace github.com/prysmaticlabs/prysm => github.com/prysmaticlabs/prysm v1.0.0-alpha.23
+replace github.com/prysmaticlabs/prysm => github.com/prysmaticlabs/prysm v1.0.0-alpha.25
 
 // replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.4.1
