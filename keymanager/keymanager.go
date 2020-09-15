@@ -2,6 +2,7 @@ package keymanager
 
 import (
 	"bytes"
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"io/ioutil"
@@ -81,7 +82,7 @@ func (km *KeyManager) FetchValidatingKeys() ([][48]byte, error) {
 }
 
 // Sign implements KeyManager interface.
-func (km *KeyManager) Sign(pubKey [48]byte, root [32]byte) (bls.Signature, error) {
+func (km *KeyManager) Sign(ctx context.Context, pubKey [48]byte, root [32]byte) (bls.Signature, error) {
 	return nil, ErrUnprotectedSigning
 }
 
