@@ -29,7 +29,7 @@ This endpoint will list all accounts of key-vault.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `LIST`  | `:mount-path/accounts`  | `200 application/json` |
+| `LIST`  | `:mount-path/<test|launchtest>/accounts`  | `200 application/json` |
 
 
 #### Sample Response
@@ -64,7 +64,7 @@ This endpoint will update the storage.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/storage`  | `200 application/json` |
+| `POST`  | `:mount-path/<test|launchtest>/storage`  | `200 application/json` |
 
 
 #### Sample Response
@@ -94,7 +94,7 @@ This endpoint will update the storage.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/storage/slashing`  | `200 application/json` |
+| `POST`  | `:mount-path/<test|launchtest>/storage/slashing`  | `200 application/json` |
 
 
 #### Sample Request
@@ -133,7 +133,7 @@ This endpoint will update the storage.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `GET`  | `:mount-path/storage/slashing`  | `200 application/json` |
+| `GET`  | `:mount-path/<test|launchtest>/storage/slashing`  | `200 application/json` |
 
 
 #### Sample Response
@@ -163,7 +163,7 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/accounts/sign-attestation`  | `200 application/json` |
+| `POST`  | `:mount-path/<test|launchtest>/accounts/sign-attestation`  | `200 application/json` |
 
 #### Parameters
 
@@ -202,7 +202,7 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/accounts/sign-proposal`  | `200 application/json` |
+| `POST`  | `:mount-path/<test|launchtest>/accounts/sign-proposal`  | `200 application/json` |
 
 #### Parameters
 
@@ -239,7 +239,7 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/accounts/sign-aggregation`  | `200 application/json` |
+| `POST`  | `:mount-path/<test|launchtest>/accounts/sign-aggregation`  | `200 application/json` |
 
 #### Parameters
 
@@ -274,12 +274,18 @@ Use the following policy to assign to a signer level access token, with the abil
 
 ```
 # Ability to list existing wallet accounts ("list")
-path "ethereum/accounts" {
+path "ethereum/test/accounts" {
+  capabilities = ["list"]
+}
+path "ethereum/launchtest/accounts" {
   capabilities = ["list"]
 }
 
 # Ability to sign data ("create")
-path "ethereum/accounts/sign-*" {
+path "ethereum/test/accounts/sign-*" {
+  capabilities = ["create"]
+}
+path "ethereum/launchtest/accounts/sign-*" {
   capabilities = ["create"]
 }
 ```
@@ -289,17 +295,26 @@ Use the following policy to assign to a admin level access token, with the full 
 
 ```
 # Ability to list existing wallet accounts ("list")
-path "ethereum/accounts" {
+path "ethereum/test/accounts" {
+  capabilities = ["list"]
+}
+path "ethereum/launchtest/accounts" {
   capabilities = ["list"]
 }
 
 # Ability to sign data ("create")
-path "ethereum/accounts/sign-*" {
+path "ethereum/test/accounts/sign-*" {
+  capabilities = ["create"]
+}
+path "ethereum/launchtest/accounts/sign-*" {
   capabilities = ["create"]
 }
 
 # Ability to update storage ("create")
-path "ethereum/storage" {
+path "ethereum/test/storage" {
+  capabilities = ["create"]
+}
+path "ethereum/launchtest/storage" {
   capabilities = ["create"]
 }
 ```
