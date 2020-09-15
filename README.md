@@ -29,7 +29,7 @@ This endpoint will list all accounts of key-vault.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `LIST`  | `:mount-path/<test|launchtest>/accounts`  | `200 application/json` |
+| `LIST`  | `:mount-path/:network/accounts`  | `200 application/json` |
 
 
 #### Sample Response
@@ -64,7 +64,7 @@ This endpoint will update the storage.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/<test|launchtest>/storage`  | `200 application/json` |
+| `POST`  | `:mount-path/:network/storage`  | `200 application/json` |
 
 
 #### Sample Response
@@ -94,7 +94,7 @@ This endpoint will update the storage.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/<test|launchtest>/storage/slashing`  | `200 application/json` |
+| `POST`  | `:mount-path/:network/storage/slashing`  | `200 application/json` |
 
 
 #### Sample Request
@@ -133,7 +133,7 @@ This endpoint will update the storage.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `GET`  | `:mount-path/<test|launchtest>/storage/slashing`  | `200 application/json` |
+| `GET`  | `:mount-path/:network/storage/slashing`  | `200 application/json` |
 
 
 #### Sample Response
@@ -163,7 +163,7 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/<test|launchtest>/accounts/sign-attestation`  | `200 application/json` |
+| `POST`  | `:mount-path/:network/accounts/sign-attestation`  | `200 application/json` |
 
 #### Parameters
 
@@ -239,7 +239,7 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/<test|launchtest>/accounts/sign-aggregation`  | `200 application/json` |
+| `POST`  | `:mount-path/:network/accounts/sign-aggregation`  | `200 application/json` |
 
 #### Parameters
 
