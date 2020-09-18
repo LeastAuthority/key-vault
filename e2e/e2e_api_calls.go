@@ -135,7 +135,8 @@ func (setup *BaseSetup) SignAttestation(data map[string]interface{}) ([]byte, er
 func (setup *BaseSetup) UpdateConfig(t *testing.T) {
 	// body
 	body, err := json.Marshal(map[string]string{
-		"network": "test",
+		"network":           "test",
+		"beacon_chain_addr": "eth2-4000.stage.bloxinfra.com:80",
 	})
 	require.NoError(t, err)
 
