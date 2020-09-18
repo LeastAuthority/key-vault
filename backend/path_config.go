@@ -3,10 +3,14 @@ package backend
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/bloxapp/eth2-key-manager/core"
+	"github.com/gogo/protobuf/types"
 	"github.com/pkg/errors"
+	ethpb "github.com/prysmaticlabs/ethereumapis/eth/v1alpha1"
 
+	"github.com/bloxapp/key-vault/utils/rpc"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 )
@@ -19,7 +23,9 @@ const (
 
 // Config contains the configuration for each mount
 type Config struct {
-	Network core.Network `json:"network"`
+	Network         core.Network `json:"network"`
+	BeaconChainAddr string       `json:"beacon_chain_addr"`
+	GenesisTime     *time.Time   `json:"genesis_time"`
 }
 
 func configPaths(b *backend) []*framework.Path {
@@ -44,6 +50,10 @@ func configPaths(b *backend) []*framework.Path {
 						string(core.LaunchTestNetwork),
 					},
 				},
+				"beacon_chain_addr": {
+					Type:        framework.TypeString,
+					Description: `Beacon chain server RPC address`,
+				},
 			},
 		},
 	}
@@ -52,9 +62,18 @@ func configPaths(b *backend) []*framework.Path {
 // pathWriteConfig is the write config path handler
 func (b *backend) pathWriteConfig(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	network := data.Get("network").(string)
+	beaconChainAddr := data.Get("beacon_chain_addr").(string)
+
+	// Load genesis time
+	genesisTime, err := b.loadGenesisTime(ctx, beaconChainAddr)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to load genesis time")
+	}
 
 	configBundle := Config{
-		Network: core.NetworkFromString(network),
+		Network:         core.NetworkFromString(network),
+		BeaconChainAddr: beaconChainAddr,
+		GenesisTime:     genesisTime,
 	}
 
 	// Create storage entry
@@ -71,7 +90,9 @@ func (b *backend) pathWriteConfig(ctx context.Context, req *logical.Request, dat
 	// Return the secret
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"network": configBundle.Network,
+			"network":           configBundle.Network,
+			"beacon_chain_addr": configBundle.BeaconChainAddr,
+			"genesis_time":      configBundle.GenesisTime,
 		},
 	}, nil
 }
@@ -90,7 +111,9 @@ func (b *backend) pathReadConfig(ctx context.Context, req *logical.Request, data
 	// Return the secret
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"network": configBundle.Network,
+			"network":           configBundle.Network,
+			"beacon_chain_addr": configBundle.BeaconChainAddr,
+			"genesis_time":      configBundle.GenesisTime,
 		},
 	}, nil
 }
@@ -123,4 +146,28 @@ func (b *backend) configured(ctx context.Context, req *logical.Request) (*Config
 	}
 
 	return config, nil
+}
+
+func (b *backend) loadGenesisTime(ctx context.Context, beaconChainAddr string) (*time.Time, error) {
+	// Create RPC client
+	client, err := rpc.Connect(beaconChainAddr)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to connect to beacon server %s", beaconChainAddr)
+	}
+	nodeClient := ethpb.NewNodeClient(client)
+	defer client.Close()
+
+	// Get genesis time
+	genesisResp, err := nodeClient.GetGenesis(ctx, &types.Empty{})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get genesis time")
+	}
+
+	// Parse genesis
+	genesisTime, err := types.TimestampFromProto(genesisResp.GetGenesisTime())
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse genesis time")
+	}
+
+	return &genesisTime, nil
 }
