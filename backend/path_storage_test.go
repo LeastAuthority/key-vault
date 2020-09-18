@@ -22,7 +22,7 @@ func _byteArray(input string) []byte {
 }
 
 func baseInmemStorage() (*in_memory.InMemStore, uuid.UUID, error) {
-	inMemStore := in_memory.NewInMemStore()
+	inMemStore := in_memory.NewInMemStore(core.MainNetwork)
 
 	// wallet
 	wallet := wallet_hd.NewHDWallet(&core.WalletContext{Storage: inMemStore})
@@ -86,7 +86,7 @@ func TestStorage(t *testing.T) {
 		acc, err := wallet.AccountByPublicKey("ab321d63b7b991107a5667bf4fe853a266c2baea87d33a41c7e39a5641bfd3b5434b76f1229d452acb45ba86284e3279")
 		require.NoError(t, err)
 
-		vault := store.NewHashicorpVaultStore(context.Background(), logicalStorage)
+		vault := store.NewHashicorpVaultStore(context.Background(), logicalStorage, core.MainNetwork)
 		wallet2, err := vault.OpenWallet()
 		require.NoError(t, err)
 		require.Equal(t, wallet.ID().String(), wallet2.ID().String())

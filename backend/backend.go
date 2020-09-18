@@ -36,6 +36,7 @@ func newBackend(version string) *backend {
 			storageSlashingPaths(b),
 			accountsPaths(b),
 			signsPaths(b),
+			configPaths(b),
 		),
 		PathsSpecial: &logical.Paths{
 			SealWrapStorage: []string{

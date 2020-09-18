@@ -12,7 +12,7 @@ import (
 )
 
 func getSlashingStorage() core.SlashingStore {
-	return store.NewHashicorpVaultStore(context.Background(), &logical.InmemStorage{})
+	return store.NewHashicorpVaultStore(context.Background(), &logical.InmemStorage{}, core.MainNetwork)
 }
 
 func TestSavingProposal(t *testing.T) {

@@ -177,8 +177,14 @@ func signsPaths(b *backend) []*framework.Path {
 }
 
 func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	// Load config
+	config, err := b.configured(ctx, req)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get config")
+	}
+
 	// bring up KeyVault and wallet
-	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage, config.Network)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
@@ -282,8 +288,14 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 }
 
 func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	// Load config
+	config, err := b.configured(ctx, req)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get config")
+	}
+
 	// bring up KeyVault and wallet
-	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage, config.Network)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
@@ -381,8 +393,14 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 }
 
 func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	// Load config
+	config, err := b.configured(ctx, req)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get config")
+	}
+
 	// bring up KeyVault and wallet
-	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage, config.Network)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 

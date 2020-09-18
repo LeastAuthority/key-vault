@@ -44,8 +44,14 @@ func storageSlashingPaths(b *backend) []*framework.Path {
 }
 
 func (b *backend) pathSlashingStorageBatchUpdate(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	// Load config
+	config, err := b.configured(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
 	// bring up KeyVault and wallet
-	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage, config.Network)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
@@ -85,8 +91,14 @@ func (b *backend) pathSlashingStorageBatchUpdate(ctx context.Context, req *logic
 }
 
 func (b *backend) pathSlashingStorageBatchRead(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	// Load config
+	config, err := b.configured(ctx, req)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get config")
+	}
+
 	// bring up KeyVault and wallet
-	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage, config.Network)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
