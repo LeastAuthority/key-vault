@@ -1,22 +1,23 @@
 package shared
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/bloxapp/eth-key-manager/core"
-	"github.com/bloxapp/eth-key-manager/stores/in_memory"
-	"github.com/bloxapp/eth-key-manager/wallet_hd"
+	"github.com/bloxapp/eth2-key-manager/core"
+	"github.com/bloxapp/eth2-key-manager/stores/in_memory"
+	"github.com/bloxapp/eth2-key-manager/wallet_hd"
 	"github.com/stretchr/testify/require"
 	types "github.com/wealdtech/go-eth2-types/v2"
 )
 
-// AccountName is the test account name.
-const AccountName = "test_account"
+// AccountIndex is the test account index.
+const AccountIndex = 0
 
 // BaseInmemStorage creates the in-memory storage and creates the base account.
 func BaseInmemStorage(t *testing.T) (*in_memory.InMemStore, error) {
 	types.InitBLS()
-	store := in_memory.NewInMemStore()
+	store := in_memory.NewInMemStore(core.MainNetwork)
 
 	entropy, err := core.GenerateNewEntropy()
 	require.NoError(t, err)
@@ -31,8 +32,7 @@ func BaseInmemStorage(t *testing.T) (*in_memory.InMemStore, error) {
 	}
 
 	// account
-	// acc, err := wallet.CreateValidatorAccount(_byteArray("0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1fff"), "test_account")
-	acc, err := wallet.CreateValidatorAccount(seed, AccountName)
+	acc, err := wallet.CreateValidatorAccount(seed, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func RetrieveAccount(t *testing.T, store core.Storage) core.ValidatorAccount {
 	require.NoError(t, err)
 
 	for _, acc := range accounts {
-		if acc.Name() == AccountName {
+		if acc.BasePath() == fmt.Sprintf("/%d", AccountIndex) {
 			return acc
 		}
 	}

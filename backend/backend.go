@@ -7,6 +7,9 @@ import (
 
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
+	"github.com/pkg/errors"
+
+	"github.com/bloxapp/key-vault/utils/errorex"
 )
 
 // Factory returns the backend factory
@@ -30,8 +33,10 @@ func newBackend(version string) *backend {
 		Paths: framework.PathAppend(
 			versionPaths(b),
 			storagePaths(b),
+			storageSlashingPaths(b),
 			accountsPaths(b),
 			signsPaths(b),
+			configPaths(b),
 		),
 		PathsSpecial: &logical.Paths{
 			SealWrapStorage: []string{
@@ -68,4 +73,15 @@ func (b *backend) notFoundResponse() (*logical.Response, error) {
 			"status_code": http.StatusNotFound,
 		},
 	}, nil, http.StatusNotFound)
+}
+
+func (b *backend) prepareErrorResponse(originError error) (*logical.Response, error) {
+	switch err := errors.Cause(originError).(type) {
+	case *errorex.ErrBadRequest:
+		return err.ToLogicalResponse()
+	case nil:
+		return nil, nil
+	default:
+		return logical.ErrorResponse(originError.Error()), nil
+	}
 }

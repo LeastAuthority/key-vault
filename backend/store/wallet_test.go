@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/bloxapp/eth-key-manager/core"
-	"github.com/bloxapp/eth-key-manager/stores"
+	"github.com/bloxapp/eth2-key-manager/core"
+	"github.com/bloxapp/eth2-key-manager/stores"
 	"github.com/hashicorp/vault/sdk/logical"
 
 	"github.com/bloxapp/key-vault/backend/store"
@@ -16,7 +16,7 @@ func getStorage() logical.Storage {
 }
 
 func getWalletStorage() core.Storage {
-	return store.NewHashicorpVaultStore(context.Background(), getStorage())
+	return store.NewHashicorpVaultStore(context.Background(), getStorage(), core.MainNetwork)
 }
 
 func TestOpeningAccounts(t *testing.T) {

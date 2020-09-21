@@ -2,6 +2,7 @@ package keymanager
 
 import (
 	"bytes"
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"io/ioutil"
@@ -10,6 +11,7 @@ import (
 	ethpb "github.com/prysmaticlabs/ethereumapis/eth/v1alpha1"
 	"github.com/prysmaticlabs/prysm/shared/bls"
 	"github.com/prysmaticlabs/prysm/shared/bytesutil"
+	v1keymanager "github.com/prysmaticlabs/prysm/validator/keymanager/v1"
 	"github.com/sirupsen/logrus"
 
 	"github.com/bloxapp/key-vault/backend"
@@ -17,99 +19,76 @@ import (
 	"github.com/bloxapp/key-vault/utils/httpex"
 )
 
-// Signing endpoints
-var (
-	signAggregationPath = endpoint.Build(backend.SignAggregationPattern)
-	signProposalPath    = endpoint.Build(backend.SignProposalPattern)
-	signAttestationPath = endpoint.Build(backend.SignAttestationPattern)
-)
+// To make sure KeyManager implements v1keymanager.ProtectingKeyManager interface
+var _ v1keymanager.KeyManager = &KeyManager{}
+var _ v1keymanager.ProtectingKeyManager = &KeyManager{}
 
 // Predefined errors
 var (
-	ErrUnprotectedSigning = NewGenericErrorWithMessage("remote HTTP key manager does not support unprotected signing")
+	ErrUnprotectedSigning = NewGenericErrorWithMessage("remote HTTP key manager does not support unprotected signing method")
+	ErrUnsupportedSigning = NewGenericErrorWithMessage("remote HTTP key manager does not support such signing method")
 	ErrNoSuchKey          = NewGenericErrorWithMessage("no such key")
 )
 
-// VaultRemoteHTTPWallet is a key manager that accesses a remote vault wallet daemon through HTTP connection.
-type VaultRemoteHTTPWallet struct {
+// KeyManager is a key manager that accesses a remote vault wallet daemon through HTTP connection.
+type KeyManager struct {
 	remoteAddress string
 	accessToken   string
 	originPubKey  string
 	pubKey        [48]byte
+	network       string
 	httpClient    *http.Client
 
 	log *logrus.Entry
 }
 
-// NewVaultRemoteHTTPWalletFromOpts is the constructor of VaultRemoteHTTPWallet.
-// This constructor handles the given options and creates a wallet.
-func NewVaultRemoteHTTPWalletFromOpts(input string) (*VaultRemoteHTTPWallet, string, error) {
-	opts := &remoteOpts{}
-	if err := json.Unmarshal([]byte(input), opts); err != nil {
-		return nil, remoteOptsHelp, NewGenericError(err, "failed to unmarshal options")
-	}
-
+// NewKeyManager is the constructor of KeyManager.
+func NewKeyManager(log *logrus.Entry, opts *Config) (*KeyManager, error) {
 	if len(opts.Location) == 0 {
-		return nil, remoteOptsHelp, NewGenericErrorMessage("wallet location is required")
+		return nil, NewGenericErrorMessage("wallet location is required")
 	}
 	if len(opts.AccessToken) == 0 {
-		return nil, remoteOptsHelp, NewGenericErrorMessage("wallet access token is required")
+		return nil, NewGenericErrorMessage("wallet access token is required")
 	}
 	if len(opts.PubKey) == 0 {
-		return nil, remoteOptsHelp, NewGenericErrorMessage("wallet public key is required")
+		return nil, NewGenericErrorMessage("wallet public key is required")
 	}
 
-	logger := logrus.New().WithFields(logrus.Fields{
-		"location":   opts.Location,
-		"public_key": opts.PubKey,
-	})
-
+	// Decode public key
 	decodedPubKey, err := hex.DecodeString(opts.PubKey)
 	if err != nil {
-		return nil, remoteOptsHelp, NewGenericError(err, "failed to hex decode public key '%s'", opts.PubKey)
+		return nil, NewGenericError(err, "failed to hex decode public key '%s'", opts.PubKey)
 	}
 
-	return &VaultRemoteHTTPWallet{
+	return &KeyManager{
 		remoteAddress: opts.Location,
 		accessToken:   opts.AccessToken,
 		originPubKey:  opts.PubKey,
 		pubKey:        bytesutil.ToBytes48(decodedPubKey),
-		httpClient:    httpex.CreateClient(),
-		log:           logger,
-	}, remoteOptsHelp, nil
-}
-
-// NewVaultRemoteHTTPWallet is the constructor of VaultRemoteHTTPWallet.
-func NewVaultRemoteHTTPWallet(log *logrus.Entry, remoteAddress, accessToken, pubKey string) (*VaultRemoteHTTPWallet, error) {
-	// Decode public key
-	decodedPubKey, err := hex.DecodeString(pubKey)
-	if err != nil {
-		return nil, NewGenericError(err, "failed to hex decode public key '%s'", pubKey)
-	}
-
-	return &VaultRemoteHTTPWallet{
-		remoteAddress: remoteAddress,
-		accessToken:   accessToken,
-		originPubKey:  pubKey,
-		pubKey:        bytesutil.ToBytes48(decodedPubKey),
+		network:       opts.Network,
 		httpClient:    httpex.CreateClient(),
 		log:           log,
 	}, nil
 }
 
+// FetchValidatingKeys implements KeyManager interface.
+func (km *KeyManager) FetchValidatingKeys() ([][48]byte, error) {
+	return [][48]byte{km.pubKey}, nil
+}
+
 // Sign implements KeyManager interface.
-func (km *VaultRemoteHTTPWallet) Sign(pubKey [48]byte, root [32]byte) (bls.Signature, error) {
+func (km *KeyManager) Sign(ctx context.Context, pubKey [48]byte, root [32]byte) (bls.Signature, error) {
 	return nil, ErrUnprotectedSigning
 }
 
 // SignGeneric implements ProtectingKeyManager interface.
-func (km *VaultRemoteHTTPWallet) SignGeneric(pubKey [48]byte, root [32]byte, domain [32]byte) (bls.Signature, error) {
+func (km *KeyManager) SignGeneric(pubKey [48]byte, root [32]byte, domain [32]byte) (bls.Signature, error) {
 	if pubKey != km.pubKey {
 		return nil, ErrNoSuchKey
 	}
 
 	// Prepare request body.
-	req := VaultSignAggregationRequest{
+	req := SignAggregationRequest{
 		PubKey:     km.originPubKey,
 		Domain:     hex.EncodeToString(domain[:]),
 		DataToSign: hex.EncodeToString(root[:]),
@@ -122,8 +101,8 @@ func (km *VaultRemoteHTTPWallet) SignGeneric(pubKey [48]byte, root [32]byte, dom
 	}
 
 	// Send request.
-	var resp VaultSignResponse
-	if err := km.sendRequest(http.MethodPost, signAggregationPath, reqBody, &resp); err != nil {
+	var resp SignResponse
+	if err := km.sendRequest(http.MethodPost, backend.SignAggregationPattern, reqBody, &resp); err != nil {
 		km.log.WithError(err).Error("failed to send sign aggregation request")
 		return nil, NewGenericError(err, "failed to send SignGeneric request to remote vault wallet")
 	}
@@ -144,13 +123,13 @@ func (km *VaultRemoteHTTPWallet) SignGeneric(pubKey [48]byte, root [32]byte, dom
 }
 
 // SignProposal implements ProtectingKeyManager interface.
-func (km *VaultRemoteHTTPWallet) SignProposal(pubKey [48]byte, domain [32]byte, data *ethpb.BeaconBlockHeader) (bls.Signature, error) {
+func (km *KeyManager) SignProposal(pubKey [48]byte, domain [32]byte, data *ethpb.BeaconBlockHeader) (bls.Signature, error) {
 	if pubKey != km.pubKey {
 		return nil, ErrNoSuchKey
 	}
 
 	// Prepare request body.
-	req := VaultSignProposalRequest{
+	req := SignProposalRequest{
 		PubKey:        km.originPubKey,
 		Domain:        hex.EncodeToString(domain[:]),
 		Slot:          data.GetSlot(),
@@ -167,8 +146,8 @@ func (km *VaultRemoteHTTPWallet) SignProposal(pubKey [48]byte, domain [32]byte, 
 	}
 
 	// Send request.
-	var resp VaultSignResponse
-	if err := km.sendRequest(http.MethodPost, signProposalPath, reqBody, &resp); err != nil {
+	var resp SignResponse
+	if err := km.sendRequest(http.MethodPost, backend.SignProposalPattern, reqBody, &resp); err != nil {
 		km.log.WithError(err).Error("failed to send sign proposal request")
 		return nil, NewGenericError(err, "failed to send SignAttestation request to remote vault wallet")
 	}
@@ -189,13 +168,13 @@ func (km *VaultRemoteHTTPWallet) SignProposal(pubKey [48]byte, domain [32]byte, 
 }
 
 // SignAttestation implements ProtectingKeyManager interface.
-func (km *VaultRemoteHTTPWallet) SignAttestation(pubKey [48]byte, domain [32]byte, data *ethpb.AttestationData) (bls.Signature, error) {
+func (km *KeyManager) SignAttestation(pubKey [48]byte, domain [32]byte, data *ethpb.AttestationData) (bls.Signature, error) {
 	if pubKey != km.pubKey {
 		return nil, ErrNoSuchKey
 	}
 
 	// Prepare request body.
-	req := VaultSignAttestationRequest{
+	req := SignAttestationRequest{
 		PubKey:          km.originPubKey,
 		Domain:          hex.EncodeToString(domain[:]),
 		Slot:            data.GetSlot(),
@@ -214,8 +193,8 @@ func (km *VaultRemoteHTTPWallet) SignAttestation(pubKey [48]byte, domain [32]byt
 	}
 
 	// Send request.
-	var resp VaultSignResponse
-	if err := km.sendRequest(http.MethodPost, signAttestationPath, reqBody, &resp); err != nil {
+	var resp SignResponse
+	if err := km.sendRequest(http.MethodPost, backend.SignAttestationPattern, reqBody, &resp); err != nil {
 		km.log.WithError(err).Error("failed to send sign attestation request")
 		return nil, NewGenericError(err, "failed to send SignAttestation request to remote vault wallet")
 	}
@@ -235,14 +214,9 @@ func (km *VaultRemoteHTTPWallet) SignAttestation(pubKey [48]byte, domain [32]byt
 	return sig, nil
 }
 
-// FetchValidatingKeys implements KeyManager interface.
-func (km *VaultRemoteHTTPWallet) FetchValidatingKeys() ([][48]byte, error) {
-	return [][48]byte{km.pubKey}, nil
-}
-
 // sendRequest implements the logic to work with HTTP requests.
-func (km *VaultRemoteHTTPWallet) sendRequest(method, path string, reqBody []byte, respBody interface{}) error {
-	endpoint := km.remoteAddress + path
+func (km *KeyManager) sendRequest(method, path string, reqBody []byte, respBody interface{}) error {
+	endpoint := km.remoteAddress + endpoint.Build(km.network, path)
 
 	// Prepare a new request
 	req, err := http.NewRequest(method, endpoint, bytes.NewBuffer(reqBody))

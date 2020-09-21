@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 
-	vault "github.com/bloxapp/eth-key-manager"
+	vault "github.com/bloxapp/eth2-key-manager"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
@@ -34,7 +34,13 @@ func accountsPaths(b *backend) []*framework.Path {
 }
 
 func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
-	storage := store.NewHashicorpVaultStore(ctx, req.Storage)
+	// Load config
+	config, err := b.configured(ctx, req)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get config")
+	}
+
+	storage := store.NewHashicorpVaultStore(ctx, req.Storage, config.Network)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)
 
@@ -49,7 +55,7 @@ func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Reque
 	}
 
 	var accounts []map[string]string
-	for a := range wallet.Accounts() {
+	for _, a := range wallet.Accounts() {
 		accObj := map[string]string{
 			"id":               a.ID().String(),
 			"name":             a.Name(),

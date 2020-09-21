@@ -29,7 +29,7 @@ This endpoint will list all accounts of key-vault.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `LIST`  | `:mount-path/accounts`  | `200 application/json` |
+| `LIST`  | `:mount-path/:network/accounts`  | `200 application/json` |
 
 
 #### Sample Response
@@ -64,7 +64,7 @@ This endpoint will update the storage.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/storage`  | `200 application/json` |
+| `POST`  | `:mount-path/:network/storage`  | `200 application/json` |
 
 
 #### Sample Response
@@ -88,6 +88,74 @@ The example below shows output for a query path of `/ethereum/storage`.
 }
 ```
 
+### UPDATE SLASHING STORAGE
+
+This endpoint will update the storage.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `POST`  | `:mount-path/:network/storage/slashing`  | `200 application/json` |
+
+
+#### Sample Request
+
+The example below shows input for a query path of `/ethereum/storage/slashing`.
+
+```
+{
+    "<public_key>": "<hex_encoded_slashing_storage>"
+}
+```
+
+
+#### Sample Response
+
+The example below shows output for a query path of `/ethereum/storage/slashing`.
+
+```
+{
+    "request_id": "d53d5075-6a3b-2642-ffde-0714beb595f5",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "status": true
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}
+```
+
+### READ SLASHING STORAGE
+
+This endpoint will update the storage.
+
+| Method  | Path | Produces |
+| ------------- | ------------- | ------------- |
+| `GET`  | `:mount-path/:network/storage/slashing`  | `200 application/json` |
+
+
+#### Sample Response
+
+The example below shows output for a query path of `/ethereum/storage/slashing`.
+
+```
+{
+    {
+        "request_id": "d53d5075-6a3b-2642-ffde-0714beb595f5",
+        "lease_id": "",
+        "renewable": false,
+        "lease_duration": 0,
+        "data": {
+            "<public_key>": "<hex_encoded_slashing_storage>"
+        },
+        "wrap_info": null,
+        "warnings": null,
+        "auth": null
+    }
+}
+```
 
 ### SIGN ATTESTATION
 
@@ -95,7 +163,7 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/accounts/sign-attestation`  | `200 application/json` |
+| `POST`  | `:mount-path/:network/accounts/sign-attestation`  | `200 application/json` |
 
 #### Parameters
 
@@ -134,7 +202,7 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/accounts/sign-proposal`  | `200 application/json` |
+| `POST`  | `:mount-path/<test|launchtest>/accounts/sign-proposal`  | `200 application/json` |
 
 #### Parameters
 
@@ -171,7 +239,7 @@ This endpoint will sign attestation for specific account at a path.
 
 | Method  | Path | Produces |
 | ------------- | ------------- | ------------- |
-| `POST`  | `:mount-path/accounts/sign-aggregation`  | `200 application/json` |
+| `POST`  | `:mount-path/:network/accounts/sign-aggregation`  | `200 application/json` |
 
 #### Parameters
 
@@ -206,12 +274,18 @@ Use the following policy to assign to a signer level access token, with the abil
 
 ```
 # Ability to list existing wallet accounts ("list")
-path "ethereum/accounts" {
+path "ethereum/test/accounts" {
+  capabilities = ["list"]
+}
+path "ethereum/launchtest/accounts" {
   capabilities = ["list"]
 }
 
 # Ability to sign data ("create")
-path "ethereum/accounts/sign-*" {
+path "ethereum/test/accounts/sign-*" {
+  capabilities = ["create"]
+}
+path "ethereum/launchtest/accounts/sign-*" {
   capabilities = ["create"]
 }
 ```
@@ -221,17 +295,26 @@ Use the following policy to assign to a admin level access token, with the full 
 
 ```
 # Ability to list existing wallet accounts ("list")
-path "ethereum/accounts" {
+path "ethereum/test/accounts" {
+  capabilities = ["list"]
+}
+path "ethereum/launchtest/accounts" {
   capabilities = ["list"]
 }
 
 # Ability to sign data ("create")
-path "ethereum/accounts/sign-*" {
+path "ethereum/test/accounts/sign-*" {
+  capabilities = ["create"]
+}
+path "ethereum/launchtest/accounts/sign-*" {
   capabilities = ["create"]
 }
 
 # Ability to update storage ("create")
-path "ethereum/storage" {
+path "ethereum/test/storage" {
+  capabilities = ["create"]
+}
+path "ethereum/launchtest/storage" {
   capabilities = ["create"]
 }
 ```
@@ -278,3 +361,19 @@ Use the current format to add new tests.
 
 versions are published to dockerhub based on tags.
 before publishing a tag update docker compose image to the to be pushed tag 
+
+## Multinetworks
+
+The plugin supports multiple Ethereum networks. All available networks are defined in `./config/vault-plugin.sh`.
+New networks could be defined by the following steps:
+
+1. Enable secrets for a new network in `./config/vault-plugin.sh`. 
+    Example
+    ```bash
+    $ vault secrets enable \
+        -path=ethereum/test \
+        -description="Eth Signing Wallet - Test Network" \
+        -plugin-name=ethsign plugin > /dev/null 2>&1
+    ```
+
+2. Update policies `./policies/admin-policy.hcl` and `./policies/signer-policy.hcl` by adding a definition with a new network in the path. 

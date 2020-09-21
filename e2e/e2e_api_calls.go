@@ -12,7 +12,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bloxapp/eth-key-manager/core"
+	"github.com/bloxapp/eth2-key-manager/core"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/require"
 
@@ -92,7 +92,7 @@ func (setup *BaseSetup) SignAttestation(data map[string]interface{}) ([]byte, er
 	}
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/accounts/sign-attestation", setup.baseURL)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/test/accounts/sign-attestation", setup.baseURL)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, nil
@@ -131,6 +131,38 @@ func (setup *BaseSetup) SignAttestation(data map[string]interface{}) ([]byte, er
 	return ret, nil
 }
 
+// UpdateConfig updates the config.
+func (setup *BaseSetup) UpdateConfig(t *testing.T) {
+	// body
+	body, err := json.Marshal(map[string]string{
+		"network": "test",
+	})
+	require.NoError(t, err)
+
+	// build req
+	targetURL := fmt.Sprintf("%s/v1/ethereum/test/config", setup.baseURL)
+	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
+	require.NoError(t, err)
+
+	req.Header.Set("Authorization", "Bearer "+setup.RootKey)
+
+	// Do request
+	httpClient := http.Client{}
+	resp, err := httpClient.Do(req)
+	require.NoError(t, err)
+
+	// Read response body
+	respBodyByts, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	respBody := string(respBodyByts)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode, respBody)
+
+	fmt.Printf("e2e: setup hashicorp vault db\n")
+}
+
 // UpdateStorage updates the storage.
 func (setup *BaseSetup) UpdateStorage(t *testing.T) core.Storage {
 	// get store
@@ -150,7 +182,7 @@ func (setup *BaseSetup) UpdateStorage(t *testing.T) core.Storage {
 	require.NoError(t, err)
 
 	// build req
-	targetURL := fmt.Sprintf("%s/v1/ethereum/storage", setup.baseURL)
+	targetURL := fmt.Sprintf("%s/v1/ethereum/test/storage", setup.baseURL)
 	req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewBuffer(body))
 	require.NoError(t, err)
 
