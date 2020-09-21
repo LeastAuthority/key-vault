@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"testing"
 
+	"github.com/bloxapp/eth2-key-manager/core"
+
 	"github.com/bloxapp/eth2-key-manager/slashing_protection"
 	"github.com/bloxapp/eth2-key-manager/stores/in_memory"
 	"github.com/bloxapp/eth2-key-manager/validator_signer"
@@ -28,6 +30,7 @@ func (test *AttestationSigning) Run(t *testing.T) {
 	setup := e2e.Setup(t)
 
 	// setup vault with db
+	setup.UpdateConfig(t)
 	storage := setup.UpdateStorage(t)
 	account := shared.RetrieveAccount(t, storage)
 	require.NotNil(t, account)
@@ -50,7 +53,7 @@ func (test *AttestationSigning) Run(t *testing.T) {
 	}
 
 	// Sign data
-	protector := slashing_protection.NewNormalProtection(in_memory.NewInMemStore())
+	protector := slashing_protection.NewNormalProtection(in_memory.NewInMemStore(core.MainNetwork))
 	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
 
 	res, err := signer.SignBeaconAttestation(test.dataToAttestationRequest(t, pubKeyBytes, dataToSign))

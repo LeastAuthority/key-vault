@@ -31,6 +31,7 @@ func TestAttestationSlashing(t *testing.T) {
 
 	t.Run("Successfully Sign Attestation", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
+		setupBaseStorage(t, req)
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -48,6 +49,7 @@ func TestAttestationSlashing(t *testing.T) {
 
 	t.Run("Sign duplicated Attestation (exactly same), should sign", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
+		setupBaseStorage(t, req)
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -72,6 +74,7 @@ func TestAttestationSlashing(t *testing.T) {
 
 	t.Run("Sign double Attestation (different block root), should return error", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
+		setupBaseStorage(t, req)
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -95,6 +98,7 @@ func TestAttestationSlashing(t *testing.T) {
 
 	t.Run("Sign double Attestation (different source root), should return error", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
+		setupBaseStorage(t, req)
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -118,6 +122,7 @@ func TestAttestationSlashing(t *testing.T) {
 
 	t.Run("Sign double Attestation (different target root), should return error", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
+		setupBaseStorage(t, req)
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -141,6 +146,7 @@ func TestAttestationSlashing(t *testing.T) {
 
 	t.Run("Sign Attestation (different domain), should sign", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
+		setupBaseStorage(t, req)
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -167,6 +173,7 @@ func TestAttestationSlashing(t *testing.T) {
 
 	t.Run("Sign surrounding Attestation, should error", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
+		setupBaseStorage(t, req)
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)
@@ -216,6 +223,7 @@ func TestAttestationSlashing(t *testing.T) {
 
 	t.Run("Sign surrounded Attestation, should error", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.CreateOperation, "accounts/sign-attestation")
+		setupBaseStorage(t, req)
 
 		// setup storage
 		err := setupStorageWithWalletAndAccounts(req.Storage)

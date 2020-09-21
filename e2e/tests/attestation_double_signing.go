@@ -25,6 +25,7 @@ func (test *AttestationDoubleSigning) Run(t *testing.T) {
 	setup := e2e.Setup(t)
 
 	// setup vault with db
+	setup.UpdateConfig(t)
 	storage := setup.UpdateStorage(t)
 	account := shared.RetrieveAccount(t, storage)
 	pubKey := hex.EncodeToString(account.ValidatorPublicKey().Marshal())

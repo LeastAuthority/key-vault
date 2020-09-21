@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bloxapp/eth2-key-manager/core"
+
 	log "github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/vault/sdk/helper/logging"
 
@@ -32,11 +34,20 @@ func getBackend(t *testing.T) (logical.Backend, logical.Storage) {
 	return b, config.StorageView
 }
 
+func setupBaseStorage(t *testing.T, req *logical.Request) {
+	entry, err := logical.StorageEntryJSON("config", Config{
+		Network: core.MainNetwork,
+	})
+	require.NoError(t, err)
+	req.Storage.Put(context.Background(), entry)
+}
+
 func TestAccountsList(t *testing.T) {
 	b, _ := getBackend(t)
 
 	t.Run("Successfully List Accounts", func(t *testing.T) {
 		req := logical.TestRequest(t, logical.ListOperation, "accounts/")
+		setupBaseStorage(t, req)
 
 		// setup logical storage
 		_, err := baseHashicorpStorage(req.Storage, context.Background())

@@ -26,15 +26,17 @@ const (
 type HashicorpVaultStore struct {
 	storage logical.Storage
 	ctx     context.Context
+	network core.Network
 
 	encryptor          types.Encryptor
 	encryptionPassword []byte
 }
 
 // NewHashicorpVaultStore is the constructor of HashicorpVaultStore.
-func NewHashicorpVaultStore(ctx context.Context, storage logical.Storage) *HashicorpVaultStore {
+func NewHashicorpVaultStore(ctx context.Context, storage logical.Storage, network core.Network) *HashicorpVaultStore {
 	return &HashicorpVaultStore{
 		storage: storage,
+		network: network,
 		ctx:     ctx,
 	}
 }
@@ -63,16 +65,16 @@ func FromInMemoryStore(ctx context.Context, inMem *in_memory.InMemStore, storage
 		return nil, err
 	}
 
-	// get new store
-	newStore := NewHashicorpVaultStore(ctx, storage)
+	// Create new store
+	newStore := NewHashicorpVaultStore(ctx, storage, inMem.Network())
 
 	// Save wallet
 	wallet, err := inMem.OpenWallet()
 	if err != nil {
 		return nil, err
 	}
-	err = newStore.SaveWallet(wallet)
-	if err != nil {
+
+	if err := newStore.SaveWallet(wallet); err != nil {
 		return nil, err
 	}
 
@@ -90,6 +92,11 @@ func FromInMemoryStore(ctx context.Context, inMem *in_memory.InMemStore, storage
 // Name returns the name of the store.
 func (store *HashicorpVaultStore) Name() string {
 	return "Hashicorp Vault"
+}
+
+// Network returns the network the storage is related to.
+func (store *HashicorpVaultStore) Network() core.Network {
+	return store.network
 }
 
 // SaveWallet implements Storage interface.

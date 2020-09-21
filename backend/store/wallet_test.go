@@ -16,7 +16,7 @@ func getStorage() logical.Storage {
 }
 
 func getWalletStorage() core.Storage {
-	return store.NewHashicorpVaultStore(context.Background(), getStorage())
+	return store.NewHashicorpVaultStore(context.Background(), getStorage(), core.MainNetwork)
 }
 
 func TestOpeningAccounts(t *testing.T) {

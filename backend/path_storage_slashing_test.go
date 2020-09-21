@@ -56,6 +56,7 @@ func TestSlashingStorage_Update(t *testing.T) {
 
 		ctx := context.Background()
 		req := logical.TestRequest(t, logical.CreateOperation, "storage/slashing")
+		setupBaseStorage(t, req)
 		req.Data = map[string]interface{}{
 			publicKey: hex.EncodeToString(slashingHistory),
 		}
@@ -70,6 +71,7 @@ func TestSlashingStorage_Update(t *testing.T) {
 	t.Run("rejects setup slashing history with wrong JSON format", func(t *testing.T) {
 		ctx := context.Background()
 		req := logical.TestRequest(t, logical.CreateOperation, "storage/slashing")
+		setupBaseStorage(t, req)
 		req.Data = map[string]interface{}{
 			publicKey: hex.EncodeToString([]byte("slashinghistory")),
 		}
@@ -84,6 +86,7 @@ func TestSlashingStorage_Update(t *testing.T) {
 	t.Run("rejects setup slashing history with wrong HEX format", func(t *testing.T) {
 		ctx := context.Background()
 		req := logical.TestRequest(t, logical.CreateOperation, "storage/slashing")
+		setupBaseStorage(t, req)
 		req.Data = map[string]interface{}{
 			publicKey: "slashinghistory",
 		}
@@ -108,6 +111,7 @@ func TestSlashingStorage_Update(t *testing.T) {
 
 		ctx := context.Background()
 		req := logical.TestRequest(t, logical.CreateOperation, "storage/slashing")
+		setupBaseStorage(t, req)
 		req.Data = map[string]interface{}{
 			fakePublicKey: hex.EncodeToString(slashingHistory),
 		}
@@ -153,6 +157,7 @@ func TestSlashingStorage_Read(t *testing.T) {
 	t.Run("successfully read slashing history", func(t *testing.T) {
 		ctx := context.Background()
 		req := logical.TestRequest(t, logical.ReadOperation, "storage/slashing")
+		setupBaseStorage(t, req)
 		newStore, err := store.FromInMemoryStore(ctx, inMemStore, req.Storage)
 		require.NoError(t, err)
 		err = newStore.SaveAttestation(account.ValidatorPublicKey(), attestation)
