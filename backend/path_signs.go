@@ -475,7 +475,7 @@ func (b *backend) isSlotTime(genesisTime *time.Time, slot int) bool {
 	left := start.Sub(roughtime.Now().UTC())
 
 	// Deviation = seconds per one slot, that's should be enough
-	deviation := time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second
+	deviation := time.Minute
 
 	return left < deviation || left > -deviation
 }
