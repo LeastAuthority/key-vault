@@ -7,12 +7,12 @@ import (
 
 	"github.com/bloxapp/eth2-key-manager/core"
 	"github.com/gogo/protobuf/types"
+	"github.com/hashicorp/vault/sdk/framework"
+	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
 	ethpb "github.com/prysmaticlabs/ethereumapis/eth/v1alpha1"
 
 	"github.com/bloxapp/key-vault/utils/rpc"
-	"github.com/hashicorp/vault/sdk/framework"
-	"github.com/hashicorp/vault/sdk/logical"
 )
 
 // Endpoints patterns
