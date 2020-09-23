@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"encoding/hex"
+	"time"
 
 	vault "github.com/bloxapp/eth2-key-manager"
 	"github.com/bloxapp/eth2-key-manager/slashing_protection"
@@ -14,6 +15,7 @@ import (
 	v1 "github.com/wealdtech/eth2-signer-api/pb/v1"
 
 	"github.com/bloxapp/key-vault/backend/store"
+	"github.com/bloxapp/key-vault/utils/roughtime"
 )
 
 // Endpoints patterns
@@ -80,11 +82,6 @@ func signsPaths(b *backend) []*framework.Path {
 					Description: "Data Target Root",
 					Default:     "",
 				},
-				"useFakeSigner": &framework.FieldSchema{
-					Type:        framework.TypeBool,
-					Description: "True if the fake signer should be used",
-					Default:     false,
-				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
@@ -131,11 +128,6 @@ func signsPaths(b *backend) []*framework.Path {
 					Description: "Data BodyRoot",
 					Default:     "",
 				},
-				"useFakeSigner": &framework.FieldSchema{
-					Type:        framework.TypeBool,
-					Description: "True if the fake signer should be used",
-					Default:     false,
-				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
@@ -161,11 +153,6 @@ func signsPaths(b *backend) []*framework.Path {
 					Type:        framework.TypeString,
 					Description: "Data to sign",
 					Default:     "",
-				},
-				"useFakeSigner": &framework.FieldSchema{
-					Type:        framework.TypeBool,
-					Description: "True if the fake signer should be used",
-					Default:     false,
 				},
 			},
 			ExistenceCheck: b.pathExistenceCheck,
@@ -254,6 +241,11 @@ func (b *backend) pathSignAttestation(ctx context.Context, req *logical.Request,
 	targetRootBytes, err := hex.DecodeString(targetRoot)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to HEX decode target root")
+	}
+
+	// Check if the given slot came in time
+	if !b.isSlotTime(config.GenesisTime, slot) {
+		return nil, errors.Wrap(err, "it's not a slot time")
 	}
 
 	protector := slashing_protection.NewNormalProtection(storage)
@@ -365,7 +357,15 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 		return nil, errors.Wrap(err, "failed to HEX decode body root")
 	}
 
-	proposalRequest := &v1.SignBeaconProposalRequest{
+	// Check if the given slot came in time
+	if !b.isSlotTime(config.GenesisTime, slot) {
+		return nil, errors.Wrap(err, "it's not a slot time")
+	}
+
+	protector := slashing_protection.NewNormalProtection(storage)
+	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
+
+	res, err := signer.SignBeaconProposal(&v1.SignBeaconProposalRequest{
 		Id:     &v1.SignBeaconProposalRequest_PublicKey{PublicKey: publicKeyBytes},
 		Domain: domainBytes,
 		Data: &v1.BeaconBlockHeader{
@@ -375,12 +375,7 @@ func (b *backend) pathSignProposal(ctx context.Context, req *logical.Request, da
 			StateRoot:     stateRootBytes,
 			BodyRoot:      bodyRootBytes,
 		},
-	}
-
-	protector := slashing_protection.NewNormalProtection(storage)
-	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
-
-	res, err := signer.SignBeaconProposal(proposalRequest)
+	})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to sign data")
 	}
@@ -454,16 +449,14 @@ func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request,
 		return nil, errors.Wrap(err, "failed to HEX decode data to sign")
 	}
 
-	proposalRequest := &v1.SignRequest{
-		Id:     &v1.SignRequest_PublicKey{PublicKey: publicKeyBytes},
-		Domain: domainBytes,
-		Data:   dataToSignBytes,
-	}
-
 	protector := slashing_protection.NewNormalProtection(storage)
 	var signer validator_signer.ValidatorSigner = validator_signer.NewSimpleSigner(wallet, protector)
 
-	res, err := signer.Sign(proposalRequest)
+	res, err := signer.Sign(&v1.SignRequest{
+		Id:     &v1.SignRequest_PublicKey{PublicKey: publicKeyBytes},
+		Domain: domainBytes,
+		Data:   dataToSignBytes,
+	})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to sign data")
 	}
@@ -473,4 +466,15 @@ func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request,
 			"signature": hex.EncodeToString(res.GetSignature()),
 		},
 	}, nil
+}
+
+func (b *backend) isSlotTime(genesisTime time.Time, slot int) bool {
+	timeSinceGenesisStart := uint64(slot) * 12
+	start := genesisTime.Add(time.Duration(timeSinceGenesisStart) * time.Second)
+	left := start.Sub(roughtime.Now().UTC())
+
+	// Deviation = seconds per one slot, that's should be enough
+	deviation := time.Minute
+
+	return left < deviation || left > -deviation
 }

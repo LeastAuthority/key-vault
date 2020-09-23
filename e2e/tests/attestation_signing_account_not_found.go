@@ -23,7 +23,6 @@ func (test *AttestationSigningAccountNotFound) Run(t *testing.T) {
 	setup := e2e.Setup(t)
 
 	// setup vault with db
-	setup.UpdateConfig(t)
 	setup.UpdateStorage(t)
 
 	// sign

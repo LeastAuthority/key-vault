@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -19,6 +20,8 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/pkg/errors"
 )
+
+var buildOnce sync.Once
 
 // Config contains configuration of validator service instance.
 type Config struct {
@@ -51,8 +54,12 @@ func New(imageName, basePath string) (*Docker, error) {
 
 // Launch implements launcher.Launcher interface by starting image using installed Docker service.
 func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
-	if err := l.buildImage(ctx); err != nil {
-		return nil, errors.Wrap(err, "failed to build image")
+	var buildErr error
+	buildOnce.Do(func() {
+		buildErr = l.buildImage(ctx)
+	})
+	if buildErr != nil {
+		return nil, errors.Wrap(buildErr, "failed to build image")
 	}
 
 	// Get available port
@@ -80,6 +87,8 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 				"VAULT_ADDR=http://127.0.0.1:8200",
 				"VAULT_API_ADDR=http://127.0.0.1:8200",
 				"VAULT_CLIENT_TIMEOUT=30s",
+				"TESTNET_GENESIS_TIME=2020-08-04 13:00:08 UTC",
+				"LAUNCHTESTNET_GENESIS_TIME=2020-08-04 13:00:08 UTC",
 				"UNSEAL=true",
 			},
 		},
@@ -126,7 +135,7 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 
 	// Read logs from stream
 	hdr := make([]byte, 8)
-	timeout := time.Tick(time.Minute)
+	timeout := time.Tick(time.Minute * 3)
 	for {
 		var loaded bool
 		select {
@@ -147,6 +156,7 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 			}
 
 			dta := strings.ToLower(string(dat))
+			fmt.Println("dta", dta)
 			if strings.Contains(dta, "connection refused") {
 				l.Stop(ctx, cont.ID)
 				return nil, errors.Errorf("failed to launch instance: %s", string(dat))
