@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -19,6 +20,8 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/pkg/errors"
 )
+
+var buildOnce sync.Once
 
 // Config contains configuration of validator service instance.
 type Config struct {
@@ -51,8 +54,12 @@ func New(imageName, basePath string) (*Docker, error) {
 
 // Launch implements launcher.Launcher interface by starting image using installed Docker service.
 func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
-	if err := l.buildImage(ctx); err != nil {
-		return nil, errors.Wrap(err, "failed to build image")
+	var buildErr error
+	buildOnce.Do(func() {
+		buildErr = l.buildImage(ctx)
+	})
+	if buildErr != nil {
+		return nil, errors.Wrap(buildErr, "failed to build image")
 	}
 
 	// Get available port
