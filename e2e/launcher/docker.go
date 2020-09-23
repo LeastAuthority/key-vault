@@ -135,7 +135,7 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 
 	// Read logs from stream
 	hdr := make([]byte, 8)
-	timeout := time.Tick(time.Minute)
+	timeout := time.Tick(time.Minute * 3)
 	for {
 		var loaded bool
 		select {
