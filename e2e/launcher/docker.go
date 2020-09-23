@@ -80,6 +80,8 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 				"VAULT_ADDR=http://127.0.0.1:8200",
 				"VAULT_API_ADDR=http://127.0.0.1:8200",
 				"VAULT_CLIENT_TIMEOUT=30s",
+				"TESTNET_GENESIS_TIME=2020-08-04 13:00:08 UTC",
+				"LAUNCHTESTNET_GENESIS_TIME=2020-08-04 13:00:08 UTC",
 				"UNSEAL=true",
 			},
 		},
