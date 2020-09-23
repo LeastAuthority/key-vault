@@ -87,8 +87,8 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 				"VAULT_ADDR=http://127.0.0.1:8200",
 				"VAULT_API_ADDR=http://127.0.0.1:8200",
 				"VAULT_CLIENT_TIMEOUT=30s",
-				`TESTNET_GENESIS_TIME="2020-08-04 13:00:08 UTC"`,
-				`LAUNCHTESTNET_GENESIS_TIME="2020-08-04 13:00:08 UTC"`,
+				"TESTNET_GENESIS_TIME=2020-08-04 13:00:08 UTC",
+				"LAUNCHTESTNET_GENESIS_TIME=2020-08-04 13:00:08 UTC",
 				"UNSEAL=true",
 			},
 		},
@@ -156,6 +156,7 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 			}
 
 			dta := strings.ToLower(string(dat))
+			fmt.Println("dta", dta)
 			if strings.Contains(dta, "connection refused") {
 				l.Stop(ctx, cont.ID)
 				return nil, errors.Errorf("failed to launch instance: %s", string(dat))
