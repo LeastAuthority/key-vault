@@ -30,7 +30,6 @@ func (test *AttestationSigning) Run(t *testing.T) {
 	setup := e2e.Setup(t)
 
 	// setup vault with db
-	setup.UpdateConfig(t)
 	storage := setup.UpdateStorage(t)
 	account := shared.RetrieveAccount(t, storage)
 	require.NotNil(t, account)
