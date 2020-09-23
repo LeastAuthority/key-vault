@@ -21,7 +21,7 @@ var offset time.Duration
 var log = logrus.WithField("prefix", "roughtime")
 
 var offsetHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
-	Name: "roughtime_offset_nsec",
+	Name: "blox_roughtime_offset_nsec",
 	Help: "The absolute value delta between roughtime computed clock time and the system clock time.",
 	Buckets: []float64{
 		float64(50 * time.Millisecond),
@@ -34,7 +34,7 @@ var offsetHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
 })
 
 var offsetsRejected = promauto.NewCounter(prometheus.CounterOpts{
-	Name: "roughtime_offsets_rejected",
+	Name: "blox_roughtime_offsets_rejected",
 	Help: "The number of times that roughtime results could not be verified and the returned offset was rejected",
 })
 
