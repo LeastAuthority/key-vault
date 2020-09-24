@@ -39,7 +39,7 @@ func (b *backend) pathWalletAccountsList(ctx context.Context, req *logical.Reque
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get config")
 	}
-
+	b.logger.Error("pathWalletAccountsList")
 	storage := store.NewHashicorpVaultStore(ctx, req.Storage, config.Network)
 	options := vault.KeyVaultOptions{}
 	options.SetStorage(storage)

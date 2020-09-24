@@ -8,14 +8,15 @@ import (
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	"github.com/bloxapp/key-vault/utils/errorex"
 )
 
 // Factory returns the backend factory
-func Factory(version string) logical.Factory {
+func Factory(version string, logger *logrus.Logger) logical.Factory {
 	return func(ctx context.Context, conf *logical.BackendConfig) (logical.Backend, error) {
-		b := newBackend(version)
+		b := newBackend(version, logger)
 		if err := b.Setup(ctx, conf); err != nil {
 			return nil, err
 		}
@@ -24,8 +25,9 @@ func Factory(version string) logical.Factory {
 }
 
 // newBackend returns the backend
-func newBackend(version string) *backend {
+func newBackend(version string, logger *logrus.Logger) *backend {
 	b := &backend{
+		logger:  logger,
 		Version: version,
 	}
 	b.Backend = &framework.Backend{
@@ -53,6 +55,7 @@ func newBackend(version string) *backend {
 // backend implements the Backend for this plugin
 type backend struct {
 	*framework.Backend
+	logger  *logrus.Logger
 	Version string
 }
 
