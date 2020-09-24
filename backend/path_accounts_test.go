@@ -35,10 +35,9 @@ func getBackend(t *testing.T) (logical.Backend, logical.Storage) {
 }
 
 func setupBaseStorage(t *testing.T, req *logical.Request) {
-	now := time.Now()
 	entry, err := logical.StorageEntryJSON("config", Config{
 		Network:     core.MainNetwork,
-		GenesisTime: &now,
+		GenesisTime: time.Now(),
 	})
 	require.NoError(t, err)
 	req.Storage.Put(context.Background(), entry)

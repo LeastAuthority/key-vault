@@ -14,7 +14,7 @@ vault secrets enable \
 echo "Configuring Test network..."
 vault write ethereum/test/config \
     network="test" \
-    beacon_chain_addr="eth2-4000.stage.bloxinfra.com:80"
+    genesis_time="$TESTNET_GENESIS_TIME"
 
 # Enable launchtest network
 echo "Enabling Launch Test network"
@@ -26,7 +26,7 @@ vault secrets enable \
 echo "Configuring Launch Test network..."
 vault write ethereum/launchtest/config \
     network="launchtest" \
-    beacon_chain_addr="eth2-4000.stage.bloxinfra.com:80"
+    genesis_time="$LAUNCHTESTNET_GENESIS_TIME"
 
 # Reload plugin
 curl --header "X-Vault-Token: $(cat /data/keys/vault.root.token)" --request PUT --data '{"plugin": "ethsign"}'  http://127.0.0.1:8200/v1/sys/plugins/reload/backend

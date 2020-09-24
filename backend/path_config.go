@@ -6,13 +6,15 @@ import (
 	"time"
 
 	"github.com/bloxapp/eth2-key-manager/core"
-	"github.com/gogo/protobuf/types"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
-	ethpb "github.com/prysmaticlabs/ethereumapis/eth/v1alpha1"
+)
 
-	"github.com/bloxapp/key-vault/utils/rpc"
+// Helpers
+const (
+	// This is the format of genesis time, e.g. 2020-08-04 13:00:08 UTC
+	genesisTimeFormat = "2006-01-02 15:04:05 MST"
 )
 
 // Endpoints patterns
@@ -23,9 +25,8 @@ const (
 
 // Config contains the configuration for each mount
 type Config struct {
-	Network         core.Network `json:"network"`
-	BeaconChainAddr string       `json:"beacon_chain_addr"`
-	GenesisTime     *time.Time   `json:"genesis_time"`
+	Network     core.Network `json:"network"`
+	GenesisTime time.Time    `json:"genesis_time"`
 }
 
 func configPaths(b *backend) []*framework.Path {
@@ -50,9 +51,9 @@ func configPaths(b *backend) []*framework.Path {
 						string(core.LaunchTestNetwork),
 					},
 				},
-				"beacon_chain_addr": {
+				"genesis_time": {
 					Type:        framework.TypeString,
-					Description: `Beacon chain server RPC address`,
+					Description: `Genesis time of the network`,
 				},
 			},
 		},
@@ -62,18 +63,17 @@ func configPaths(b *backend) []*framework.Path {
 // pathWriteConfig is the write config path handler
 func (b *backend) pathWriteConfig(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	network := data.Get("network").(string)
-	beaconChainAddr := data.Get("beacon_chain_addr").(string)
+	genesisTimeStr := data.Get("genesis_time").(string)
 
-	// Load genesis time
-	genesisTime, err := b.loadGenesisTime(ctx, beaconChainAddr)
+	// Parse genesis time
+	genesisTime, err := time.Parse(genesisTimeFormat, genesisTimeStr)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to load genesis time")
+		return nil, errors.Wrap(err, "failed to parse genesis time")
 	}
 
 	configBundle := Config{
-		Network:         core.NetworkFromString(network),
-		BeaconChainAddr: beaconChainAddr,
-		GenesisTime:     genesisTime,
+		Network:     core.NetworkFromString(network),
+		GenesisTime: genesisTime,
 	}
 
 	// Create storage entry
@@ -90,9 +90,8 @@ func (b *backend) pathWriteConfig(ctx context.Context, req *logical.Request, dat
 	// Return the secret
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"network":           configBundle.Network,
-			"beacon_chain_addr": configBundle.BeaconChainAddr,
-			"genesis_time":      configBundle.GenesisTime,
+			"network":      configBundle.Network,
+			"genesis_time": configBundle.GenesisTime,
 		},
 	}, nil
 }
@@ -111,9 +110,8 @@ func (b *backend) pathReadConfig(ctx context.Context, req *logical.Request, data
 	// Return the secret
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"network":           configBundle.Network,
-			"beacon_chain_addr": configBundle.BeaconChainAddr,
-			"genesis_time":      configBundle.GenesisTime,
+			"network":      configBundle.Network,
+			"genesis_time": configBundle.GenesisTime,
 		},
 	}, nil
 }
@@ -146,28 +144,4 @@ func (b *backend) configured(ctx context.Context, req *logical.Request) (*Config
 	}
 
 	return config, nil
-}
-
-func (b *backend) loadGenesisTime(ctx context.Context, beaconChainAddr string) (*time.Time, error) {
-	// Create RPC client
-	client, err := rpc.Connect(beaconChainAddr)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to connect to beacon server %s", beaconChainAddr)
-	}
-	nodeClient := ethpb.NewNodeClient(client)
-	defer client.Close()
-
-	// Get genesis time
-	genesisResp, err := nodeClient.GetGenesis(ctx, &types.Empty{})
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get genesis time")
-	}
-
-	// Parse genesis
-	genesisTime, err := types.TimestampFromProto(genesisResp.GetGenesisTime())
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse genesis time")
-	}
-
-	return &genesisTime, nil
 }

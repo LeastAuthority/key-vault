@@ -6,12 +6,12 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/Microsoft/hcsshim v0.8.9 // indirect
 	github.com/bloxapp/eth2-key-manager v0.2.10
+	github.com/cloudflare/roughtime v0.0.0-20200911173848-eb42b5b8e068
 	github.com/containerd/containerd v1.4.0 // indirect
 	github.com/containerd/continuity v0.0.0-20200710164510-efbc4488d8fe // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v17.12.0-ce-rc1.0.20200618181300-9dc6525e6118+incompatible
 	github.com/docker/go-connections v0.4.0
-	github.com/gogo/protobuf v1.3.1
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
@@ -26,6 +26,7 @@ require (
 	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/pborman/uuid v1.2.0
 	github.com/pkg/errors v0.9.1
+	github.com/prometheus/client_golang v1.7.1
 	github.com/prysmaticlabs/ethereumapis v0.0.0-20200827165051-58ccb36e36b9
 	github.com/prysmaticlabs/prysm v1.0.0-alpha.25
 	github.com/sirupsen/logrus v1.6.0
