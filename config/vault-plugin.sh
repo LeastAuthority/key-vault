@@ -1,8 +1,14 @@
 #!/bin/sh
 
-# Upgrade Ethereum 2.0 Signing Plugin
 export SHASUM256=$(sha256sum "/vault/plugins/ethsign" | cut -d' ' -f1)
-vault write /sys/plugins/catalog/secret/ethsign sha_256=${SHASUM256} command=ethsign > /dev/null 2>&1
+
+# Register plugin
+vault plugin register \
+    -sha256=${SHASUM256} \
+    -args=--log-format=${LOG_FORMAT} \
+    -args=--log-dsn=${LOG_DSN} \
+    -args=--log-levels=${LOG_LEVELS} \
+    secret ethsign
 
 # Enable test network
 echo "Enabling Test network..."

@@ -12,10 +12,15 @@ services:
       - ./data:/data
       - ./policies:/policies
     environment:
-      VAULT_ADDR: http://127.0.0.1:8200
-      VAULT_API_ADDR: http://127.0.0.1:8200
+      VAULT_ADDR: "http://127.0.0.1:8200"
+      VAULT_API_ADDR: "http://127.0.0.1:8200"
       VAULT_CLIENT_TIMEOUT: "30s"
       UNSEAL: "true"
+      # This is needed only for development coz we can't see plugin logs.
+      LOG_FORMAT: ${LOG_FORMAT}
+      LOG_LEVELS: ${LOG_LEVELS}
+      LOG_DSN: ${LOG_DSN}
+      # Genesis times per network
       TESTNET_GENESIS_TIME: "2020-08-04 13:00:08 UTC"
       LAUNCHTESTNET_GENESIS_TIME: "2020-08-04 13:00:08 UTC"
     cap_add:
@@ -30,10 +35,11 @@ services:
       - ./data:/data
       - ./policies:/policies
     environment:
-      VAULT_ADDR: http://127.0.0.1:8200
-      VAULT_API_ADDR: http://127.0.0.1:8200
+      VAULT_ADDR: "http://127.0.0.1:8200"
+      VAULT_API_ADDR: "http://127.0.0.1:8200"
       VAULT_CLIENT_TIMEOUT: "30s"
       UNSEAL: "true"
+      # Genesis times per network
       TESTNET_GENESIS_TIME: "2020-08-04 13:00:08 UTC"
       LAUNCHTESTNET_GENESIS_TIME: "2020-08-04 13:00:08 UTC"
     cap_add:

@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/bloxapp/eth2-key-manager/core"
-
 	log "github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/vault/sdk/helper/logging"
+	"github.com/sirupsen/logrus"
 
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/stretchr/testify/require"
@@ -23,7 +23,7 @@ func getBackend(t *testing.T) (logical.Backend, logical.Storage) {
 		BackendUUID: "test",
 	}
 
-	b, err := Factory("test")(context.Background(), config)
+	b, err := Factory("test", logrus.New())(context.Background(), config)
 	if err != nil {
 		t.Fatalf("unable to create backend: %v", err)
 	}
