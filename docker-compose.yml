@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
 
   vault-image:
-    image: bloxstaking/key-vault:v0.1.5
+    image: bloxstaking/key-vault:v0.1.6
     ports:
       - 8200:8200
     volumes:
