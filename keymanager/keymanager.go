@@ -149,7 +149,7 @@ func (km *KeyManager) SignProposal(pubKey [48]byte, domain [32]byte, data *ethpb
 	var resp SignResponse
 	if err := km.sendRequest(http.MethodPost, backend.SignProposalPattern, reqBody, &resp); err != nil {
 		km.log.WithError(err).Error("failed to send sign proposal request")
-		return nil, NewGenericError(err, "failed to send SignAttestation request to remote vault wallet")
+		return nil, NewGenericError(err, "failed to send SignProposal request to remote vault wallet")
 	}
 
 	// Signature is base64 encoded, so we have to decode that.
