@@ -46,7 +46,7 @@ Run tests of the application:
   tags:
     - blox-infra-stage
   script:
-    - DOCKER_API_VERSION=1.39 go test -timeout 20m -cover -race -p 1 ./...
+    - DOCKER_API_VERSION=1.39 go test -tags blst_enabled -timeout 20m -cover -race -p 1 ./...
 
 Build stage Docker image:
   stage: build
@@ -96,7 +96,7 @@ Run prod tests of the application:
   tags:
     - blox-infra-prod
   script:
-    - DOCKER_API_VERSION=1.39 go test -timeout 20m -cover -race -p 1 ./...
+    - DOCKER_API_VERSION=1.39 go test -tags blst_enabled -timeout 20m -cover -race -p 1 ./...
   only:
     - master
 
