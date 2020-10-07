@@ -12,10 +12,10 @@ import (
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/pkg/errors"
+	"github.com/prysmaticlabs/prysm/shared/timeutils"
 	v1 "github.com/wealdtech/eth2-signer-api/pb/v1"
 
 	"github.com/bloxapp/key-vault/backend/store"
-	"github.com/bloxapp/key-vault/utils/roughtime"
 )
 
 // Endpoints patterns
@@ -471,7 +471,7 @@ func (b *backend) pathSignAggregation(ctx context.Context, req *logical.Request,
 func (b *backend) isSlotTime(genesisTime time.Time, slot int) bool {
 	timeSinceGenesisStart := uint64(slot) * 12
 	start := genesisTime.Add(time.Duration(timeSinceGenesisStart) * time.Second)
-	left := start.Sub(roughtime.Now().UTC())
+	left := start.Sub(timeutils.Now().UTC())
 
 	// Deviation = seconds per one slot, that's should be enough
 	deviation := time.Minute
