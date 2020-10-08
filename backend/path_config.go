@@ -44,11 +44,11 @@ func configPaths(b *backend) []*framework.Path {
 				"network": {
 					Type: framework.TypeString,
 					Description: `Ethereum network - can be one of the following values:
-					launchtest - Launch Test Network
-					test 	   - Goerli Test Network`,
+					zinken - Zinken Test Network
+					test   - Goerli Test Network`,
 					AllowedValues: []interface{}{
 						string(core.TestNetwork),
-						string(core.LaunchTestNetwork),
+						string(core.ZinkenNetwork),
 					},
 				},
 				"genesis_time": {
