@@ -22,7 +22,7 @@ services:
       LOG_DSN: ${LOG_DSN}
       # Genesis times per network
       TESTNET_GENESIS_TIME: "2020-08-04 13:00:08 UTC"
-      ZINKEN_GENESIS_TIME: "2020-09-29 12:00:13 UTC"
+      ZINKEN_GENESIS_TIME: "2020-10-12 12:00:00 UTC"
     cap_add:
       - IPC_LOCK
     restart: unless-stopped
@@ -41,7 +41,7 @@ services:
       UNSEAL: "true"
       # Genesis times per network
       TESTNET_GENESIS_TIME: "2020-08-04 13:00:08 UTC"
-      ZINKEN_GENESIS_TIME: "2020-09-29 12:00:13 UTC"
+      ZINKEN_GENESIS_TIME: "2020-10-12 12:00:00 UTC"
     cap_add:
       - IPC_LOCK
     restart: unless-stopped
