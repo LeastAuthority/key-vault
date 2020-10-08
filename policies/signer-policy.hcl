@@ -2,7 +2,7 @@
 path "ethereum/test/accounts" {
   capabilities = ["list"]
 }
-path "ethereum/launchtest/accounts" {
+path "ethereum/zinken/accounts" {
   capabilities = ["list"]
 }
 
@@ -10,6 +10,6 @@ path "ethereum/launchtest/accounts" {
 path "ethereum/test/accounts/sign-*" {
   capabilities = ["create"]
 }
-path "ethereum/launchtest/accounts/sign-*" {
+path "ethereum/zinken/accounts/sign-*" {
   capabilities = ["create"]
 }
