@@ -159,6 +159,10 @@ func (store *HashicorpVaultStore) ListAllProposals(key e2types.PublicKey) ([]*co
 
 	proposals := make([]*core.BeaconBlockHeader, 0)
 	for _, entry := range entries {
+		if entry == "latest" {
+			continue
+		}
+
 		epoch, err := strconv.Atoi(entry)
 		if err != nil {
 			return nil, errors.Wrapf(err, "invalid epoch number %s", entry)
