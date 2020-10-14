@@ -91,6 +91,10 @@ func (store *HashicorpVaultStore) ListAllAttestations(key e2types.PublicKey) ([]
 
 	attestations := make([]*core.BeaconAttestation, 0)
 	for _, entry := range entries {
+		if entry == "latest" {
+			continue
+		}
+
 		epoch, err := strconv.Atoi(entry)
 		if err != nil {
 			return nil, errors.Wrapf(err, "invalid epoch number %s", entry)
