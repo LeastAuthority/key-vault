@@ -84,7 +84,7 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 		&container.Config{
 			Image: l.imageName,
 			Env: []string{
-				"VAULT_EXTERNAL_ADDRESS=127.0.0.1",
+				"VAULT_EXTERNAL_ADDRESS=172.17.0.1",
 				"VAULT_CLIENT_TIMEOUT=30s",
 				"TESTNET_GENESIS_TIME=2020-08-04 13:00:08 UTC",
 				"ZINKEN_GENESIS_TIME=2020-10-12 12:00:13 UTC",
