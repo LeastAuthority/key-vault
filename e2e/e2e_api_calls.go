@@ -164,7 +164,13 @@ func (setup *BaseSetup) UpdateStorage(t *testing.T) core.Storage {
 	req.Header.Set("Authorization", "Bearer "+setup.RootKey)
 
 	// Do request
-	httpClient := http.Client{}
+	httpClient := http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
 	resp, err := httpClient.Do(req)
 	require.NoError(t, err)
 
