@@ -3,6 +3,7 @@ package e2e
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -100,7 +101,13 @@ func (setup *BaseSetup) SignAttestation(data map[string]interface{}) ([]byte, er
 	req.Header.Set("Authorization", "Bearer "+setup.RootKey)
 
 	// Do request
-	httpClient := http.Client{}
+	httpClient := http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
