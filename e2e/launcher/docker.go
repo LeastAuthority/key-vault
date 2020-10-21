@@ -84,8 +84,7 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 		&container.Config{
 			Image: l.imageName,
 			Env: []string{
-				"VAULT_ADDR=http://127.0.0.1:8200",
-				"VAULT_API_ADDR=http://127.0.0.1:8200",
+				"VAULT_EXTERNAL_ADDRESS=172.17.0.1",
 				"VAULT_CLIENT_TIMEOUT=30s",
 				"TESTNET_GENESIS_TIME=2020-08-04 13:00:08 UTC",
 				"ZINKEN_GENESIS_TIME=2020-10-12 12:00:13 UTC",
@@ -183,7 +182,7 @@ func (l *Docker) Launch(ctx context.Context, name string) (*Config, error) {
 
 	return &Config{
 		ID:    cont.ID,
-		URL:   fmt.Sprintf("http://%s:%d", ip, hostPort),
+		URL:   fmt.Sprintf("https://%s:%d", ip, hostPort),
 		Token: strings.TrimSpace(tokenData.stdOut),
 	}, nil
 }

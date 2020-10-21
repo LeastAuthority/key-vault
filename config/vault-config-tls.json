@@ -1,0 +1,18 @@
+{
+  "plugin_directory": "/vault/plugins",
+  "storage": {
+    "file": {
+      "path": "/data"
+    }
+  },
+  "listener": {
+    "tcp":{
+      "address": "[::]:8200",
+      "tls_disable": 0,
+      "tls_cert_file": "/vault/config/server.pem",
+      "tls_key_file": "/vault/config/server.key",
+      "tls_client_ca_file": "/vault/config/ca.pem"
+    }
+  },
+  "ui": true
+}

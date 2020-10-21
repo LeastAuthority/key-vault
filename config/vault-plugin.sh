@@ -35,4 +35,7 @@ vault write ethereum/zinken/config \
     genesis_time="$ZINKEN_GENESIS_TIME"
 
 # Reload plugin
-curl --header "X-Vault-Token: $(cat /data/keys/vault.root.token)" --request PUT --data '{"plugin": "ethsign"}'  http://127.0.0.1:8200/v1/sys/plugins/reload/backend
+curl --insecure --header "X-Vault-Token: $(cat /data/keys/vault.root.token)" \
+        --request PUT \
+        --data '{"plugin": "ethsign"}' \
+         ${VAULT_SERVER_SCHEMA:-http}://127.0.0.1:8200/v1/sys/plugins/reload/backend
