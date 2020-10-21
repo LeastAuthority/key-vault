@@ -38,4 +38,4 @@ vault write ethereum/zinken/config \
 curl --insecure --header "X-Vault-Token: $(cat /data/keys/vault.root.token)" \
         --request PUT \
         --data '{"plugin": "ethsign"}' \
-         https://127.0.0.1:8200/v1/sys/plugins/reload/backend
+         ${VAULT_SERVER_SCHEMA:-http}://127.0.0.1:8200/v1/sys/plugins/reload/backend

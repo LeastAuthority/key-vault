@@ -39,15 +39,12 @@ WORKDIR /vault/plugins/
 
 COPY --from=builder /go/src/github.com/bloxapp/key-vault/ethsign ./ethsign
 COPY ./config/vault-config.json /vault/config/vault-config.json
+COPY ./config/vault-config-tls.json /vault/config/vault-config-tls.json
 COPY ./config/entrypoint.sh /vault/config/entrypoint.sh
 COPY ./config/vault-tls.sh /vault/config/vault-tls.sh
 COPY ./config/vault-init.sh /vault/config/vault-init.sh
 COPY ./config/vault-unseal.sh /vault/config/vault-unseal.sh
 COPY ./config/vault-plugin.sh /vault/config/vault-plugin.sh
-
-ENV VAULT_CACERT=/vault/config/ca.pem
-ENV VAULT_ADDR=https://127.0.0.1:8200
-ENV VAULT_API_ADDR=https://127.0.0.1:8200
 
 RUN chown vault /vault/config/entrypoint.sh
 RUN apk add jq
